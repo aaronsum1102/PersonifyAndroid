@@ -1,14 +1,20 @@
 package aaronsum.sda.com.personifyandroid
 
+import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_task_form.*
 
 class TaskFormFragment : Fragment() {
+    private var existingTask: Task? = null
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_task_form, container, false)
     }
@@ -17,22 +23,33 @@ class TaskFormFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         removeTaskButton.visibility = View.INVISIBLE
-        val taskViewModel = ViewModelProviders.of(activity!!)[TaskViewModel::class.java]
-        val taskId = arguments?.getInt(TaskListFragment.KEY_TASK_INDEX) ?: -1
-        if (taskId >= 0) {
-            val task = taskViewModel.tasks.value?.get(taskId)
-            taskNameText.setText(task?.name)
-            dueDate.setText(task?.dueDate)
-            status.setText(task?.status)
-            priority.setText(task?.priority)
-            remarksText.setText(task?.remarks)
-            removeTaskButton.visibility = View.VISIBLE
+        val viewModel = ViewModelProviders.of(activity!!)[TaskViewModel::class.java]
+        val taskId = arguments?.getInt(TaskListFragment.KEY_TASK_ID) ?: 0
+        if (taskId != 0) {
+            viewModel.loadTask(taskId)
+                    .observe(this, Observer {
+                        existingTask = it
+                        taskNameText.setText(it?.name ?: "")
+                        dueDate.setText(it?.dueDate ?: "")
+                        status.setText(it?.status ?: "")
+                        priority.setText(it?.priority ?: "")
+                        remarksText.setText(it?.remarks ?: "")
+                    })
 
+            removeTaskButton.visibility = View.VISIBLE
             removeTaskButton.setOnClickListener {
-                task?.let {
-                    taskViewModel.removeTask(it)
+                existingTask?.let {
+                    viewModel.deleteTask(it)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(
+                                    {
+                                        fragmentManager?.popBackStack()
+                                    }, { error ->
+                                Snackbar.make(view,
+                                        "Something went wrong: ${error.message}.", Snackbar.LENGTH_SHORT).show()
+                            })
                 }
-                fragmentManager?.popBackStack()
             }
         }
 
@@ -50,12 +67,18 @@ class TaskFormFragment : Fragment() {
             val status = status.text.toString()
             val priority = priority.text.toString()
             val remarks = remarksText.text.toString()
-            val task = Task(name, dueDate, status, priority, remarks)
-            taskViewModel.addTask(task)
-            fragmentManager
-                    ?.beginTransaction()
-                    ?.replace(R.id.container, TaskListFragment())
-                    ?.commitNow()
+            val task = Task(existingTask?.id ?: 0, name, dueDate, status, priority, remarks)
+
+            viewModel.addTask(task)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                            {
+                                fragmentManager?.popBackStack()
+                            },
+                            { error ->
+                                Snackbar.make(view, "Something went wrong: ${error.message}.", Snackbar.LENGTH_SHORT).show()
+                            })
         }
 
 

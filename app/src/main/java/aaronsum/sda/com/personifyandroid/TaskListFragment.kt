@@ -17,7 +17,7 @@ interface OnTaskClickListener {
 
 class TaskListFragment : Fragment(), OnTaskClickListener {
     companion object {
-        const val KEY_TASK_INDEX = "task index"
+        const val KEY_TASK_ID = "task id"
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -51,7 +51,7 @@ class TaskListFragment : Fragment(), OnTaskClickListener {
     override fun onTaskClick(task: Task, position: Int) {
         val taskFormFragment = TaskFormFragment()
         val arguments = Bundle()
-        arguments.putInt(KEY_TASK_INDEX, position)
+        arguments.putInt(KEY_TASK_ID, task.id)
         taskFormFragment.arguments = arguments
         fragmentManager
                 ?.beginTransaction()

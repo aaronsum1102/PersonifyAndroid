@@ -15,7 +15,5 @@ class MainActivity : AppCompatActivity() {
                     .replace(R.id.container, TaskListFragment())
                     .commit()
         }
-
-
     }
 }

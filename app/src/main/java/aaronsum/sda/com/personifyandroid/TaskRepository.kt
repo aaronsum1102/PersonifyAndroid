@@ -1,31 +1,58 @@
 package aaronsum.sda.com.personifyandroid
 
-import android.arch.lifecycle.MutableLiveData
+import android.app.Application
+import android.arch.lifecycle.LiveData
+import android.arch.persistence.room.*
 
-
-data class Task(val name: String,
-                val dueDate: String,
+@Entity
+data class Task(@PrimaryKey(autoGenerate = true) val id: Int,
+                val name: String,
+                @ColumnInfo(name = "due_date") val dueDate: String,
                 val status: String,
                 val priority: String,
                 val remarks: String)
 
-class TaskRepository {
-    val tasks: MutableLiveData<List<Task>> = MutableLiveData()
+@Dao
+interface TaskDao {
+    @Query("SELECT * FROM Task ORDER BY name")
+    fun loadAllTasks(): LiveData<List<Task>>
+
+    @Query("SELECT * FROM Task WHERE id = :taskId")
+    fun loadTask(taskId: Int): LiveData<Task>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun saveTask(task: Task)
+
+    @Delete
+    fun deleteTask(task: Task)
+}
+
+@Database(entities = [Task::class], version = 1)
+abstract class TaskDatabase : RoomDatabase() {
+    abstract fun taskDao(): TaskDao
+}
+
+class TaskRepository(application: Application) {
+    private val taskDao: TaskDao
 
     init {
-        tasks.postValue(mutableListOf())
+        val database = Room
+                .databaseBuilder(application
+                        , TaskDatabase::class.java
+                        , "task-database")
+                .build()
+        taskDao = database.taskDao()
     }
 
-    fun addTask(task: Task) {
-        val taskList = tasks.value
-        taskList as MutableList
-        taskList.add(task)
+    fun loadTasks(): LiveData<List<Task>> = taskDao.loadAllTasks()
+
+    fun loadTask(taskId: Int): LiveData<Task> = taskDao.loadTask(taskId)
+
+    fun saveTask(task: Task) {
+        taskDao.saveTask(task)
     }
 
-    fun removeTask(task: Task) {
-        val taskList = tasks.value
-        taskList as MutableList
-        val index = taskList.indexOf(task)
-        taskList.removeAt(index)
+    fun deleteTask(task: Task) {
+        taskDao.deleteTask(task)
     }
 }
