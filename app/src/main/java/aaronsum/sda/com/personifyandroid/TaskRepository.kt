@@ -2,6 +2,7 @@ package aaronsum.sda.com.personifyandroid
 
 import android.arch.lifecycle.MutableLiveData
 
+
 data class Task(val name: String,
                 val dueDate: String,
                 val status: String,

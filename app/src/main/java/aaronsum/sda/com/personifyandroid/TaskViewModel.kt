@@ -5,7 +5,7 @@ import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
 
 class TaskViewModel(application: Application) : AndroidViewModel(application) {
-    val repository = TaskRepository()
+    private val repository = TaskRepository()
     val tasks: LiveData<List<Task>> = repository.tasks
 
     fun addTask(task: Task) {

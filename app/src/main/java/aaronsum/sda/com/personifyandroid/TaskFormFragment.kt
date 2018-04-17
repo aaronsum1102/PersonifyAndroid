@@ -8,7 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.fragment_task_form.*
 
-class TaskFromFragment : Fragment() {
+class TaskFormFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_task_form, container, false)
     }
@@ -16,7 +16,25 @@ class TaskFromFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        removeTaskButton.visibility = View.INVISIBLE
         val taskViewModel = ViewModelProviders.of(activity!!)[TaskViewModel::class.java]
+        val taskId = arguments?.getInt(TaskListFragment.KEY_TASK_INDEX) ?: -1
+        if (taskId >= 0) {
+            val task = taskViewModel.tasks.value?.get(taskId)
+            taskNameText.setText(task?.name)
+            dueDate.setText(task?.dueDate)
+            status.setText(task?.status)
+            priority.setText(task?.priority)
+            remarksText.setText(task?.remarks)
+            removeTaskButton.visibility = View.VISIBLE
+
+            removeTaskButton.setOnClickListener {
+                task?.let {
+                    taskViewModel.removeTask(it)
+                }
+                fragmentManager?.popBackStack()
+            }
+        }
 
         clearFormButton.setOnClickListener {
             taskNameText.text.clear()
@@ -38,7 +56,8 @@ class TaskFromFragment : Fragment() {
                     ?.beginTransaction()
                     ?.replace(R.id.container, TaskListFragment())
                     ?.commitNow()
-
         }
+
+
     }
 }

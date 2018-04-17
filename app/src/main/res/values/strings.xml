@@ -11,6 +11,6 @@
     <string name="eg_priority">eg. Low, Medium, High</string>
     <string name="description_of_the_task">Description of the task. eg. Weekly laundry for my family.</string>
     <string name="confirm">confirm</string>
-    <string name="remove">remove</string>
+    <string name="delete">delete</string>
     <string name="clear">clear</string>
 </resources>
