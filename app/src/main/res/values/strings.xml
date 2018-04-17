@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">PersonifyAndroid</string>
+    <string name="task_name">Task Name :</string>
+    <string name="date">Date :</string>
+    <string name="status">Status :</string>
+    <string name="priority">Priority :</string>
+    <string name="remarks">Remarks :</string>
+    <string name="eg_laundry">eg. Laundry</string>
+    <string name="eg_2018_03_20">eg. 2018-03-20</string>
+    <string name="eg_status">eg. To do, In progress, Done, Overdue</string>
+    <string name="eg_priority">eg. Low, Medium, High</string>
+    <string name="description_of_the_task">Description of the task. eg. Weekly laundry for my family.</string>
+    <string name="confirm">confirm</string>
+    <string name="remove">remove</string>
+    <string name="clear">clear</string>
+</resources>
