@@ -46,6 +46,7 @@ class TaskListFragment : Fragment(), OnTaskClickListener {
                         ?.commit()
             }
         }
+
     }
 
     override fun onTaskClick(task: Task, position: Int) {

@@ -6,11 +6,22 @@
     <string name="priority">Priority :</string>
     <string name="remarks">Remarks :</string>
     <string name="eg_laundry">eg. Laundry</string>
-    <string name="eg_2018_03_20">eg. 2018-03-20</string>
     <string name="eg_status">eg. To do, In progress, Done, Overdue</string>
     <string name="eg_priority">eg. Low, Medium, High</string>
     <string name="description_of_the_task">Description of the task. eg. Weekly laundry for my family.</string>
     <string name="confirm">confirm</string>
     <string name="delete">delete</string>
     <string name="clear">clear</string>
+    <string name="date_picker">date picker</string>
+    <string-array name="status">
+        <item>To do</item>
+        <item>In progress</item>
+        <item>Done</item>
+        <item>Overdue</item>
+    </string-array>
+    <string-array name="priority">
+        <item>Low</item>
+        <item>Medium</item>
+        <item>High</item>
+    </string-array>
 </resources>
