@@ -9,10 +9,19 @@
     <string name="eg_status">eg. To do, In progress, Done, Overdue</string>
     <string name="eg_priority">eg. Low, Medium, High</string>
     <string name="description_of_the_task">Description of the task. eg. Weekly laundry for my family.</string>
-    <string name="confirm">confirm</string>
     <string name="delete">delete</string>
     <string name="clear">clear</string>
     <string name="date_picker">date picker</string>
+    <string name="enter_password_here">enter password here</string>
+    <string name="enter_email_here">enter email here</string>
+    <string name="sign_in_with_your_current_account_here">Sign in with your current account here</string>
+    <string name="confirm">confirm</string>
+    <string name="i_need_a_new_password">I need a new password</string>
+    <string name="login">login</string>
+    <string name="signup">SignUp</string>
+    <string name="page_sub_title">Your personal assistant with simplicity at heart</string>
+    <string name="page_title">Welcome to Personify</string>
+    <string name="quote">Life is really simple, but we insist on making it complicated. -- by Confucius</string>
     <string-array name="status">
         <item>To do</item>
         <item>In progress</item>

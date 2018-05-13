@@ -71,6 +71,8 @@
                 android:layout_marginEnd="12dp"
                 android:text="@string/delete"
                 android:visibility="invisible"
+                android:background="@drawable/my_button_background"
+                android:textColor="#FFFFFF"
                 app:layout_constraintEnd_toStartOf="@+id/addTaskButton"
                 app:layout_constraintTop_toTopOf="@+id/addTaskButton" />
 
@@ -112,6 +114,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/clear"
+                android:background="@drawable/my_button_background"
+                android:textColor="#FFFFFF"
                 app:layout_constraintStart_toStartOf="@+id/remarksText"
                 app:layout_constraintTop_toTopOf="@+id/removeTaskButton" />
 
@@ -126,6 +130,8 @@
                 android:enabled="false"
                 android:text="@string/confirm"
                 android:visibility="visible"
+                android:background="@drawable/my_button_background"
+                android:textColor="#FFFFFF"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/remarksText"
