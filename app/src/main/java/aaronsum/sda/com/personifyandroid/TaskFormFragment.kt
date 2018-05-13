@@ -46,7 +46,7 @@ class TaskFormFragment : Fragment() {
                             existingTask = it
                             taskNameText.setText(it.name)
                             dueDate.text = it.dueDate
-                            val statusArrayAdapter = statusSpinner.adapter as ArrayAdapter<String>
+                            val statusArrayAdapter: ArrayAdapter<String> = statusSpinner.adapter as ArrayAdapter<String>
                             statusSpinner.setSelection(statusArrayAdapter.getPosition(it.status))
                             val priorityArrayAdapter = prioritySpinner.adapter as ArrayAdapter<String>
                             prioritySpinner.setSelection(priorityArrayAdapter.getPosition(it.priority))
