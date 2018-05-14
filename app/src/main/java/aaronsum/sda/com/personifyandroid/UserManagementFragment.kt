@@ -18,7 +18,7 @@ class UserManagementFragment : Fragment() {
             signUpButton.setOnClickListener {
                 fragmentManager
                         ?.beginTransaction()
-                        ?.replace(R.id.container, Fragment())
+                        ?.replace(R.id.container, SignUpFragment())
                         ?.addToBackStack("welcome")
                         ?.commit()
             }

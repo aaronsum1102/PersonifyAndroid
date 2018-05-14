@@ -22,6 +22,15 @@
     <string name="page_sub_title">Your personal assistant with simplicity at heart</string>
     <string name="page_title">Welcome to Personify</string>
     <string name="quote">Life is really simple, but we insist on making it complicated. -- by Confucius</string>
+    <string name="password">password</string>
+    <string name="_6_characters_minimum">6 characters minimum...</string>
+    <string name="create_account">Create Account</string>
+    <string name="first_and_last_name">First and last name...</string>
+    <string name="email">Email</string>
+    <string name="to_let_me_know_more_about_you">To let me know more about you...</string>
+    <string name="for_sign_in_and_recover_password">For sign in and recover password...</string>
+    <string name="verify_password">verify password</string>
+    <string name="to_help_you_practise_with_your_new_password">To help you practise with your new password...</string>
     <string-array name="status">
         <item>To do</item>
         <item>In progress</item>

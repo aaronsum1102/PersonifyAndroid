@@ -15,45 +15,50 @@ import com.google.firebase.auth.FirebaseAuth
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.fragment_user_login.*
+import kotlinx.android.synthetic.main.fragment_signup.*
 
-class LogInFragment : Fragment(), TextWatcher {
+
+data class UserInfo(val name: String, val email: String, val password: String)
+
+class SignUpFragment : Fragment(), TextWatcher {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_user_login, container, false)
+        return inflater.inflate(R.layout.fragment_signup, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        confirmButton.isEnabled = false
+        createAccountButton.isEnabled = false
+
+        nameText.addTextChangedListener(this)
         emailText.addTextChangedListener(this)
         passwordText.addTextChangedListener(this)
+        verifyPasswordText.addTextChangedListener(this)
 
-        confirmButton.setOnClickListener {
-            val email = emailText.text.toString()
-            val password = passwordText.text.toString()
-            Single.fromCallable { signInAuthentication(email, password) }
+        createAccountButton.setOnClickListener {
+            val userInfo = UserInfo(nameText.text.toString(),
+                    emailText.text.toString(),
+                    passwordText.text.toString())
+            Single.fromCallable { createNewAccount(userInfo) }
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({
-                        Log.d(TAG, "authentication on sub thread: success")
+                        Log.d(TAG, "create account on sub thread: success")
                     }, {
-                        Log.d(TAG, "authentication on sub thread: failed", it.cause)
+                        Log.d(TAG, "create account on sub thread: failed", it.cause)
                     })
         }
     }
 
-    private fun signInAuthentication(email: String, password: String) {
+    private fun createNewAccount(userInfo: UserInfo) {
         val firebaseAuth = FirebaseAuth.getInstance()
-        firebaseAuth.signInWithEmailAndPassword(email, password)
+        firebaseAuth.createUserWithEmailAndPassword(userInfo.email, userInfo.password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        Log.d(TAG, "signInWithEmail: success")
+                        Log.d(TAG, "createUserWithEmail:success")
                         val user = firebaseAuth.currentUser
-                        val displayName = user?.displayName
                         Toast.makeText(context,
-                                "Welcome back, $displayName",
-                                Toast.LENGTH_SHORT)
+                                "Welcome, ${userInfo.name}", Toast.LENGTH_SHORT)
                                 .show()
                         fragmentManager?.popBackStack("welcome",
                                 FragmentManager.POP_BACK_STACK_INCLUSIVE)
@@ -61,18 +66,27 @@ class LogInFragment : Fragment(), TextWatcher {
                                 ?.beginTransaction()
                                 ?.replace(R.id.container, TaskListFragment())
                                 ?.commit()
+
                     } else {
-                        Log.d(TAG, "signInWithEmail: failure", task.exception)
+                        Log.w(TAG, "createUserWithEmail:failure", task.exception)
                         Toast.makeText(context,
-                                "Authentication failed. Please try again.",
-                                Toast.LENGTH_SHORT)
-                                .show()
+                                "Authentication failed.",
+                                Toast.LENGTH_SHORT).show()
                     }
                 }
+
     }
 
     override fun afterTextChanged(s: Editable?) {
-        confirmButton.isEnabled = emailText.text.contains("@") && passwordText.text.isNotEmpty()
+        createAccountButton.isEnabled = nameText.text.isNotEmpty()
+                && emailText.text.contains("@")
+                && passwordText.text.toString() == verifyPasswordText.text.toString()
+                && passwordText.text.length >= 6
+        if (passwordText.text.length == verifyPasswordText.text.length &&
+                passwordText.text.toString() != verifyPasswordText.text.toString() &&
+                passwordText.text.isNotEmpty()) {
+            Toast.makeText(context, "Password doesn't match.", Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
