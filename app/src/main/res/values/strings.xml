@@ -25,7 +25,7 @@
     <string name="password">password</string>
     <string name="_6_characters_minimum">6 characters minimum...</string>
     <string name="create_account">Create Account</string>
-    <string name="first_and_last_name">First and last name...</string>
+    <string name="display_name">display name...</string>
     <string name="email">Email</string>
     <string name="to_let_me_know_more_about_you">To let me know more about you...</string>
     <string name="for_sign_in_and_recover_password">For sign in and recover password...</string>
