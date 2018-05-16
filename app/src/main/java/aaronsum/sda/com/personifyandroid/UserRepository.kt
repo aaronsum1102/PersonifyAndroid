@@ -73,4 +73,15 @@ class UserRepository() {
                     }
                 }
     }
+
+    fun resetPassword(context: Context, email: String, callback: OnFirebaseActionCompleteCallback) {
+        firebaseAuth.sendPasswordResetEmail(email)
+                .addOnSuccessListener {
+                    Toast.makeText(context,
+                            "An email has been sent to your email address. Please follow the link to reset your password.",
+                            Toast.LENGTH_LONG)
+                            .show()
+                    callback.onActionCompleted()
+                }
+    }
 }

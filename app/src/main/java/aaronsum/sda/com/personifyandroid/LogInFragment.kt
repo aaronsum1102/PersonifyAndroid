@@ -32,6 +32,15 @@ class LogInFragment : Fragment(), TextWatcher {
             val password = passwordText.text.toString()
             signInAuthentication(email, password)
         }
+
+        newPasswordButton.setOnClickListener {
+            fragmentManager
+                    ?.beginTransaction()
+                    ?.addToBackStack("login")
+                    ?.replace(R.id.container, ResetPasswordFragment())
+                    ?.commit()
+        }
+
     }
 
     private fun signInAuthentication(email: String, password: String) {

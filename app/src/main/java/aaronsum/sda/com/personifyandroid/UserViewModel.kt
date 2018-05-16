@@ -31,5 +31,10 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
                 .subscribe()
     }
 
-
+    fun resetPassword(email: String, callback: OnFirebaseActionCompleteCallback) {
+        Single.fromCallable { userRepository.resetPassword(getApplication() as Context , email, callback) }
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe()
+    }
 }
