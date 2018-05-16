@@ -12,10 +12,9 @@ import android.view.ViewGroup
 import android.widget.Toast
 import kotlinx.android.synthetic.main.fragment_signup.*
 
-interface OnAccountCreatedCallback {
-    fun onAccountCreated()
+interface OnFirebaseActionCompleteCallback {
+    fun onActionCompleted()
 }
-
 
 data class UserInfo(val name: String, val email: String, val password: String)
 
@@ -47,8 +46,8 @@ class SignUpFragment : Fragment(), TextWatcher {
     }
 
     private fun createNewAccount(userInfo: UserInfo) {
-        userViewModel.createNewUser(context!!, userInfo, object : OnAccountCreatedCallback {
-            override fun onAccountCreated() {
+        userViewModel.createNewUser(userInfo, object : OnFirebaseActionCompleteCallback {
+            override fun onActionCompleted() {
                 fragmentManager?.popBackStack("welcome",
                         FragmentManager.POP_BACK_STACK_INCLUSIVE)
                 fragmentManager
