@@ -1,6 +1,8 @@
 package aaronsum.sda.com.personifyandroid
 
+import android.arch.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.UserProfileChangeRequest
 
 interface OnFirebaseActionCompleteCallback {
@@ -11,27 +13,35 @@ interface OnFirebaseActionCompleteCallback {
 
 class UserRepository {
     private val firebaseAuth = FirebaseAuth.getInstance()
+    val currentUsername: MutableLiveData<String> = MutableLiveData()
+
+    init {
+        checkUserSignInState()
+    }
 
     fun createNewUser(userInfo: UserInfo, callback: OnFirebaseActionCompleteCallback) {
         firebaseAuth.createUserWithEmailAndPassword(userInfo.email, userInfo.password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         val user = firebaseAuth.currentUser
-                        val userProfileChangeRequest = UserProfileChangeRequest
-                                .Builder()
-                                .setDisplayName(userInfo.name)
-                                .build()
                         user?.let { newUser ->
-                            newUser.updateProfile(userProfileChangeRequest)
-                                    .addOnCompleteListener {
-
-                                        callback.onActionSucceed(userInfo.name)
-                                    }
+                            updateUserProfile(userInfo, callback, newUser)
                         }
                     } else {
                         val message = task.exception?.message
                         message?.let { callback.onActionFailed(it) }
                     }
+                }
+    }
+
+    private fun updateUserProfile(userInfo: UserInfo, callback: OnFirebaseActionCompleteCallback, newUser: FirebaseUser) {
+        val userProfileChangeRequest = UserProfileChangeRequest
+                .Builder()
+                .setDisplayName(userInfo.name)
+                .build()
+        newUser.updateProfile(userProfileChangeRequest)
+                .addOnCompleteListener {
+                    callback.onActionSucceed(userInfo.name)
                 }
     }
 
@@ -49,17 +59,15 @@ class UserRepository {
                 }
     }
 
-    fun silentSignIn(callback: OnFirebaseActionCompleteCallback) {
-        firebaseAuth.signInAnonymously()
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        val displayName = firebaseAuth.currentUser?.displayName
-                        displayName?.let { callback.onActionSucceed(displayName) }
-                    } else {
-                        val message = task.exception?.message
-                        message?.let { callback.onActionFailed(it) }
-                    }
-                }
+    private fun checkUserSignInState() {
+        firebaseAuth.addAuthStateListener {
+            val currentUser = it.currentUser
+            if (currentUser != null) {
+                currentUsername.postValue(currentUser.displayName)
+            } else {
+                currentUsername.postValue("")
+            }
+        }
     }
 
     fun resetPassword(email: String, callback: OnFirebaseActionCompleteCallback) {
@@ -73,5 +81,9 @@ class UserRepository {
                         message?.let { callback.onActionFailed(message) }
                     }
                 }
+    }
+
+    fun signOut() {
+        firebaseAuth.signOut()
     }
 }

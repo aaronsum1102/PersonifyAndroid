@@ -27,6 +27,7 @@ class TaskListFragment : Fragment(), OnTaskClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val viewModel = ViewModelProviders.of(activity!!)[TaskViewModel::class.java]
+
         val adaptor = TaskViewAdaptor(this)
         taskRecyclerView.adapter = adaptor
 
@@ -46,7 +47,6 @@ class TaskListFragment : Fragment(), OnTaskClickListener {
                         ?.commit()
             }
         }
-
     }
 
     override fun onTaskClick(task: Task, position: Int) {
