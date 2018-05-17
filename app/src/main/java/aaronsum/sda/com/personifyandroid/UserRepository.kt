@@ -1,87 +1,77 @@
 package aaronsum.sda.com.personifyandroid
 
-import android.content.ContentValues
-import android.content.Context
-import android.util.Log
-import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 
-class UserRepository() {
+interface OnFirebaseActionCompleteCallback {
+    fun onActionSucceed(message: String)
+
+    fun onActionFailed(message: String)
+}
+
+class UserRepository {
     private val firebaseAuth = FirebaseAuth.getInstance()
 
-    fun createNewUser(context: Context, userInfo: UserInfo, callback: OnFirebaseActionCompleteCallback) {
+    fun createNewUser(userInfo: UserInfo, callback: OnFirebaseActionCompleteCallback) {
         firebaseAuth.createUserWithEmailAndPassword(userInfo.email, userInfo.password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        Log.d("TAG", "createUserWithEmail:success")
                         val user = firebaseAuth.currentUser
                         val userProfileChangeRequest = UserProfileChangeRequest
                                 .Builder()
                                 .setDisplayName(userInfo.name)
                                 .build()
-                        user?.let { user ->
-                            user.updateProfile(userProfileChangeRequest)
+                        user?.let { newUser ->
+                            newUser.updateProfile(userProfileChangeRequest)
                                     .addOnCompleteListener {
-                                        Toast.makeText(context,
-                                                "Welcome, ${userInfo.name}", Toast.LENGTH_SHORT)
-                                                .show()
-                                        callback.onActionCompleted()
+
+                                        callback.onActionSucceed(userInfo.name)
                                     }
                         }
                     } else {
-                        Log.d("TAG", "createUserWithEmail:failure", task.exception)
-                        Toast.makeText(context,
-                                "Authentication failed. ${task.exception?.message}",
-                                Toast.LENGTH_SHORT).show()
+                        val message = task.exception?.message
+                        message?.let { callback.onActionFailed(it) }
                     }
                 }
     }
 
-    fun signInUser(context: Context, email: String, password: String, callback: OnFirebaseActionCompleteCallback) {
+    fun signInUser(email: String, password: String, callback: OnFirebaseActionCompleteCallback) {
         firebaseAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        Log.d(ContentValues.TAG, "signInWithEmail: success")
                         val user = firebaseAuth.currentUser
                         val displayName = user?.displayName
-                        Toast.makeText(context,
-                                "Welcome back, $displayName",
-                                Toast.LENGTH_SHORT)
-                                .show()
-                        callback.onActionCompleted()
-
+                        displayName?.let { callback.onActionSucceed(it) }
                     } else {
-                        Log.d(ContentValues.TAG, "signInWithEmail: failure", task.exception)
-                        Toast.makeText(context,
-                                "Authentication failed. Please try again.",
-                                Toast.LENGTH_SHORT)
-                                .show()
+                        val message = task.exception?.message
+                        message?.let { callback.onActionFailed(it) }
                     }
                 }
     }
 
-    fun silentSignIn(context: Context, callback: OnFirebaseActionCompleteCallback) {
+    fun silentSignIn(callback: OnFirebaseActionCompleteCallback) {
         firebaseAuth.signInAnonymously()
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        Toast.makeText(context,
-                                "Welcome back, ${firebaseAuth.currentUser!!.displayName}",
-                                Toast.LENGTH_SHORT)
-                                .show()
-                        callback.onActionCompleted()
+                        val displayName = firebaseAuth.currentUser?.displayName
+                        displayName?.let { callback.onActionSucceed(displayName) }
+                    } else {
+                        val message = task.exception?.message
+                        message?.let { callback.onActionFailed(it) }
                     }
                 }
     }
 
-    fun resetPassword(context: Context, email: String, callback: OnFirebaseActionCompleteCallback) {
+    fun resetPassword(email: String, callback: OnFirebaseActionCompleteCallback) {
         firebaseAuth.sendPasswordResetEmail(email)
-                .addOnSuccessListener {
-                    Toast.makeText(context,
-                            "An email has been sent to your email address.",
-                            Toast.LENGTH_LONG)
-                            .show()
-                    callback.onActionCompleted()
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        val message = "An email has been sent to your email address."
+                        callback.onActionSucceed(message)
+                    } else {
+                        val message = task.exception?.message
+                        message?.let { callback.onActionFailed(message) }
+                    }
                 }
     }
 }

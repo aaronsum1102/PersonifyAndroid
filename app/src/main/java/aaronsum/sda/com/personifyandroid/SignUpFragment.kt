@@ -12,10 +12,6 @@ import android.view.ViewGroup
 import android.widget.Toast
 import kotlinx.android.synthetic.main.fragment_signup.*
 
-interface OnFirebaseActionCompleteCallback {
-    fun onActionCompleted()
-}
-
 data class UserInfo(val name: String, val email: String, val password: String)
 
 class SignUpFragment : Fragment(), TextWatcher {
@@ -47,7 +43,15 @@ class SignUpFragment : Fragment(), TextWatcher {
 
     private fun createNewAccount(userInfo: UserInfo) {
         userViewModel.createNewUser(userInfo, object : OnFirebaseActionCompleteCallback {
-            override fun onActionCompleted() {
+            override fun onActionFailed(message: String) {
+                Toast.makeText(context, "Authentication failed. $message", Toast.LENGTH_LONG)
+                        .show()
+            }
+
+            override fun onActionSucceed(message: String) {
+                Toast.makeText(context,
+                        "Welcome, $message", Toast.LENGTH_SHORT)
+                        .show()
                 fragmentManager?.popBackStack("welcome",
                         FragmentManager.POP_BACK_STACK_INCLUSIVE)
                 fragmentManager

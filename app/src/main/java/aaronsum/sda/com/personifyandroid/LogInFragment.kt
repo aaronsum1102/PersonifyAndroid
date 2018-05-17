@@ -9,6 +9,7 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import kotlinx.android.synthetic.main.fragment_user_login.*
 
 class LogInFragment : Fragment(), TextWatcher {
@@ -45,7 +46,18 @@ class LogInFragment : Fragment(), TextWatcher {
 
     private fun signInAuthentication(email: String, password: String) {
         userViewModel.signInWithDetails(email, password, object : OnFirebaseActionCompleteCallback {
-            override fun onActionCompleted() {
+            override fun onActionFailed(message: String) {
+                Toast.makeText(context,
+                        "Authentication failed because $message. Please try again.",
+                        Toast.LENGTH_LONG)
+                        .show()
+            }
+
+            override fun onActionSucceed(message: String) {
+                Toast.makeText(context,
+                        "Welcome back, $message",
+                        Toast.LENGTH_SHORT)
+                        .show()
                 fragmentManager?.popBackStack("welcome",
                         FragmentManager.POP_BACK_STACK_INCLUSIVE)
                 fragmentManager
