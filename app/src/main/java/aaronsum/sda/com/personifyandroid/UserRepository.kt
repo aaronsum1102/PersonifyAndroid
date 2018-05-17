@@ -78,7 +78,7 @@ class UserRepository() {
         firebaseAuth.sendPasswordResetEmail(email)
                 .addOnSuccessListener {
                     Toast.makeText(context,
-                            "An email has been sent to your email address. Please follow the link to reset your password.",
+                            "An email has been sent to your email address.",
                             Toast.LENGTH_LONG)
                             .show()
                     callback.onActionCompleted()

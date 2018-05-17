@@ -131,7 +131,7 @@
                 android:layout_marginTop="32dp"
                 android:background="@drawable/my_button_background"
                 android:enabled="false"
-                android:text="@string/confirm"
+                android:text="@string/request_for_new_password"
                 android:textColor="#FFFFFF"
                 android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="parent"
