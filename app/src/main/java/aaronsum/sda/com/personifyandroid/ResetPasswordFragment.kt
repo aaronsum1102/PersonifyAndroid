@@ -41,7 +41,7 @@ class ResetPasswordFragment : Fragment() {
             userViewModel.resetPassword(email, object : OnFirebaseActionCompleteCallback {
                 override fun onActionFailed(message: String) {
                     Toast.makeText(context,
-                            "Failed to request new password because $message",
+                            "Failed to request new password. $message",
                             Toast.LENGTH_LONG)
                             .show()
                 }

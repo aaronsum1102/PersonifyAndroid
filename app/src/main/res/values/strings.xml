@@ -14,7 +14,7 @@
     <string name="date_picker">date picker</string>
     <string name="enter_password_here">enter password here</string>
     <string name="enter_email_here">enter email here</string>
-    <string name="sign_in_with_your_current_account_here">Sign in with your current account here</string>
+    <string name="sign_in_your_account_here">Sign in your account here</string>
     <string name="request_for_new_password">request for new password</string>
     <string name="i_need_a_new_password">I need a new password</string>
     <string name="login">login</string>

@@ -44,7 +44,7 @@ class SignUpFragment : Fragment(), TextWatcher {
     private fun createNewAccount(userInfo: UserInfo) {
         userViewModel.createNewUser(userInfo, object : OnFirebaseActionCompleteCallback {
             override fun onActionFailed(message: String) {
-                Toast.makeText(context, "Authentication failed. $message", Toast.LENGTH_LONG)
+                Toast.makeText(context, "Failed to create an account. $message", Toast.LENGTH_LONG)
                         .show()
             }
 

@@ -1,58 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/itemTask"
-    android:background="#FFFFFF"
     android:layout_width="match_parent"
-    android:layout_marginTop="2.5dp"
-    android:layout_marginBottom="2.5dp"
-    android:layout_marginStart="5dp"
-    android:layout_marginEnd="5dp"
-    android:elevation="2dp"
-    android:layout_height="80dp">
+    android:layout_marginEnd="8dp"
+    android:layout_marginStart="8dp"
+    android:layout_marginTop="8dp"
+    android:layout_height="80dp"
+    app:cardCornerRadius="10dp"
+    android:background="#FFFFFF">
 
-    <TextView
-        android:id="@+id/taskName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:textAppearance="@style/Body1"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="Laundry" />
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/dueDate"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:textAppearance="@style/Body2"
-        app:layout_constraintStart_toStartOf="@+id/taskName"
-        app:layout_constraintTop_toBottomOf="@+id/taskName"
-        tools:text="2018-03-20" />
+        <TextView
+            android:id="@+id/taskName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:textAppearance="@style/Body1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Laundry" />
 
-    <TextView
-        android:id="@+id/priority"
-        android:layout_width="100dp"
-        android:layout_height="0dp"
-        android:layout_marginEnd="16dp"
-        android:textAppearance="@style/Body2"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/status"
-        tools:text="high" />
+        <TextView
+            android:id="@+id/dueDate"
+            android:layout_width="85dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:textAppearance="@style/Body2"
+            app:layout_constraintEnd_toStartOf="@+id/status"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"
+            app:layout_constraintStart_toStartOf="@+id/taskName"
+            app:layout_constraintTop_toBottomOf="@+id/taskName"
+            tools:text="2018-03-20" />
 
-    <TextView
-        android:id="@+id/status"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:textAppearance="@style/Body2"
-        app:layout_constraintEnd_toStartOf="@+id/priority"
-        app:layout_constraintStart_toEndOf="@+id/dueDate"
-        app:layout_constraintTop_toTopOf="@+id/dueDate"
-        tools:text="to do" />
+        <TextView
+            android:id="@+id/priority"
+            android:layout_width="60dp"
+            android:layout_height="0dp"
+            android:layout_marginEnd="16dp"
+            android:textAppearance="@style/Body2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/status"
+            app:layout_constraintTop_toTopOf="@+id/status"
+            tools:text="medium" />
 
-</android.support.constraint.ConstraintLayout>
+        <TextView
+            android:id="@+id/status"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:textAlignment="textStart"
+            android:textAppearance="@style/Body2"
+            app:layout_constraintEnd_toStartOf="@+id/priority"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/dueDate"
+            app:layout_constraintTop_toTopOf="@+id/dueDate"
+            tools:text="in progress" />
+    </android.support.constraint.ConstraintLayout>
+</android.support.v7.widget.CardView>

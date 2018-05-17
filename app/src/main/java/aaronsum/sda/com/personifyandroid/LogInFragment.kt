@@ -48,7 +48,7 @@ class LogInFragment : Fragment(), TextWatcher {
         userViewModel.signInWithDetails(email, password, object : OnFirebaseActionCompleteCallback {
             override fun onActionFailed(message: String) {
                 Toast.makeText(this@LogInFragment.context,
-                        "Authentication failed because $message. Please try again.",
+                        "Authentication failed. $message",
                         Toast.LENGTH_LONG)
                         .show()
             }
@@ -69,7 +69,7 @@ class LogInFragment : Fragment(), TextWatcher {
     }
 
     override fun afterTextChanged(s: Editable?) {
-        confirmButton.isEnabled = emailText.text.contains("@") && passwordText.text.isNotEmpty()
+        confirmButton.isEnabled = emailText.text.contains("@") && passwordText.text.toString().length >= 6
     }
 
     override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
