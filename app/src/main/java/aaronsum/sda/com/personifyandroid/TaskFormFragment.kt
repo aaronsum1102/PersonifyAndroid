@@ -4,21 +4,23 @@ import android.app.DatePickerDialog
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
+import android.widget.Toast
 import kotlinx.android.synthetic.main.fragment_task_form.*
 import java.util.*
 
 class TaskFormFragment : Fragment() {
+    companion object {
+        private const val TAG = "TaskFormFragment"
+    }
 
     private var existingTask: Task? = null
     private lateinit var status: String
@@ -38,8 +40,8 @@ class TaskFormFragment : Fragment() {
         prioritySpinner.setSelection(2)
 
         val viewModel = ViewModelProviders.of(activity!!)[TaskViewModel::class.java]
-        val taskId = arguments?.getInt(TaskListFragment.KEY_TASK_ID) ?: 0
-        if (taskId != 0) {
+        val taskId: String = arguments?.getString(TaskListFragment.KEY_TASK_ID) ?: ""
+        if (taskId.isNotEmpty()) {
             viewModel.loadTask(taskId)
                     .observe(this, Observer {
                         it?.let {
@@ -56,16 +58,21 @@ class TaskFormFragment : Fragment() {
             removeTaskButton.visibility = View.VISIBLE
             removeTaskButton.setOnClickListener {
                 existingTask?.let {
-                    viewModel.deleteTask(it)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(
-                                    {
-                                        fragmentManager?.popBackStack()
-                                    }, { error ->
-                                Snackbar.make(view,
-                                        "Something went wrong: ${error.message}.", Snackbar.LENGTH_SHORT).show()
-                            })
+                    val taskId = arguments?.getString(TaskListFragment.KEY_TASK_ID)
+                    taskId?.let {
+                        viewModel.deleteTask(taskId)
+                                .addOnSuccessListener {
+                                    Toast.makeText(this@TaskFormFragment.context,
+                                            "Deleting your task now...",
+                                            Toast.LENGTH_SHORT)
+                                            .show()
+                                    Log.i(TAG, "task deleted.")
+                                    fragmentManager?.popBackStack()
+                                }
+                                .addOnFailureListener {
+                                    Log.w(TAG, "Error while deleting task, ${it.message}.")
+                                }
+                    }
                 }
             }
         }
@@ -81,17 +88,28 @@ class TaskFormFragment : Fragment() {
             val dueDate = dueDate.text.toString()
             val remarks = remarksText.text.toString()
             if (this::status.isInitialized && this::priority.isInitialized) {
-                val task = Task(existingTask?.id ?: 0, name, dueDate, status, priority, remarks)
-                viewModel.addTask(task)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(
-                                {
-                                    fragmentManager?.popBackStack()
-                                },
-                                { error ->
-                                    Snackbar.make(view, "Something went wrong: ${error.message}.", Snackbar.LENGTH_SHORT).show()
-                                })
+                val task = Task(name, dueDate, status, priority, remarks)
+                val taskId = arguments?.getString(TaskListFragment.KEY_TASK_ID)
+                if (taskId != null) {
+                    viewModel.modifyTask(taskId to task)
+                            .addOnSuccessListener {
+                                Log.i(TAG, "new information saved to DB.")
+                                fragmentManager?.popBackStack()
+                            }
+                            .addOnFailureListener {
+                                Log.w(TAG, "Error saving new information: ${it.message}.")
+                            }
+
+                } else {
+                    viewModel.addTask(task)
+                            .addOnSuccessListener {
+                                Log.i(TAG, "new task saved to DB.")
+                                fragmentManager?.popBackStack()
+                            }
+                            .addOnFailureListener {
+                                Log.w(TAG, "Error adding document: ${it.message}.")
+                            }
+                }
             }
         }
 

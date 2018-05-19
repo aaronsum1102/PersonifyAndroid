@@ -12,7 +12,7 @@ import android.widget.TextView
 import kotlinx.android.synthetic.main.fragment_tasks_list.*
 
 interface OnTaskClickListener {
-    fun onTaskClick(task: Task, position: Int)
+    fun onTaskClick(task: Task, taskId: String)
 }
 
 class TaskListFragment : Fragment(), OnTaskClickListener {
@@ -49,10 +49,10 @@ class TaskListFragment : Fragment(), OnTaskClickListener {
         }
     }
 
-    override fun onTaskClick(task: Task, position: Int) {
+    override fun onTaskClick(task: Task, taskId: String) {
         val taskFormFragment = TaskFormFragment()
         val arguments = Bundle()
-        arguments.putInt(KEY_TASK_ID, task.id)
+        arguments.putString(KEY_TASK_ID, taskId)
         taskFormFragment.arguments = arguments
         fragmentManager
                 ?.beginTransaction()
@@ -62,7 +62,7 @@ class TaskListFragment : Fragment(), OnTaskClickListener {
     }
 
     class TaskViewAdaptor(private val taskClickListener: OnTaskClickListener) : RecyclerView.Adapter<TaskViewHolder>() {
-        var tasks: List<Task> = emptyList()
+        var tasks: List<Pair<String, Task>> = listOf()
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
             val view = LayoutInflater.from(parent.context).inflate(R.layout.item_task, parent, false)
@@ -72,18 +72,19 @@ class TaskListFragment : Fragment(), OnTaskClickListener {
         override fun getItemCount(): Int = tasks.size
 
         override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
-            holder.bind(tasks[position], taskClickListener, position)
+            holder.bind(tasks[position], taskClickListener)
         }
     }
 
     class TaskViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        fun bind(task: Task, taskClickListener: OnTaskClickListener, position: Int) {
+        fun bind(pair: Pair<String, Task>, taskClickListener: OnTaskClickListener) {
+            val task = pair.second
             itemView.findViewById<TextView>(R.id.taskName).text = task.name
             itemView.findViewById<TextView>(R.id.dueDate).text = task.dueDate
             itemView.findViewById<TextView>(R.id.status).text = task.status
             itemView.findViewById<TextView>(R.id.priority).text = task.priority
             itemView.setOnClickListener {
-                taskClickListener.onTaskClick(task, position)
+                taskClickListener.onTaskClick(task, pair.first)
             }
         }
     }

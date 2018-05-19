@@ -3,19 +3,19 @@ package aaronsum.sda.com.personifyandroid
 import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
-import io.reactivex.Single
 
 class TaskViewModel(application: Application) : AndroidViewModel(application) {
-    private val repository = TaskRepository(application)
-    val tasks: LiveData<List<Task>> = repository.loadTasks()
+    private val repository = TaskRepository()
+    val tasks: LiveData<List<Pair<String, Task>>> = repository.tasks
 
-    fun addTask(task: Task): Single<Unit> {
-        return Single.fromCallable { repository.saveTask(task) }
-    }
+    fun loadAllTask() = repository.loadAllTasks()
 
-    fun loadTask(taskId: Int): LiveData<Task> = repository.loadTask(taskId)
+    fun addTask(task: Task) = repository.addTask(task)
 
-    fun deleteTask(task: Task): Single<Unit> {
-        return Single.fromCallable { repository.deleteTask(task) }
-    }
+    fun modifyTask(pair: Pair<String, Task>) = repository.modifyTask(pair)
+
+    fun loadTask(taskId: String): LiveData<Task> = repository.loadTask(taskId)
+
+    fun deleteTask(taskId: String) = repository.deleteTask(taskId)
+
 }

@@ -1,58 +1,130 @@
 package aaronsum.sda.com.personifyandroid
 
-import android.app.Application
-import android.arch.lifecycle.LiveData
-import android.arch.persistence.room.*
+import android.arch.lifecycle.MutableLiveData
+import android.util.Log
+import com.google.firebase.firestore.DocumentChange
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreSettings
+import com.google.firebase.firestore.QuerySnapshot
 
-@Entity
-data class Task(@PrimaryKey(autoGenerate = true) val id: Int,
-                val name: String,
-                @ColumnInfo(name = "due_date") val dueDate: String,
-                val status: String,
-                val priority: String,
-                val remarks: String)
 
-@Dao
-interface TaskDao {
-    @Query("SELECT * FROM Task ORDER BY name")
-    fun loadAllTasks(): LiveData<List<Task>>
+data class Task(var name: String = "",
+                var dueDate: String = "",
+                var status: String = "",
+                var priority: String = "",
+                var remarks: String = "")
 
-    @Query("SELECT * FROM Task WHERE id = :taskId")
-    fun loadTask(taskId: Int): LiveData<Task>
+class TaskRepository {
+    companion object {
+        private const val TAG = "TaskRepository"
+        private const val DOCUMENT_NAME = "tasks"
+    }
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun saveTask(task: Task)
-
-    @Delete
-    fun deleteTask(task: Task)
-}
-
-@Database(entities = [Task::class], version = 1)
-abstract class TaskDatabase : RoomDatabase() {
-    abstract fun taskDao(): TaskDao
-}
-
-class TaskRepository(application: Application) {
-    private val taskDao: TaskDao
+    private val db = FirebaseFirestore.getInstance()
+    private val taskCollection = db.collection(DOCUMENT_NAME)
+    val tasks: MutableLiveData<List<Pair<String, Task>>> = MutableLiveData()
 
     init {
-        val database = Room
-                .databaseBuilder(application
-                        , TaskDatabase::class.java
-                        , "task-database")
+        setupDBForPersistence(db)
+        addEventListenerToDB()
+    }
+
+    private fun setupDBForPersistence(db: FirebaseFirestore) {
+        val dbSetting = FirebaseFirestoreSettings.Builder()
+                .setPersistenceEnabled(true)
                 .build()
-        taskDao = database.taskDao()
+        db.firestoreSettings = dbSetting
     }
 
-    fun loadTasks(): LiveData<List<Task>> = taskDao.loadAllTasks()
-
-    fun loadTask(taskId: Int): LiveData<Task> = taskDao.loadTask(taskId)
-
-    fun saveTask(task: Task) {
-        taskDao.saveTask(task)
+    fun loadAllTasks() : com.google.android.gms.tasks.Task<QuerySnapshot>  {
+        val task = taskCollection.get()
+        task.addOnCompleteListener { queryTask ->
+            if (queryTask.isSuccessful) {
+                val tasks = mutableListOf<Pair<String, Task>>()
+                queryTask.result.forEach { document ->
+                    tasks.add(document.id to document.toObject(Task::class.java))
+                }
+                this.tasks.postValue(tasks)
+                Log.i(TAG, "task loaded from DB. Number of tasks: ${tasks.size}")
+            } else {
+                Log.w(TAG, "error getting document. ${queryTask.exception?.message}")
+            }
+        }
+        return task
     }
 
-    fun deleteTask(task: Task) {
-        taskDao.deleteTask(task)
+    private fun addEventListenerToDB() {
+        taskCollection.addSnapshotListener { documentSnapshot, exception ->
+            if (exception != null) {
+                Log.w(TAG, "Failed to add event listener to DB. ${exception.message}")
+                return@addSnapshotListener
+            }
+            val source = if (documentSnapshot != null &&
+                    documentSnapshot.metadata.hasPendingWrites()) "Local" else "Server"
+            documentSnapshot?.documentChanges?.forEach { change ->
+                Log.i(TAG, "event source: $source")
+                when (change.type) {
+                    DocumentChange.Type.ADDED -> onDocumentAdded(change)
+                    DocumentChange.Type.MODIFIED -> onDocumentModified(change)
+                    DocumentChange.Type.REMOVED -> onDocumentRemoved(change)
+                }
+            }
+        }
     }
+
+    private fun onDocumentAdded(change: DocumentChange) {
+        val temporaryTasks = mutableListOf<Pair<String, Task>>()
+        tasks.value?.let {
+            temporaryTasks.addAll(it)
+            val document = change.document
+            temporaryTasks.add(document.id to document.toObject(Task::class.java))
+            tasks.value = temporaryTasks
+            Log.i(TAG, "New document added. Number of tasks: ${tasks.value?.size}")
+        }
+    }
+
+    private fun onDocumentModified(change: DocumentChange) {
+        val taskId = change.document.id
+        val temporaryTasks = mutableListOf<Pair<String, Task>>()
+        tasks.value?.let { taskList ->
+            temporaryTasks.addAll(taskList)
+            val taskPair = temporaryTasks.find { it.first == taskId }
+            temporaryTasks.remove(taskPair)
+            temporaryTasks.add(taskId to change.document.toObject(Task::class.java))
+            tasks.value = temporaryTasks
+            Log.i(TAG, "Document has been modified. Number of tasks :${tasks.value?.size}")
+        }
+    }
+
+    private fun onDocumentRemoved(change: DocumentChange) {
+        val temporaryTasks = tasks.value
+        temporaryTasks?.let {
+            temporaryTasks as MutableList<Pair<String, Task>>
+            val taskToRemove = temporaryTasks.find { it.first == change.document.id }
+            taskToRemove?.let {
+                temporaryTasks.remove(taskToRemove)
+                tasks.value = temporaryTasks
+                Log.i(TAG, "Document has been deleted. Number of tasks :${tasks.value?.size}")
+            }
+        }
+    }
+
+    fun addTask(task: Task) = taskCollection.document().set(task)
+
+    fun modifyTask(pair: Pair<String, Task>) = taskCollection.document(pair.first).set(pair.second)
+
+    fun loadTask(id: String): MutableLiveData<Task> {
+        val taskLiveData: MutableLiveData<Task> = MutableLiveData()
+        taskCollection.document(id).get()
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        taskLiveData.postValue(task.result.toObject(Task::class.java))
+                    } else {
+                        Log.w(TAG, "error getting specific document. ${task.exception?.message}")
+                    }
+                }
+        return taskLiveData
+    }
+
+    fun deleteTask(id: String) = taskCollection.document(id).delete()
 }
