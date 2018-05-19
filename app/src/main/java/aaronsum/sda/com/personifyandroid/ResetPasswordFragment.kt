@@ -38,20 +38,20 @@ class ResetPasswordFragment : Fragment() {
 
         confirmButton.setOnClickListener {
             val email = emailText.text.toString()
-            userViewModel.resetPassword(email, object : OnFirebaseActionCompleteCallback {
-                override fun onActionFailed(message: String) {
-                    Toast.makeText(context,
-                            "Failed to request new password. $message",
-                            Toast.LENGTH_LONG)
-                            .show()
-                }
-
-                override fun onActionSucceed(message: String) {
-                    Toast.makeText(context, message, Toast.LENGTH_LONG)
-                            .show()
-                    fragmentManager?.popBackStack()
-                }
-            })
+            userViewModel.resetPassword(email)
+                    .addOnSuccessListener {
+                        Toast.makeText(context,
+                                "An email has been sent to your email address.",
+                                Toast.LENGTH_LONG)
+                                .show()
+                        fragmentManager?.popBackStack()
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(context,
+                                "Failed to request new password. ${it.localizedMessage}",
+                                Toast.LENGTH_LONG)
+                                .show()
+                    }
         }
     }
 }

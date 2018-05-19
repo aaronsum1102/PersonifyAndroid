@@ -2,10 +2,7 @@ package aaronsum.sda.com.personifyandroid
 
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
-import com.google.firebase.firestore.DocumentChange
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.FirebaseFirestoreSettings
-import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.*
 
 
 data class Task(var name: String = "",
@@ -17,16 +14,16 @@ data class Task(var name: String = "",
 class TaskRepository {
     companion object {
         private const val TAG = "TaskRepository"
-        private const val DOCUMENT_NAME = "tasks"
+        private const val COLLECTION_NAME = "tasks"
+        private const val SUB_COLLECTION_NAME = "user tasks"
     }
 
     private val db = FirebaseFirestore.getInstance()
-    private val taskCollection = db.collection(DOCUMENT_NAME)
+    private lateinit var taskCollection: CollectionReference
     val tasks: MutableLiveData<List<Pair<String, Task>>> = MutableLiveData()
 
     init {
         setupDBForPersistence(db)
-        addEventListenerToDB()
     }
 
     private fun setupDBForPersistence(db: FirebaseFirestore) {
@@ -36,51 +33,61 @@ class TaskRepository {
         db.firestoreSettings = dbSetting
     }
 
-    fun loadAllTasks() : com.google.android.gms.tasks.Task<QuerySnapshot>  {
-        val task = taskCollection.get()
-        task.addOnCompleteListener { queryTask ->
-            if (queryTask.isSuccessful) {
-                val tasks = mutableListOf<Pair<String, Task>>()
-                queryTask.result.forEach { document ->
-                    tasks.add(document.id to document.toObject(Task::class.java))
+    fun loadAllTasks(): com.google.android.gms.tasks.Task<QuerySnapshot>? {
+        var task: com.google.android.gms.tasks.Task<QuerySnapshot>? = null
+        if (this::taskCollection.isInitialized) {
+            task = taskCollection.get()
+            task.addOnCompleteListener {
+                if (task.isSuccessful) {
+                    val tasks = mutableListOf<Pair<String, Task>>()
+                    task.result.forEach { document ->
+                        tasks.add(document.id to document.toObject(Task::class.java))
+                    }
+                    this.tasks.postValue(tasks)
+                    Log.i(TAG, "task loaded from DB. Number of tasks: ${tasks.size}")
+                } else {
+                    Log.w(TAG, "error getting document. ${task.exception?.message}")
                 }
-                this.tasks.postValue(tasks)
-                Log.i(TAG, "task loaded from DB. Number of tasks: ${tasks.size}")
-            } else {
-                Log.w(TAG, "error getting document. ${queryTask.exception?.message}")
             }
         }
         return task
     }
 
-    private fun addEventListenerToDB() {
-        taskCollection.addSnapshotListener { documentSnapshot, exception ->
-            if (exception != null) {
-                Log.w(TAG, "Failed to add event listener to DB. ${exception.message}")
-                return@addSnapshotListener
-            }
-            val source = if (documentSnapshot != null &&
-                    documentSnapshot.metadata.hasPendingWrites()) "Local" else "Server"
-            documentSnapshot?.documentChanges?.forEach { change ->
-                Log.i(TAG, "event source: $source")
-                when (change.type) {
-                    DocumentChange.Type.ADDED -> onDocumentAdded(change)
-                    DocumentChange.Type.MODIFIED -> onDocumentModified(change)
-                    DocumentChange.Type.REMOVED -> onDocumentRemoved(change)
+    fun addEventListenerToDB(userId: String) {
+        initUserTaskCollectionPath(userId)
+        if (this::taskCollection.isInitialized) {
+            taskCollection.addSnapshotListener { documentSnapshot, exception ->
+                if (exception != null) {
+                    Log.w(TAG, "Failed to add event listener to DB. ${exception.message}")
+                    return@addSnapshotListener
+                }
+                val source = if (documentSnapshot != null &&
+                        documentSnapshot.metadata.hasPendingWrites()) "Local" else "Server"
+                documentSnapshot?.documentChanges?.forEach { change ->
+                    Log.i(TAG, "event source: $source")
+                    when (change.type) {
+                        DocumentChange.Type.ADDED -> onDocumentAdded(change)
+                        DocumentChange.Type.MODIFIED -> onDocumentModified(change)
+                        DocumentChange.Type.REMOVED -> onDocumentRemoved(change)
+                    }
                 }
             }
         }
     }
 
+    private fun initUserTaskCollectionPath(userId: String) {
+        taskCollection = db.collection(COLLECTION_NAME)
+                .document(userId)
+                .collection(SUB_COLLECTION_NAME)
+    }
+
     private fun onDocumentAdded(change: DocumentChange) {
         val temporaryTasks = mutableListOf<Pair<String, Task>>()
-        tasks.value?.let {
-            temporaryTasks.addAll(it)
-            val document = change.document
-            temporaryTasks.add(document.id to document.toObject(Task::class.java))
-            tasks.value = temporaryTasks
-            Log.i(TAG, "New document added. Number of tasks: ${tasks.value?.size}")
-        }
+        tasks.value?.let { temporaryTasks.addAll(it) }
+        val document = change.document
+        temporaryTasks.add(document.id to document.toObject(Task::class.java))
+        tasks.value = temporaryTasks
+        Log.i(TAG, "New document added. Number of tasks: ${tasks.value?.size}")
     }
 
     private fun onDocumentModified(change: DocumentChange) {

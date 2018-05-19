@@ -45,27 +45,25 @@ class LogInFragment : Fragment(), TextWatcher {
     }
 
     private fun signInAuthentication(email: String, password: String) {
-        userViewModel.signInWithDetails(email, password, object : OnFirebaseActionCompleteCallback {
-            override fun onActionFailed(message: String) {
-                Toast.makeText(this@LogInFragment.context,
-                        "Authentication failed. $message",
-                        Toast.LENGTH_LONG)
-                        .show()
-            }
-
-            override fun onActionSucceed(message: String) {
-                Toast.makeText(this@LogInFragment.context,
-                        "Welcome back, $message",
-                        Toast.LENGTH_SHORT)
-                        .show()
-                fragmentManager?.popBackStack("welcome",
-                        FragmentManager.POP_BACK_STACK_INCLUSIVE)
-                fragmentManager
-                        ?.beginTransaction()
-                        ?.replace(R.id.container, TaskListFragment())
-                        ?.commit()
-            }
-        })
+        userViewModel.signInWithDetails(email, password)
+                .addOnSuccessListener {
+                    Toast.makeText(this@LogInFragment.context,
+                            "Welcome back, ${it.user.displayName}.",
+                            Toast.LENGTH_SHORT)
+                            .show()
+                    fragmentManager?.popBackStack("welcome",
+                            FragmentManager.POP_BACK_STACK_INCLUSIVE)
+                    fragmentManager
+                            ?.beginTransaction()
+                            ?.replace(R.id.container, TaskListFragment())
+                            ?.commit()
+                }
+                .addOnFailureListener {
+                    Toast.makeText(this@LogInFragment.context,
+                            "Authentication failed. ${it.localizedMessage}",
+                            Toast.LENGTH_LONG)
+                            .show()
+                }
     }
 
     override fun afterTextChanged(s: Editable?) {

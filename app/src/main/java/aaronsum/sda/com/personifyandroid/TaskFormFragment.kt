@@ -7,25 +7,18 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.Toast
 import kotlinx.android.synthetic.main.fragment_task_form.*
 import java.util.*
 
 class TaskFormFragment : Fragment() {
-    companion object {
-        private const val TAG = "TaskFormFragment"
-    }
-
     private var existingTask: Task? = null
     private lateinit var status: String
     private lateinit var priority: String
-
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_task_form, container, false)
@@ -61,17 +54,7 @@ class TaskFormFragment : Fragment() {
                     val taskId = arguments?.getString(TaskListFragment.KEY_TASK_ID)
                     taskId?.let {
                         viewModel.deleteTask(taskId)
-                                .addOnSuccessListener {
-                                    Toast.makeText(this@TaskFormFragment.context,
-                                            "Deleting your task now...",
-                                            Toast.LENGTH_SHORT)
-                                            .show()
-                                    Log.i(TAG, "task deleted.")
-                                    fragmentManager?.popBackStack()
-                                }
-                                .addOnFailureListener {
-                                    Log.w(TAG, "Error while deleting task, ${it.message}.")
-                                }
+                        fragmentManager?.popBackStack()
                     }
                 }
             }
@@ -92,24 +75,10 @@ class TaskFormFragment : Fragment() {
                 val taskId = arguments?.getString(TaskListFragment.KEY_TASK_ID)
                 if (taskId != null) {
                     viewModel.modifyTask(taskId to task)
-                            .addOnSuccessListener {
-                                Log.i(TAG, "new information saved to DB.")
-                                fragmentManager?.popBackStack()
-                            }
-                            .addOnFailureListener {
-                                Log.w(TAG, "Error saving new information: ${it.message}.")
-                            }
-
                 } else {
                     viewModel.addTask(task)
-                            .addOnSuccessListener {
-                                Log.i(TAG, "new task saved to DB.")
-                                fragmentManager?.popBackStack()
-                            }
-                            .addOnFailureListener {
-                                Log.w(TAG, "Error adding document: ${it.message}.")
-                            }
                 }
+                fragmentManager?.popBackStack()
             }
         }
 

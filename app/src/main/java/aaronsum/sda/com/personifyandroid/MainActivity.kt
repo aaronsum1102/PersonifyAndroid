@@ -6,9 +6,6 @@ import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
-import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 
 class MainActivity : AppCompatActivity() {
     private lateinit var userViewModel: UserViewModel
@@ -22,11 +19,11 @@ class MainActivity : AppCompatActivity() {
         taskViewModel = ViewModelProviders.of(this)[TaskViewModel::class.java]
 
         supportActionBar?.hide()
-        var currentUsername: String?
-        userViewModel.currentUsername.observe(this, Observer {
-            currentUsername = it
-            when (currentUsername) {
-                "" -> {
+        var currentUser: User?
+        userViewModel.currentUser.observe(this, Observer {
+            currentUser = it
+            when (currentUser) {
+                null -> {
                     supportFragmentManager
                             .beginTransaction()
                             .replace(R.id.container, UserManagementFragment())
@@ -34,13 +31,14 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 else -> {
-                    currentUsername?.let {
+                    currentUser?.let {
+                        taskViewModel.addEventListenerToDB(it.userId)
                         Toast.makeText(this@MainActivity,
-                                "Welcome back, $currentUsername.",
+                                "Welcome back, ${it.username}.",
                                 Toast.LENGTH_SHORT)
                                 .show()
+                        initTaskList()
                     }
-                    initTaskList()
                 }
             }
         })
@@ -48,13 +46,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun initTaskList() {
         taskViewModel.loadAllTask()
-                .addOnSuccessListener {
+                ?.addOnSuccessListener {
                     supportFragmentManager
                             .beginTransaction()
                             .replace(R.id.container, TaskListFragment())
                             .commit()
                 }
-                .addOnFailureListener {
+                ?.addOnFailureListener {
                     Snackbar.make(this@MainActivity.currentFocus,
                             "Unable to load your data. ${it.message}",
                             Snackbar.LENGTH_LONG)

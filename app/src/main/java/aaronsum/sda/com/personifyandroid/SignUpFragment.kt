@@ -42,24 +42,24 @@ class SignUpFragment : Fragment(), TextWatcher {
     }
 
     private fun createNewAccount(userInfo: UserInfo) {
-        userViewModel.createNewUser(userInfo, object : OnFirebaseActionCompleteCallback {
-            override fun onActionFailed(message: String) {
-                Toast.makeText(context, "Failed to create an account. $message", Toast.LENGTH_LONG)
-                        .show()
-            }
-
-            override fun onActionSucceed(message: String) {
-                Toast.makeText(context,
-                        "Welcome, $message", Toast.LENGTH_SHORT)
-                        .show()
-                fragmentManager?.popBackStack("welcome",
-                        FragmentManager.POP_BACK_STACK_INCLUSIVE)
-                fragmentManager
-                        ?.beginTransaction()
-                        ?.replace(R.id.container, TaskListFragment())
-                        ?.commit()
-            }
-        })
+        userViewModel.createNewUser(userInfo)
+                .addOnSuccessListener {
+                    val taskViewModel = ViewModelProviders.of(activity!!)[TaskViewModel::class.java]
+                    taskViewModel.addEventListenerToDB(it.user.uid)
+                    Toast.makeText(context,
+                            "Welcome, ${it.user.displayName}.", Toast.LENGTH_SHORT)
+                            .show()
+                    fragmentManager?.popBackStack("welcome",
+                            FragmentManager.POP_BACK_STACK_INCLUSIVE)
+                    fragmentManager
+                            ?.beginTransaction()
+                            ?.replace(R.id.container, TaskListFragment())
+                            ?.commit()
+                }
+                .addOnFailureListener {
+                    Toast.makeText(context, "Failed to create an account. ${it.localizedMessage}", Toast.LENGTH_LONG)
+                            .show()
+                }
     }
 
     override fun afterTextChanged(s: Editable?) {
