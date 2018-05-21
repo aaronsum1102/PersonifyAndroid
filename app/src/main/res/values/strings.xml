@@ -36,6 +36,9 @@
     <string name="request_for_a_new_password_here">Request for a new password here</string>
     <string name="confirm">confirm</string>
     <string name="app_title">Personify</string>
+    <string name="tasks">Tasks</string>
+    <string name="profile">Profile</string>
+    <string name="settings">settings</string>
     <string-array name="status">
         <item>To do</item>
         <item>In progress</item>

@@ -4,10 +4,10 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.util.Log
+import android.view.*
 import android.widget.TextView
 import kotlinx.android.synthetic.main.fragment_tasks_list.*
 
@@ -20,13 +20,18 @@ class TaskListFragment : Fragment(), OnTaskClickListener {
         const val KEY_TASK_ID = "task id"
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_tasks_list, container, false)
-        return view
+        return inflater.inflate(R.layout.fragment_tasks_list, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        (activity as AppCompatActivity).setSupportActionBar(toolbar)
 
         val viewModel = ViewModelProviders.of(activity!!)[TaskViewModel::class.java]
 
@@ -61,6 +66,24 @@ class TaskListFragment : Fragment(), OnTaskClickListener {
                 ?.replace(R.id.container, taskFormFragment)
                 ?.addToBackStack(null)
                 ?.commit()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater?.inflate(R.menu.toolbar_menu, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when (item?.itemId) {
+            R.id.action_setting -> {
+                fragmentManager
+                        ?.beginTransaction()
+                        ?.replace(R.id.container, Fragment())
+                        ?.addToBackStack("taskList")
+                        ?.commit()
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     class TaskViewAdaptor(private val taskClickListener: OnTaskClickListener) : RecyclerView.Adapter<TaskViewHolder>() {

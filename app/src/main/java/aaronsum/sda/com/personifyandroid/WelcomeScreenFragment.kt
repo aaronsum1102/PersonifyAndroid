@@ -12,6 +12,8 @@ import android.view.ViewGroup
 import android.widget.Toast
 
 class WelcomeScreenFragment : Fragment() {
+    private val welcomeScreenTime = 1000L
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_welcome_screen, container, false)
     }
@@ -34,7 +36,7 @@ class WelcomeScreenFragment : Fragment() {
                                 ?.beginTransaction()
                                 ?.replace(R.id.container, UserManagementFragment())
                                 ?.commit()
-                    }, 2000)
+                    }, welcomeScreenTime)
                 }
 
                 else -> {
@@ -63,7 +65,7 @@ class WelcomeScreenFragment : Fragment() {
                                 ?.beginTransaction()
                                 ?.replace(R.id.container, TaskListFragment())
                                 ?.commit()
-                    }, 2000)
+                    }, welcomeScreenTime)
                 }
                 ?.addOnFailureListener { exception ->
                     val view = this@WelcomeScreenFragment.view
