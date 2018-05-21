@@ -46,23 +46,36 @@ class LogInFragment : Fragment(), TextWatcher {
 
     private fun signInAuthentication(email: String, password: String) {
         userViewModel.signInWithDetails(email, password)
-                .addOnSuccessListener {
-                    Toast.makeText(this@LogInFragment.context,
-                            "Welcome back, ${it.user.displayName}.",
-                            Toast.LENGTH_SHORT)
-                            .show()
-                    fragmentManager?.popBackStack("welcome",
-                            FragmentManager.POP_BACK_STACK_INCLUSIVE)
-                    fragmentManager
-                            ?.beginTransaction()
-                            ?.replace(R.id.container, TaskListFragment())
-                            ?.commit()
+                .addOnCompleteListener {
+                    if (it.isSuccessful) {
+                        it.continueWith {
+                            val result = it.result
+                            this@LogInFragment.context?.let {
+                                Toast.makeText(this@LogInFragment.context,
+                                        "Welcome back, ${result.user.displayName}.",
+                                        Toast.LENGTH_SHORT)
+                                        .show()
+                            }
+                            val taskViewModel = ViewModelProviders.of(activity!!)[TaskViewModel::class.java]
+                            taskViewModel.addEventListenerToDB(result.user.uid)
+                            taskViewModel.loadAllTask()
+                            val taskListFragment = TaskListFragment()
+                            fragmentManager?.popBackStack("welcome",
+                                    FragmentManager.POP_BACK_STACK_INCLUSIVE)
+                            fragmentManager
+                                    ?.beginTransaction()
+                                    ?.replace(R.id.container, taskListFragment)
+                                    ?.commit()
+                        }
+                    }
                 }
-                .addOnFailureListener {
-                    Toast.makeText(this@LogInFragment.context,
-                            "Authentication failed. ${it.localizedMessage}",
-                            Toast.LENGTH_LONG)
-                            .show()
+                .addOnFailureListener { exception ->
+                    this@LogInFragment.context?.let {
+                        Toast.makeText(this@LogInFragment.context,
+                                "Authentication failed. ${exception.localizedMessage}",
+                                Toast.LENGTH_LONG)
+                                .show()
+                    }
                 }
     }
 

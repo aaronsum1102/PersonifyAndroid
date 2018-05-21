@@ -21,11 +21,13 @@ class TaskListFragment : Fragment(), OnTaskClickListener {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_tasks_list, container, false)
+        val view = inflater.inflate(R.layout.fragment_tasks_list, container, false)
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         val viewModel = ViewModelProviders.of(activity!!)[TaskViewModel::class.java]
 
         val adaptor = TaskViewAdaptor(this)

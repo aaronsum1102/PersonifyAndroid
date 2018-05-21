@@ -1,8 +1,6 @@
 <resources>
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/primaryColor</item>
         <item name="colorPrimaryDark">@color/primaryDarkColor</item>
         <item name="colorAccent">@color/primaryLightColor</item>
@@ -24,5 +22,11 @@
     <style name="MyButtonStyle" parent="Widget.AppCompat.Button.Colored">
         <item name="android:textColor">@color/primaryDarkColor</item>
         <item name="android:fontFamily">@font/roboto</item>
+    </style>
+
+     <style name="AppTitle" parent="TextAppearance.AppCompat.Title">
+         <item name="android:textSize">48sp</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:fontFamily">@font/pacifico</item>
     </style>
 </resources>

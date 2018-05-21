@@ -23,7 +23,6 @@ class SignUpFragment : Fragment(), TextWatcher {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         userViewModel = ViewModelProviders.of(activity!!)[UserViewModel::class.java]
 
         createAccountButton.isEnabled = false
@@ -43,22 +42,33 @@ class SignUpFragment : Fragment(), TextWatcher {
 
     private fun createNewAccount(userInfo: UserInfo) {
         userViewModel.createNewUser(userInfo)
-                .addOnSuccessListener {
-                    val taskViewModel = ViewModelProviders.of(activity!!)[TaskViewModel::class.java]
-                    taskViewModel.addEventListenerToDB(it.user.uid)
-                    Toast.makeText(context,
-                            "Welcome, ${it.user.displayName}.", Toast.LENGTH_SHORT)
-                            .show()
-                    fragmentManager?.popBackStack("welcome",
-                            FragmentManager.POP_BACK_STACK_INCLUSIVE)
-                    fragmentManager
-                            ?.beginTransaction()
-                            ?.replace(R.id.container, TaskListFragment())
-                            ?.commit()
+                .addOnCompleteListener {
+                    if (it.isSuccessful) {
+                        it.continueWith {
+                            val result = it.result
+                            val taskViewModel = ViewModelProviders.of(activity!!)[TaskViewModel::class.java]
+                            taskViewModel.addEventListenerToDB(result.user.uid)
+                            context?.let {
+                                Toast.makeText(context,
+                                        "Welcome, ${userInfo.name}", Toast.LENGTH_SHORT)
+                                        .show()
+                            }
+                            fragmentManager?.popBackStack("welcome",
+                                    FragmentManager.POP_BACK_STACK_INCLUSIVE)
+                            fragmentManager
+                                    ?.beginTransaction()
+                                    ?.replace(R.id.container, TaskListFragment())
+                                    ?.commit()
+                        }
+                    }
                 }
-                .addOnFailureListener {
-                    Toast.makeText(context, "Failed to create an account. ${it.localizedMessage}", Toast.LENGTH_LONG)
-                            .show()
+                .addOnFailureListener { exception ->
+                    context?.let {
+                        Toast.makeText(context,
+                                "Failed to create an account. ${exception.localizedMessage}",
+                                Toast.LENGTH_LONG)
+                                .show()
+                    }
                 }
     }
 
@@ -70,7 +80,9 @@ class SignUpFragment : Fragment(), TextWatcher {
         if (passwordText.text.length == verifyPasswordText.text.length &&
                 passwordText.text.toString() != verifyPasswordText.text.toString() &&
                 passwordText.text.isNotEmpty()) {
-            Toast.makeText(context, "Password doesn't match.", Toast.LENGTH_SHORT).show()
+            context?.let {
+                Toast.makeText(context, "Password doesn't match.", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 

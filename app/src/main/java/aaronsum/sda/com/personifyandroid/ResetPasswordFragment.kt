@@ -40,17 +40,21 @@ class ResetPasswordFragment : Fragment() {
             val email = emailText.text.toString()
             userViewModel.resetPassword(email)
                     .addOnSuccessListener {
-                        Toast.makeText(context,
-                                "An email has been sent to your email address.",
-                                Toast.LENGTH_LONG)
-                                .show()
+                        context?.let {
+                            Toast.makeText(context,
+                                    "An email has been sent to your email address.",
+                                    Toast.LENGTH_LONG)
+                                    .show()
+                        }
                         fragmentManager?.popBackStack()
                     }
-                    .addOnFailureListener {
-                        Toast.makeText(context,
-                                "Failed to request new password. ${it.localizedMessage}",
-                                Toast.LENGTH_LONG)
-                                .show()
+                    .addOnFailureListener { exception ->
+                        context?.let {
+                            Toast.makeText(context,
+                                    "Failed to request new password. ${exception.localizedMessage}",
+                                    Toast.LENGTH_LONG)
+                                    .show()
+                        }
                     }
         }
     }

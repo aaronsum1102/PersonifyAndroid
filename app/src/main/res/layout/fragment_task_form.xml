@@ -193,10 +193,11 @@
                 android:id="@+id/calenderButton"
                 android:layout_width="24dp"
                 android:layout_height="0dp"
+                android:layout_marginEnd="12dp"
                 android:contentDescription="@string/date_picker"
                 app:layout_constraintBottom_toBottomOf="@+id/dueDate"
-                app:layout_constraintEnd_toStartOf="@+id/guideline2"
+                app:layout_constraintEnd_toEndOf="@+id/statusSpinner"
                 app:layout_constraintTop_toTopOf="@+id/dueDate"
-                app:srcCompat="@drawable/ic_today_24dp" />
+                app:srcCompat="@drawable/ic_outline_calendar_today_24px" />
         </android.support.constraint.ConstraintLayout>
 </ScrollView>
