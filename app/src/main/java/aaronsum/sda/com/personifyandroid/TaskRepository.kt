@@ -134,4 +134,11 @@ class TaskRepository {
     }
 
     fun deleteTask(id: String) = taskCollection.document(id).delete()
+
+    fun deleteUserDocument() {
+        taskCollection.get()
+                .addOnSuccessListener {
+                    it.documents.forEach { it.reference.delete() }
+                }
+    }
 }

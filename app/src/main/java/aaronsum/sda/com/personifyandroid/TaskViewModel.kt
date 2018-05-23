@@ -22,4 +22,8 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
 
     fun deleteTask(taskId: String) = repository.deleteTask(taskId)
 
+    fun deleteUserDocument() {
+        repository.deleteUserDocument()
+    }
+
 }

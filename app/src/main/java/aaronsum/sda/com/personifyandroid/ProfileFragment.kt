@@ -29,7 +29,9 @@ class ProfileFragment : Fragment() {
         setHasOptionsMenu(true)
         val appCompatActivity = activity as AppCompatActivity
         appCompatActivity.setSupportActionBar(profileToolbar)
-        appCompatActivity.supportActionBar?.setDisplayShowTitleEnabled(false)
+        val supportActionBar = appCompatActivity.supportActionBar
+        supportActionBar?.setDisplayShowTitleEnabled(false)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbarTitle.text = username
     }
 
@@ -49,6 +51,8 @@ class ProfileFragment : Fragment() {
                     menu.inflate(R.menu.profile_setting_menu)
                     menu.show()
                 }
+
+                else -> activity?.onBackPressed()
             }
         }
         return super.onOptionsItemSelected(item)
@@ -57,7 +61,12 @@ class ProfileFragment : Fragment() {
     private fun settingMenuSelector(menuItem: MenuItem): Boolean {
         when (menuItem.itemId) {
             R.id.actionEditProfile -> {
-
+                fragmentManager?.apply {
+                    beginTransaction()
+                            .replace(R.id.container, EditProfileFragment())
+                            .addToBackStack("profile")
+                            .commit()
+                }
             }
 
             R.id.actionLogOut -> {

@@ -17,6 +17,7 @@ interface OnTaskClickListener {
 class TaskListFragment : Fragment(), OnTaskClickListener {
     companion object {
         const val KEY_TASK_ID = "task id"
+        const val BACK_STACK_NAME = "taskList"
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -75,7 +76,7 @@ class TaskListFragment : Fragment(), OnTaskClickListener {
                 fragmentManager
                         ?.beginTransaction()
                         ?.replace(R.id.container, ProfileFragment())
-                        ?.addToBackStack("taskList")
+                        ?.addToBackStack(BACK_STACK_NAME)
                         ?.commit()
             }
         }

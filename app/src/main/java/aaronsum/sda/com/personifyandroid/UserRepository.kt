@@ -77,4 +77,9 @@ class UserRepository {
     fun resetPassword(email: String) = auth.sendPasswordResetEmail(email)
 
     fun signOut() = auth.signOut()
+
+    fun editProfile() {
+    }
+
+    fun deleteProfile() = auth.currentUser?.delete()
 }

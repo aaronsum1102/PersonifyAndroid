@@ -14,4 +14,6 @@ class UserViewModel : ViewModel() {
     fun resetPassword(email: String) = userRepository.resetPassword(email)
 
     fun signOut() = userRepository.signOut()
+
+    fun deleteProfile() = userRepository.deleteProfile()
 }

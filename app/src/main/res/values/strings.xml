@@ -48,6 +48,13 @@
     <string name="earliest_completion">Earliest completion:</string>
     <string name="completion_on_time">Completion on time:</string>
     <string name="over_due">Over due:</string>
+    <string name="how_would_you_like_me_to_call_you">How would you like me to call you?</string>
+    <string name="your_current_password">your current password...</string>
+    <string name="current_password">Current password</string>
+    <string name="enter_your_new_email_here">enter your new email here...</string>
+    <string name="do_you_want_to_change_your_email">Do you want to change your email?</string>
+    <string name="save">save</string>
+    <string name="delete_my_account">delete my account</string>
     <string-array name="status">
         <item>To do</item>
         <item>In progress</item>
