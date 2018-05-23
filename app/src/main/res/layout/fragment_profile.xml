@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -20,5 +22,123 @@
             android:textAppearance="@style/AppBarTitle" />
     </android.support.v7.widget.Toolbar>
 
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:contentDescription="background"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.4"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/profileToolbar"
+        app:layout_constraintVertical_bias="0.0"
+        app:srcCompat="@color/primaryColor" />
 
+    <TextView
+        android:id="@+id/completionRateTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="24dp"
+        android:layout_marginStart="24dp"
+        android:text="Completion on time:"
+        android:textAppearance="@style/Body2"
+        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/earliestCompletionTitle" />
+
+    <TextView
+        android:id="@+id/overDueRateTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Over due:"
+        android:textAppearance="@style/Body2"
+        app:layout_constraintStart_toStartOf="@+id/completionRateText"
+        app:layout_constraintTop_toTopOf="@+id/longestOverDueTitle" />
+
+    <TextView
+        android:id="@+id/completionRateText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/Body1"
+        app:layout_constraintStart_toStartOf="@+id/completionRateTitle"
+        app:layout_constraintTop_toTopOf="@+id/earliestCompletionText"
+        tools:text="90%" />
+
+    <TextView
+        android:id="@+id/overDueRateText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="10%"
+        android:textAppearance="@style/Body1"
+        app:layout_constraintStart_toStartOf="@+id/overDueRateTitle"
+        app:layout_constraintTop_toTopOf="@+id/longestOverDueText" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintGuide_percent="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/earliestCompletionTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="24dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="32dp"
+        android:text="Earliest completion:"
+        android:textAppearance="@style/Body2"
+        app:layout_constraintBottom_toTopOf="@+id/earliestCompletionText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintStart_toStartOf="@+id/guideline"
+        app:layout_constraintTop_toBottomOf="@+id/imageView"
+        app:layout_constraintVertical_bias="0.0"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <TextView
+        android:id="@+id/earliestCompletionText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:textAppearance="@style/Body1"
+        app:layout_constraintBottom_toTopOf="@+id/longestOverDueTitle"
+        app:layout_constraintStart_toStartOf="@+id/earliestCompletionTitle"
+        app:layout_constraintTop_toBottomOf="@+id/earliestCompletionTitle"
+        tools:text="5 days"
+        app:layout_constraintHorizontal_chainStyle="packed"/>
+
+    <TextView
+        android:id="@+id/longestOverDueTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="24dp"
+        android:layout_marginTop="24dp"
+        android:text="Longest over due:"
+        android:textAppearance="@style/Body2"
+        app:layout_constraintBottom_toTopOf="@+id/longestOverDueText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="@+id/earliestCompletionText"
+        app:layout_constraintTop_toBottomOf="@+id/earliestCompletionText"
+        app:layout_constraintHorizontal_chainStyle="packed"/>
+
+    <TextView
+        android:id="@+id/longestOverDueText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:layout_marginTop="16dp"
+        android:textAppearance="@style/Body1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="@+id/longestOverDueTitle"
+        app:layout_constraintTop_toBottomOf="@+id/longestOverDueTitle"
+        tools:text="5 days" />
 </android.support.constraint.ConstraintLayout>
