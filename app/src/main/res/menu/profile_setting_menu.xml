@@ -6,15 +6,7 @@
         android:title="@string/edit_profile"
         app:showAsAction="never" />
     <item
-        android:id="@+id/actionPassword"
-        android:title="@string/change_password"
-        app:showAsAction="never" />
-    <item
         android:id="@+id/actionLogOut"
         android:title="@string/log_out"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/actionDeleteAccount"
-        android:title="@string/delete_account"
         app:showAsAction="never" />
 </menu>

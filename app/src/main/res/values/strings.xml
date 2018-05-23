@@ -43,6 +43,11 @@
     <string name="change_password">Change password</string>
     <string name="log_out">Log Out</string>
     <string name="delete_account">Delete account</string>
+    <string name="no_data_yet">No data yet...</string>
+    <string name="longest_over_due">Longest over due:</string>
+    <string name="earliest_completion">Earliest completion:</string>
+    <string name="completion_on_time">Completion on time:</string>
+    <string name="over_due">Over due:</string>
     <string-array name="status">
         <item>To do</item>
         <item>In progress</item>
