@@ -2,11 +2,14 @@ package aaronsum.sda.com.personifyandroid
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.*
+import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import kotlinx.android.synthetic.main.fragment_tasks_list.*
 
@@ -29,6 +32,7 @@ class TaskListFragment : Fragment(), OnTaskClickListener {
         setHasOptionsMenu(true)
         (activity as AppCompatActivity).setSupportActionBar(toolbar)
         (activity as AppCompatActivity).supportActionBar?.setDisplayShowTitleEnabled(false)
+
         val viewModel = ViewModelProviders.of(activity!!)[TaskViewModel::class.java]
 
         val adaptor = TaskViewAdaptor(this)

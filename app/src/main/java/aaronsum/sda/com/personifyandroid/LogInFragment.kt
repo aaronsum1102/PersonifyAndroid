@@ -13,7 +13,7 @@ import android.widget.Toast
 import kotlinx.android.synthetic.main.fragment_user_login.*
 
 class LogInFragment : Fragment(), TextWatcher {
-    lateinit var userViewModel: UserViewModel
+    private lateinit var userViewModel: UserViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_user_login, container, false)
@@ -41,7 +41,6 @@ class LogInFragment : Fragment(), TextWatcher {
                     ?.replace(R.id.container, ResetPasswordFragment())
                     ?.commit()
         }
-
     }
 
     private fun signInAuthentication(email: String, password: String) {
@@ -59,6 +58,8 @@ class LogInFragment : Fragment(), TextWatcher {
                             val taskViewModel = ViewModelProviders.of(activity!!)[TaskViewModel::class.java]
                             taskViewModel.addEventListenerToDB(result.user.uid)
                             taskViewModel.loadAllTask()
+                            view?.let { Util.hideSoftKeyboard(activity, view as View) }
+
                             val taskListFragment = TaskListFragment()
                             fragmentManager?.popBackStack("welcome",
                                     FragmentManager.POP_BACK_STACK_INCLUSIVE)
