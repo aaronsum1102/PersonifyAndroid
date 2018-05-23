@@ -9,7 +9,8 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.UserProfileChangeRequest
 
 data class User(val userId: String,
-                val username: String)
+                val username: String,
+                val email: String)
 
 class UserRepository {
     companion object {
@@ -29,7 +30,8 @@ class UserRepository {
             it.continueWith {
                 val result = it.result
                 updateUserProfile(userInfo, result.user)
-                currentUser.value = User(result.user.uid, userInfo.name)
+                val email = result.user?.email
+                email?.let { currentUser.value = User(result.user.uid, userInfo.name, email) }
                 Log.i(TAG, "create new account, ${currentUser.value?.username}")
             }
         }
@@ -64,7 +66,8 @@ class UserRepository {
                             Log.i(TAG, "account reload successes. $displayName.")
                             displayName?.let {
                                 Log.i(TAG, "show user display name.")
-                                this.currentUser.postValue(User(currentUser.uid, displayName))
+                                val email = currentUser.email
+                                email?.let { this.currentUser.postValue(User(currentUser.uid, displayName, email)) }
                             }
                         }
             } else {
@@ -78,7 +81,18 @@ class UserRepository {
 
     fun signOut() = auth.signOut()
 
-    fun editProfile() {
+    fun editProfile(userInfo: UserInfo) {
+        val currentUser = auth.currentUser
+        currentUser?.let {
+            updateUserProfile(userInfo, currentUser)
+            this.currentUser.postValue(User(currentUser.uid, userInfo.name, userInfo.email))
+            currentUser.updateEmail(userInfo.email)
+        }
+    }
+
+    fun verifyPassword(password: String): Task<AuthResult>? {
+        val email = auth.currentUser?.email
+        return email?.let { auth.signInWithEmailAndPassword(email, password) }
     }
 
     fun deleteProfile() = auth.currentUser?.delete()

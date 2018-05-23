@@ -10,6 +10,10 @@ import android.widget.PopupMenu
 import kotlinx.android.synthetic.main.fragment_profile.*
 
 class ProfileFragment : Fragment() {
+    companion object {
+        const val PROFILE_BACK_STACK = "profile"
+    }
+
     private lateinit var userViewModel: UserViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -64,7 +68,7 @@ class ProfileFragment : Fragment() {
                 fragmentManager?.apply {
                     beginTransaction()
                             .replace(R.id.container, EditProfileFragment())
-                            .addToBackStack("profile")
+                            .addToBackStack(PROFILE_BACK_STACK)
                             .commit()
                 }
             }

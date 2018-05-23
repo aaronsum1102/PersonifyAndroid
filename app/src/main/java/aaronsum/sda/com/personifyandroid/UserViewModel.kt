@@ -16,4 +16,10 @@ class UserViewModel : ViewModel() {
     fun signOut() = userRepository.signOut()
 
     fun deleteProfile() = userRepository.deleteProfile()
+
+    fun verifyPassword(password: String) = userRepository.verifyPassword(password)
+
+    fun editProfile(userInfo: UserInfo) {
+        userRepository.editProfile(userInfo)
+    }
 }
