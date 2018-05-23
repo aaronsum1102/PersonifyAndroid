@@ -39,6 +39,10 @@
     <string name="tasks">Tasks</string>
     <string name="profile">Profile</string>
     <string name="settings">settings</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="change_password">Change password</string>
+    <string name="log_out">Log Out</string>
+    <string name="delete_account">Delete account</string>
     <string-array name="status">
         <item>To do</item>
         <item>In progress</item>

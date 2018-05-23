@@ -12,7 +12,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 
 class WelcomeScreenFragment : Fragment() {
-    private val welcomeScreenTime = 1000L
+    private val welcomeScreenTime : Long = 1000
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_welcome_screen, container, false)

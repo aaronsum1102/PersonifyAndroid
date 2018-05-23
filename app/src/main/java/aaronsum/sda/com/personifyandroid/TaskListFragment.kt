@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.*
 import android.widget.TextView
 import kotlinx.android.synthetic.main.fragment_tasks_list.*
@@ -20,19 +19,15 @@ class TaskListFragment : Fragment(), OnTaskClickListener {
         const val KEY_TASK_ID = "task id"
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_tasks_list, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setHasOptionsMenu(true)
         (activity as AppCompatActivity).setSupportActionBar(toolbar)
-
+        (activity as AppCompatActivity).supportActionBar?.setDisplayShowTitleEnabled(false)
         val viewModel = ViewModelProviders.of(activity!!)[TaskViewModel::class.java]
 
         val adaptor = TaskViewAdaptor(this)
@@ -70,15 +65,16 @@ class TaskListFragment : Fragment(), OnTaskClickListener {
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
         super.onCreateOptionsMenu(menu, inflater)
-        inflater?.inflate(R.menu.toolbar_menu, menu)
+        inflater?.inflate(R.menu.main_toolbar_menu, menu)
+        menu?.findItem(R.id.action_profile)?.setIcon(R.drawable.download)
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
-            R.id.action_setting -> {
+            R.id.action_profile -> {
                 fragmentManager
                         ?.beginTransaction()
-                        ?.replace(R.id.container, Fragment())
+                        ?.replace(R.id.container, ProfileFragment())
                         ?.addToBackStack("taskList")
                         ?.commit()
             }
