@@ -2,13 +2,22 @@ package aaronsum.sda.com.personifyandroid
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
+import com.squareup.picasso.Picasso
+import com.squareup.picasso.Target
 import kotlinx.android.synthetic.main.fragment_tasks_list.*
+import java.lang.Exception
 
 interface OnTaskClickListener {
     fun onTaskClick(task: Task, taskId: String)
@@ -21,12 +30,24 @@ class TaskListFragment : Fragment(), OnTaskClickListener {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_tasks_list, container, false)
+        val view = inflater.inflate(R.layout.fragment_tasks_list, container, false)
+        val imageView = view.findViewById<ImageView>(R.id.toProfilePage)
+
+        val url = "http://i.imgur.com/DvpvklR.png"
+        Picasso.get().load(url).into(object : Target {
+            override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
+
+            override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
+
+            override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+                imageView.background = BitmapDrawable(resources, bitmap)
+            }
+        })
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setHasOptionsMenu(true)
         (activity as AppCompatActivity).setSupportActionBar(toolbar)
         (activity as AppCompatActivity).supportActionBar?.setDisplayShowTitleEnabled(false)
 
@@ -51,6 +72,14 @@ class TaskListFragment : Fragment(), OnTaskClickListener {
                         ?.commit()
             }
         }
+
+        toProfilePage.setOnClickListener {
+            fragmentManager
+                    ?.beginTransaction()
+                    ?.replace(R.id.container, ProfileFragment())
+                    ?.addToBackStack(TASK_LIST_BACK_STACK)
+                    ?.commit()
+        }
     }
 
     override fun onTaskClick(task: Task, taskId: String) {
@@ -63,25 +92,6 @@ class TaskListFragment : Fragment(), OnTaskClickListener {
                 ?.replace(R.id.container, taskFormFragment)
                 ?.addToBackStack(null)
                 ?.commit()
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
-        super.onCreateOptionsMenu(menu, inflater)
-        inflater?.inflate(R.menu.main_toolbar_menu, menu)
-        menu?.findItem(R.id.action_profile)?.setIcon(R.drawable.download)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when (item?.itemId) {
-            R.id.action_profile -> {
-                fragmentManager
-                        ?.beginTransaction()
-                        ?.replace(R.id.container, ProfileFragment())
-                        ?.addToBackStack(TASK_LIST_BACK_STACK)
-                        ?.commit()
-            }
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     class TaskViewAdaptor(private val taskClickListener: OnTaskClickListener) : RecyclerView.Adapter<TaskViewHolder>() {

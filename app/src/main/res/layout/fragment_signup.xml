@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/textVsPrimary">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
@@ -51,14 +53,14 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="24dp"
             android:layout_marginStart="24dp"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="16dp"
             android:ems="10"
             android:hint="@string/display_name"
             android:inputType="textPersonName"
             android:textAppearance="@style/TextAppearance.subtitle1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/pageTitle"
+            app:layout_constraintTop_toBottomOf="@+id/profileImage"
             app:layout_constraintWidth_percent="0.85" />
 
         <EditText
@@ -128,16 +130,29 @@
             style="@style/AppTheme.PrimaryButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="32dp"
             android:layout_marginEnd="28dp"
             android:layout_marginStart="28dp"
             android:layout_marginTop="40dp"
             android:background="@drawable/my_button_background"
             android:text="@string/create_account"
             android:textColor="#FFFFFF"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView6"
             app:layout_constraintWidth_percent="0.85" />
+
+        <ImageView
+            android:id="@+id/profileImage"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginTop="32dp"
+            app:layout_constraintStart_toStartOf="@+id/pageTitle"
+            app:layout_constraintTop_toBottomOf="@+id/pageTitle"
+            android:background="@color/primaryColor"
+            android:tint="@android:color/background_light"
+            app:srcCompat="@drawable/rectangle_image" />
 
     </android.support.constraint.ConstraintLayout>
 </ScrollView>
