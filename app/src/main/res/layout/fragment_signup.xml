@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -19,8 +18,7 @@
             android:ems="10"
             android:hint="@string/password"
             android:inputType="textPassword"
-            android:textAppearance="@style/Body2"
-            android:textColor="@color/primaryTextColor"
+            android:textAppearance="@style/TextAppearance.subtitle1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/emailExplain"
@@ -32,7 +30,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:text="@string/_6_characters_minimum"
-            android:textAppearance="@style/Body2"
+            android:textAppearance="@style/TextAppearance.subtitle2"
             app:layout_constraintStart_toStartOf="@+id/passwordText"
             app:layout_constraintTop_toBottomOf="@+id/passwordText" />
 
@@ -43,8 +41,7 @@
             android:layout_marginStart="4dp"
             android:layout_marginTop="64dp"
             android:text="@string/create_account"
-            android:textAppearance="@style/Body1"
-            android:textSize="24sp"
+            android:textAppearance="@style/TextAppearance.H5"
             app:layout_constraintStart_toStartOf="@+id/nameText"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -58,8 +55,7 @@
             android:ems="10"
             android:hint="@string/display_name"
             android:inputType="textPersonName"
-            android:textAppearance="@style/Body2"
-            android:textColor="@color/primaryTextColor"
+            android:textAppearance="@style/TextAppearance.subtitle1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/pageTitle"
@@ -75,8 +71,7 @@
             android:ems="10"
             android:hint="@string/email"
             android:inputType="textEmailAddress"
-            android:textAppearance="@style/Body2"
-            android:textColor="@color/primaryTextColor"
+            android:textAppearance="@style/TextAppearance.subtitle1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/nameExplain"
@@ -88,8 +83,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:text="@string/to_let_me_know_more_about_you"
-            android:textAppearance="@style/Body2"
-            android:textSize="14sp"
+            android:textAppearance="@style/TextAppearance.subtitle2"
             app:layout_constraintStart_toStartOf="@+id/nameText"
             app:layout_constraintTop_toBottomOf="@+id/nameText" />
 
@@ -99,7 +93,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:text="@string/for_sign_in_and_recover_password"
-            android:textAppearance="@style/Body2"
+            android:textAppearance="@style/TextAppearance.subtitle2"
             app:layout_constraintStart_toStartOf="@+id/emailText"
             app:layout_constraintTop_toBottomOf="@+id/emailText" />
 
@@ -113,8 +107,7 @@
             android:ems="10"
             android:hint="@string/verify_password"
             android:inputType="textPassword"
-            android:textAppearance="@style/Body2"
-            android:textColor="@color/primaryTextColor"
+            android:textAppearance="@style/TextAppearance.subtitle1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/emailExplain2"
@@ -126,12 +119,13 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:text="@string/to_help_you_practise_with_your_new_password"
-            android:textAppearance="@style/Body2"
+            android:textAppearance="@style/TextAppearance.subtitle2"
             app:layout_constraintStart_toStartOf="@+id/verifyPasswordText"
             app:layout_constraintTop_toBottomOf="@+id/verifyPasswordText" />
 
         <Button
             android:id="@+id/createAccountButton"
+            style="@style/AppTheme.PrimaryButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="28dp"

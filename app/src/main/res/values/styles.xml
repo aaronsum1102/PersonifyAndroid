@@ -4,43 +4,70 @@
         <item name="colorPrimary">@color/primaryColor</item>
         <item name="colorPrimaryDark">@color/primaryDarkColor</item>
         <item name="colorAccent">@color/primaryLightColor</item>
-        <item name="buttonStyle">@style/MyButtonStyle</item>
+        <item name="buttonStyle">@style/AppTheme.PrimaryButtonStyle</item>
+        <item name="android:editTextStyle">@style/AppTheme.EditText</item>
+        <item name="editTextStyle">@style/AppTheme.EditText</item>
+        <item name="alertDialogTheme">@style/AppTheme.AlertDialog</item>
     </style>
 
-    <style name="Body1" parent="TextAppearance.AppCompat.Body2">
+    <style name="AppTheme.Toolbar" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="android:background">@color/primaryColor</item>
+    </style>
+
+    <style name="AppBarTitle" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textColor">@color/textVsPrimary</item>
+        <item name="android:fontFamily">@font/pacifico</item>
+    </style>
+
+    <style name="AppTheme.TextColor" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">@color/primaryTextColor</item>
+    </style>
+
+    <style name="TextAppearance.H5" parent="TextAppearance.AppCompat.Caption">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textColor">@color/primaryTextColor</item>
+        <item name="android:fontFamily">@font/roboto</item>
+    </style>
+
+    <style name="TextAppearance.H6" parent="TextAppearance.AppCompat.Body1">
         <item name="android:textSize">20sp</item>
         <item name="android:textColor">@color/primaryTextColor</item>
         <item name="android:fontFamily">@font/roboto</item>
     </style>
 
-    <style name="Body2" parent="TextAppearance.AppCompat.Body1">
+    <style name="TextAppearance.subtitle1" parent="TextAppearance.AppCompat.Body1">
         <item name="android:textSize">16sp</item>
         <item name="android:textColor">@color/primaryTextColor</item>
         <item name="android:fontFamily">@font/roboto</item>
     </style>
 
-    <style name="MyButtonStyle" parent="Widget.AppCompat.Button.Colored">
-        <item name="android:textColor">@color/primaryDarkColor</item>
-        <item name="android:fontFamily">@font/roboto</item>
-    </style>
-
-     <style name="AppTitle" parent="TextAppearance.AppCompat.Title">
-         <item name="android:textSize">48sp</item>
-        <item name="android:textColor">#FFFFFF</item>
-        <item name="android:fontFamily">@font/pacifico</item>
-    </style>
-
-    <style name="AppBarTitle" parent="TextAppearance.AppCompat.Title">
-        <item name="android:textSize">20sp</item>
-        <item name="android:textColor">#FFFFFF</item>
-        <item name="android:fontFamily">@font/pacifico</item>
-    </style>
-
-    <style name="TabText" parent="TextAppearance.AppCompat.Body1">
-        <item name="android:textSize">16sp</item>
+    <style name="TextAppearance.subtitle2" parent="TextAppearance.subtitle1">
+        <item name="android:textSize">14sp</item>
         <item name="android:textColor">@color/primaryTextColor</item>
-        <item name="android:textAllCaps">true</item>
-        <item name="android:textStyle">bold</item>
         <item name="android:fontFamily">@font/roboto</item>
+    </style>
+
+    <style name="AppTitle" parent="TextAppearance.AppCompat.Title">
+        <item name="android:textSize">48sp</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:fontFamily">@font/pacifico</item>
+    </style>
+
+    <style name="AppTheme.PrimaryButtonStyle" parent="Widget.AppCompat.Button.Colored">
+        <item name="android:textColor">@color/textVsPrimary</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">@font/roboto</item>
+        <item name="android:background">@drawable/my_button_background</item>
+    </style>
+
+    <style name="AppTheme.EditText" parent="Widget.AppCompat.EditText">
+        <item name="android:textColor">@color/primaryTextColor</item>
+        <item name="android:textAppearance">@style/TextAppearance.subtitle1</item>
+    </style>
+
+    <style name="AppTheme.AlertDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:colorAccent">@color/primaryTextColor</item>
+        <item name="android:textColorPrimary">@color/primaryTextColor</item>
     </style>
 </resources>

@@ -31,7 +31,7 @@
     <string name="for_sign_in_and_recover_password">For sign in and recover password...</string>
     <string name="verify_password">verify password</string>
     <string name="to_help_you_practise_with_your_new_password">To help you practise with your new password...</string>
-    <string name="please_enter_the_email_address_you_used_for_the_app_and_follow_the_email_you_recevied_for_steps_to_reset_your_password">Please enter the email address you used for the app, and follow the email you recevied for steps to reset your password.</string>
+    <string name="please_enter_the_email_address_you_used_for_the_app_and_follow_the_email_you_received_for_steps_to_reset_your_password">Please enter the email address you used for the app, and follow the email you received for steps to reset your password.</string>
     <string name="enter_your_email_here">enter your email here</string>
     <string name="request_for_a_new_password_here">Request for a new password here</string>
     <string name="confirm">confirm</string>

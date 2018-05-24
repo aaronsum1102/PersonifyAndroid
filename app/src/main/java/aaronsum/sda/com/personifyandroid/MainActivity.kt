@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
-    lateinit var welcomeScreenFragment: WelcomeScreenFragment
+    private lateinit var welcomeScreenFragment: WelcomeScreenFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

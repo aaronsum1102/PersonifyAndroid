@@ -51,11 +51,8 @@ class TaskFormFragment : Fragment() {
             removeTaskButton.visibility = View.VISIBLE
             removeTaskButton.setOnClickListener {
                 existingTask?.let {
-                    val taskId = arguments?.getString(TaskListFragment.KEY_TASK_ID)
-                    taskId?.let {
-                        viewModel.deleteTask(taskId)
-                        fragmentManager?.popBackStack()
-                    }
+                    viewModel.deleteTask(taskId)
+                    fragmentManager?.popBackStack()
                 }
             }
         }

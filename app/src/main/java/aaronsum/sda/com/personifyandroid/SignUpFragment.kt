@@ -15,7 +15,7 @@ import kotlinx.android.synthetic.main.fragment_signup.*
 data class UserInfo(val name: String, val email: String, val password: String)
 
 class SignUpFragment : Fragment(), TextWatcher {
-    lateinit var userViewModel: UserViewModel
+    private lateinit var userViewModel: UserViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_signup, container, false)

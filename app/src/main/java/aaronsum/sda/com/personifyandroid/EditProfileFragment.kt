@@ -2,7 +2,6 @@ package aaronsum.sda.com.personifyandroid
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
-import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
@@ -14,7 +13,6 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import kotlinx.android.synthetic.main.fragment_edit_profile.*
 
@@ -50,7 +48,7 @@ class EditProfileFragment : Fragment(), TextWatcher {
                                 newEmailText.text.toString(),
                                 passwordText.text.toString())
                         userViewModel.editProfile(userInfo)
-                        Util.hideSoftKeyboard(activity,view)
+                        Util.hideSoftKeyboard(activity, view)
                         fragmentManager?.popBackStack(TaskListFragment.TASK_LIST_BACK_STACK,
                                 FragmentManager.POP_BACK_STACK_INCLUSIVE)
                     }
