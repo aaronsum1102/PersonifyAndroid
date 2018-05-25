@@ -12,7 +12,6 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
@@ -30,20 +29,7 @@ class TaskListFragment : Fragment(), OnTaskClickListener {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_tasks_list, container, false)
-        val imageView = view.findViewById<ImageView>(R.id.toProfilePage)
-
-        val url = "http://i.imgur.com/DvpvklR.png"
-        Picasso.get().load(url).into(object : Target {
-            override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
-
-            override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
-
-            override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                imageView.background = BitmapDrawable(resources, bitmap)
-            }
-        })
-        return view
+        return inflater.inflate(R.layout.fragment_tasks_list, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -52,6 +38,20 @@ class TaskListFragment : Fragment(), OnTaskClickListener {
         (activity as AppCompatActivity).supportActionBar?.setDisplayShowTitleEnabled(false)
 
         val viewModel = ViewModelProviders.of(activity!!)[TaskViewModel::class.java]
+        val photoViewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
+        photoViewModel.profilePhotoUrl.observe(this, Observer { uri ->
+            uri?.let {
+                Picasso.get().load(it).into(object : Target {
+                    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
+
+                    override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
+
+                    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+                        toProfilePage.background = BitmapDrawable(resources, bitmap)
+                    }
+                })
+            }
+        })
 
         val adaptor = TaskViewAdaptor(this)
         taskRecyclerView.adapter = adaptor

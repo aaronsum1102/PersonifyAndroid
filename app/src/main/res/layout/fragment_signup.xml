@@ -60,7 +60,7 @@
             android:textAppearance="@style/TextAppearance.subtitle1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/profileImage"
+            app:layout_constraintTop_toBottomOf="@+id/profilePhoto"
             app:layout_constraintWidth_percent="0.85" />
 
         <EditText
@@ -144,7 +144,7 @@
             app:layout_constraintWidth_percent="0.85" />
 
         <ImageView
-            android:id="@+id/profileImage"
+            android:id="@+id/profilePhoto"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_marginTop="32dp"

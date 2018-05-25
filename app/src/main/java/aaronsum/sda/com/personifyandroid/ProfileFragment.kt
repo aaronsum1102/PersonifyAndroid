@@ -2,12 +2,18 @@ package aaronsum.sda.com.personifyandroid
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.view.*
 import android.widget.PopupMenu
+import com.squareup.picasso.Picasso
+import com.squareup.picasso.Target
 import kotlinx.android.synthetic.main.fragment_profile.*
+import java.lang.Exception
 
 class ProfileFragment : Fragment() {
     companion object {
@@ -26,6 +32,21 @@ class ProfileFragment : Fragment() {
         userViewModel = ViewModelProviders.of(activity!!)[UserViewModel::class.java]
         userViewModel.currentUser.observe(this, Observer { user ->
             user?.let { initialisedToolbar(it.username) }
+        })
+
+        val photoViewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
+        photoViewModel.profilePhotoUrl.observe(this, Observer { uri ->
+            uri?.let {
+                Picasso.get().load(it).into(object : Target {
+                    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
+
+                    override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
+
+                    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+                        profilePhoto.background = BitmapDrawable(resources, bitmap)
+                    }
+                })
+            }
         })
     }
 

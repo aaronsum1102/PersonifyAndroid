@@ -20,7 +20,6 @@ class WelcomeScreenFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         signInStateCheckForAction()
     }
 
@@ -44,14 +43,14 @@ class WelcomeScreenFragment : Fragment() {
                         val taskViewModel = ViewModelProviders.of(activity!!)[TaskViewModel::class.java]
                         taskViewModel.addEventListenerToDB(it.userId)
                         val message = "Welcome back, ${it.username}."
-                        initTaskList(taskViewModel, message)
+                        initTaskList(taskViewModel, message, it.userId)
                     }
                 }
             }
         })
     }
 
-    private fun initTaskList(taskViewModel: TaskViewModel, message: String) {
+    private fun initTaskList(taskViewModel: TaskViewModel, message: String, userId: String) {
         taskViewModel.loadAllTask()
                 ?.addOnSuccessListener {
                     Handler().postDelayed({
