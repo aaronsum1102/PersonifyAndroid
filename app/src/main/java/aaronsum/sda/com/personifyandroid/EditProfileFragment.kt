@@ -39,6 +39,7 @@ class EditProfileFragment : Fragment(), TextWatcher {
 
         deleteProfileButton.setOnClickListener {
             deleteProfile(userViewModel, taskViewModel)
+
         }
 
         saveButton.setOnClickListener {
@@ -76,6 +77,9 @@ class EditProfileFragment : Fragment(), TextWatcher {
                                                 "Unable to delete your account. ${it.message}",
                                                 Toast.LENGTH_LONG).show()
                                     }
+                            val user = userViewModel.currentUser.value
+                            val photoViewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
+                            user?.userId?.let { photoViewModel.deleteUserProfile(it) }
                             fragmentManager?.apply {
                                 popBackStack(TaskListFragment.TASK_LIST_BACK_STACK,
                                         FragmentManager.POP_BACK_STACK_INCLUSIVE)

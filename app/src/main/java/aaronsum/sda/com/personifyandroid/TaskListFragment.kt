@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -40,16 +41,20 @@ class TaskListFragment : Fragment(), OnTaskClickListener {
         val viewModel = ViewModelProviders.of(activity!!)[TaskViewModel::class.java]
         val photoViewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
         photoViewModel.profilePhotoUrl.observe(this, Observer { uri ->
-            uri?.let {
-                Picasso.get().load(it).into(object : Target {
+            if (uri != null) {
+                Picasso.get().load(uri).into(object : Target {
                     override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
 
                     override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
 
                     override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+                        Log.d("TAG", "load profile pic")
                         toProfilePage.background = BitmapDrawable(resources, bitmap)
                     }
                 })
+            } else {
+                val userId = arguments?.getString(WelcomeScreenFragment.USER_ID)
+                userId?.let { photoViewModel.loadUserProfilePic(userId) }
             }
         })
 

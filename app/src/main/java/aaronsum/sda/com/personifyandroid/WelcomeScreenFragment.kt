@@ -12,6 +12,10 @@ import android.view.ViewGroup
 import android.widget.Toast
 
 class WelcomeScreenFragment : Fragment() {
+    companion object {
+        const val USER_ID = "userId"
+    }
+
     private val welcomeScreenTime: Long = 1500
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -60,9 +64,15 @@ class WelcomeScreenFragment : Fragment() {
                                     Toast.LENGTH_SHORT)
                                     .show()
                         }
+                        val photoViewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
+                        photoViewModel.loadUserProfilePic(userId)
+                        val taskListFragment = TaskListFragment()
+                        val bundle = Bundle()
+                        bundle.putString(USER_ID, userId)
+                        taskListFragment.arguments = bundle
                         fragmentManager
                                 ?.beginTransaction()
-                                ?.replace(R.id.container, TaskListFragment())
+                                ?.replace(R.id.container, taskListFragment)
                                 ?.commit()
                     }, welcomeScreenTime)
                 }
