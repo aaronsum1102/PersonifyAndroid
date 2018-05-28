@@ -14,6 +14,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import kotlinx.android.synthetic.main.fragment_tasks_list.*
@@ -29,6 +30,8 @@ class TaskListFragment : Fragment(), OnTaskClickListener {
         const val TASK_LIST_BACK_STACK = "taskList"
     }
 
+    private val TAG = "TaskListFragment"
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_tasks_list, container, false)
     }
@@ -40,21 +43,27 @@ class TaskListFragment : Fragment(), OnTaskClickListener {
 
         val viewModel = ViewModelProviders.of(activity!!)[TaskViewModel::class.java]
         val photoViewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
+
         photoViewModel.profilePhotoUrl.observe(this, Observer { uri ->
-            if (uri != null) {
-                Picasso.get().load(uri).into(object : Target {
-                    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
+            uri?.let {
+                Picasso.get().load(uri).fetch(object : Callback {
+                    override fun onSuccess() {
+                        Picasso.get().load(uri).into(object : Target {
+                            override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
 
-                    override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
+                            override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
 
-                    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                        Log.d("TAG", "load profile pic")
-                        toProfilePage.background = BitmapDrawable(resources, bitmap)
+                            override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+
+                                toProfilePage.background = BitmapDrawable(resources, bitmap)
+                            }
+                        })
+                    }
+
+                    override fun onError(e: Exception?) {
+                        Log.e(TAG, "Something went wrong. $e.")
                     }
                 })
-            } else {
-                val userId = arguments?.getString(WelcomeScreenFragment.USER_ID)
-                userId?.let { photoViewModel.loadUserProfilePic(userId) }
             }
         })
 

@@ -27,18 +27,14 @@ object Util {
                 val uriForFile = getUriForFile(file, context)
                 val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, uriForFile)
-//                intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-//                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-//                intent.putExtra("return-data", true)
                 fragment.startActivityForResult(intent, SignUpFragment.CAMERA_REQUEST_CODE)
-//                fragment.startActivity(intent)
             }
         }
         return file
     }
 
     fun getUriForFile(file: File?, context: Context?): Uri? {
-        val authority = "com.aaronsum.personify.fileprovider"
+        val authority = "${context?.packageName}.fileprovider"
         if (file != null && context != null) {
             return FileProvider.getUriForFile(context, authority, file)
         }
@@ -49,7 +45,10 @@ object Util {
         context?.let {
             try {
                 val file = File(it.filesDir, "images")
-                return createTempFile("tmp", ".jpg", file)
+                if (!file.exists()) {
+                    file.mkdir()
+                }
+                return File.createTempFile("tmp", ".jpg", file)
             } catch (exception: IOException) {
                 Log.e("TAG", "unable to create file. ${exception.message}")
             }

@@ -34,12 +34,14 @@ class WelcomeScreenFragment : Fragment() {
             currentUser = it
             when (currentUser) {
                 null -> {
-                    Handler().postDelayed({
-                        fragmentManager
-                                ?.beginTransaction()
-                                ?.replace(R.id.container, UserManagementFragment())
-                                ?.commit()
-                    }, welcomeScreenTime)
+                    Handler().postDelayed(
+                            {
+                                fragmentManager
+                                        ?.beginTransaction()
+                                        ?.replace(R.id.container, UserManagementFragment())
+                                        ?.commit()
+                            },
+                            welcomeScreenTime)
                 }
 
                 else -> {
@@ -57,24 +59,26 @@ class WelcomeScreenFragment : Fragment() {
     private fun initTaskList(taskViewModel: TaskViewModel, message: String, userId: String) {
         taskViewModel.loadAllTask()
                 ?.addOnSuccessListener {
-                    Handler().postDelayed({
-                        this@WelcomeScreenFragment.context?.let {
-                            Toast.makeText(this@WelcomeScreenFragment.context,
-                                    message,
-                                    Toast.LENGTH_SHORT)
-                                    .show()
-                        }
-                        val photoViewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
-                        photoViewModel.loadUserProfilePic(userId)
-                        val taskListFragment = TaskListFragment()
-                        val bundle = Bundle()
-                        bundle.putString(USER_ID, userId)
-                        taskListFragment.arguments = bundle
-                        fragmentManager
-                                ?.beginTransaction()
-                                ?.replace(R.id.container, taskListFragment)
-                                ?.commit()
-                    }, welcomeScreenTime)
+                    Handler().postDelayed(
+                            {
+                                this@WelcomeScreenFragment.context?.let {
+                                    Toast.makeText(this@WelcomeScreenFragment.context,
+                                            message,
+                                            Toast.LENGTH_SHORT)
+                                            .show()
+                                }
+                                val photoViewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
+                                photoViewModel.loadUserProfilePic(userId)
+                                val taskListFragment = TaskListFragment()
+                                val bundle = Bundle()
+                                bundle.putString(USER_ID, userId)
+                                taskListFragment.arguments = bundle
+                                fragmentManager
+                                        ?.beginTransaction()
+                                        ?.replace(R.id.container, taskListFragment)
+                                        ?.commit()
+                            },
+                            welcomeScreenTime)
                 }
                 ?.addOnFailureListener { exception ->
                     val view = this@WelcomeScreenFragment.view

@@ -148,11 +148,23 @@
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_marginTop="32dp"
+            android:background="@drawable/download"
+            android:tint="@android:color/background_light"
             app:layout_constraintStart_toStartOf="@+id/pageTitle"
             app:layout_constraintTop_toBottomOf="@+id/pageTitle"
-            android:background="@color/primaryColor"
-            android:tint="@android:color/background_light"
             app:srcCompat="@drawable/rectangle_image" />
 
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/addPhoto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="80dp"
+            android:layout_marginTop="60dp"
+            android:clickable="true"
+            android:tint="@color/textVsPrimary"
+            app:backgroundTint="@color/primaryColor"
+            app:layout_constraintStart_toStartOf="@+id/profilePhoto"
+            app:layout_constraintTop_toTopOf="@+id/profilePhoto"
+            app:srcCompat="@drawable/ic_add_black_24dp" />
     </android.support.constraint.ConstraintLayout>
 </ScrollView>

@@ -53,8 +53,12 @@ class PhotoRepository {
     }
 
     fun deleteUserProfilePic(userId: String) {
-        Log.d("TAG", "$userId")
+        Log.d("delete", "user id in photo repository $userId")
         collection.document(userId).delete()
         photoReference.child("$userId.jpg").delete()
+    }
+
+    fun clearProfilePic(userId: String) {
+        profilePhoto.postValue(null)
     }
 }

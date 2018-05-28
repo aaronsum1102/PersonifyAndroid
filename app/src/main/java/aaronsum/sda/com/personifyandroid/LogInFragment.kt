@@ -55,6 +55,8 @@ class LogInFragment : Fragment(), TextWatcher {
                                         Toast.LENGTH_SHORT)
                                         .show()
                             }
+                            val photoViewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
+                            photoViewModel.loadUserProfilePic(result.user.uid)
                             val taskViewModel = ViewModelProviders.of(activity!!)[TaskViewModel::class.java]
                             taskViewModel.addEventListenerToDB(result.user.uid)
                             taskViewModel.loadAllTask()

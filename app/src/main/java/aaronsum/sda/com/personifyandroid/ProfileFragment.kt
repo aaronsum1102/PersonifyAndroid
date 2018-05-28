@@ -8,11 +8,14 @@ import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.*
 import android.widget.PopupMenu
+import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import kotlinx.android.synthetic.main.fragment_profile.*
+import kotlinx.android.synthetic.main.fragment_tasks_list.*
 import java.lang.Exception
 
 class ProfileFragment : Fragment() {
@@ -20,7 +23,9 @@ class ProfileFragment : Fragment() {
         const val PROFILE_BACK_STACK = "profile"
     }
 
+    private val TAG = "ProfileFragment"
     private lateinit var userViewModel: UserViewModel
+    private lateinit var photoViewModel: PhotoViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_profile, container, false)
@@ -34,16 +39,24 @@ class ProfileFragment : Fragment() {
             user?.let { initialisedToolbar(it.username) }
         })
 
-        val photoViewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
+        photoViewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
         photoViewModel.profilePhotoUrl.observe(this, Observer { uri ->
             uri?.let {
-                Picasso.get().load(it).into(object : Target {
-                    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
+                Picasso.get().load(uri).fetch(object : Callback {
+                    override fun onSuccess() {
+                        Picasso.get().load(uri).into(object : Target {
+                            override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
 
-                    override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
+                            override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
 
-                    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                        profilePhoto.background = BitmapDrawable(resources, bitmap)
+                            override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+                                profilePhoto.background = BitmapDrawable(resources, bitmap)
+                            }
+                        })
+                    }
+
+                    override fun onError(e: Exception?) {
+                        Log.e(TAG, "Something went wrong. $e.")
                     }
                 })
             }
@@ -95,6 +108,8 @@ class ProfileFragment : Fragment() {
             }
 
             R.id.actionLogOut -> {
+                val userId = userViewModel.currentUser.value?.userId
+                userId?.let { photoViewModel.clearProfilePicAfterUserSession(userId) }
                 userViewModel.signOut()
                 fragmentManager?.apply {
                     popBackStack()

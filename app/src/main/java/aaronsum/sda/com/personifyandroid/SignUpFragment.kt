@@ -11,10 +11,12 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import kotlinx.android.synthetic.main.fragment_signup.*
@@ -28,6 +30,7 @@ class SignUpFragment : Fragment(), TextWatcher {
         const val CAMERA_REQUEST_CODE = 100
     }
 
+    private val TAG = "SignUpFragment"
     private lateinit var userViewModel: UserViewModel
     private var fileToUpload: File? = null
 
@@ -53,7 +56,7 @@ class SignUpFragment : Fragment(), TextWatcher {
             createNewAccount(userInfo)
         }
 
-        profilePhoto.setOnClickListener {
+        addPhoto.setOnClickListener {
             fileToUpload = Util.cameraIntent(this)
         }
     }
@@ -117,13 +120,21 @@ class SignUpFragment : Fragment(), TextWatcher {
                     fileToUpload?.let {
                         val uri = Util.getUriForFile(fileToUpload!!, context)
                         uri?.let {
-                            Picasso.get().load(uri).into(object : Target {
-                                override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
+                            Picasso.get().load(uri).fetch(object : Callback {
+                                override fun onSuccess() {
+                                    Picasso.get().load(uri).into(object : Target {
+                                        override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
 
-                                override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
+                                        override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
 
-                                override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                                    profilePhoto.background = BitmapDrawable(resources, bitmap)
+                                        override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+                                            profilePhoto.background = BitmapDrawable(resources, bitmap)
+                                        }
+                                    })
+                                }
+
+                                override fun onError(e: Exception?) {
+                                    Log.e(TAG, "something went wrong. ${e?.message}.")
                                 }
                             })
                         }

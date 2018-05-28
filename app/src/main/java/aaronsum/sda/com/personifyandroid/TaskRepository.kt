@@ -133,7 +133,10 @@ class TaskRepository {
         return taskLiveData
     }
 
-    fun deleteTask(id: String) = taskCollection.document(id).delete()
+    fun deleteTask(id: String) {
+        Log.d("delete", "user id $id")
+        taskCollection.document(id).delete()
+    }
 
     fun deleteUserDocument() {
         taskCollection.get()

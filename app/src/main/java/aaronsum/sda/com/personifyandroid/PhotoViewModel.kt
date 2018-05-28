@@ -21,4 +21,8 @@ class PhotoViewModel : ViewModel() {
     fun deleteUserProfile(userId: String) {
         photoRepository.deleteUserProfilePic(userId)
     }
+
+    fun clearProfilePicAfterUserSession(userId: String) {
+        photoRepository.clearProfilePic(userId)
+    }
 }

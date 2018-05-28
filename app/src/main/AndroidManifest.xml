@@ -17,7 +17,7 @@
         
         <provider
             android:name="android.support.v4.content.FileProvider"
-            android:authorities= "com.aaronsum.personify.fileprovider"
+            android:authorities= "aaronsum.sda.com.personifyandroid.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
