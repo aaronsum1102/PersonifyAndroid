@@ -1,7 +1,9 @@
 package aaronsum.sda.com.personifyandroid
 
+import android.app.Activity
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
@@ -15,7 +17,7 @@ import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import kotlinx.android.synthetic.main.fragment_profile.*
-import kotlinx.android.synthetic.main.fragment_tasks_list.*
+import java.io.File
 import java.lang.Exception
 
 class ProfileFragment : Fragment() {
@@ -26,6 +28,8 @@ class ProfileFragment : Fragment() {
     private val TAG = "ProfileFragment"
     private lateinit var userViewModel: UserViewModel
     private lateinit var photoViewModel: PhotoViewModel
+    private var uploadedFile: File? = null
+    private lateinit var user: User
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_profile, container, false)
@@ -36,7 +40,10 @@ class ProfileFragment : Fragment() {
 
         userViewModel = ViewModelProviders.of(activity!!)[UserViewModel::class.java]
         userViewModel.currentUser.observe(this, Observer { user ->
-            user?.let { initialisedToolbar(it.username) }
+            user?.let {
+                this.user = it
+                initialisedToolbar(this.user.username)
+            }
         })
 
         photoViewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
@@ -61,6 +68,10 @@ class ProfileFragment : Fragment() {
                 })
             }
         })
+
+        changeProfilePicButton.setOnClickListener {
+            uploadedFile = Util.cameraIntent(this)
+        }
     }
 
     private fun initialisedToolbar(username: String) {
@@ -120,5 +131,44 @@ class ProfileFragment : Fragment() {
             }
         }
         return true
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        when (requestCode) {
+            SignUpFragment.CAMERA_REQUEST_CODE -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    uploadedFile?.let {
+                        val uri = Util.getUriForFile(uploadedFile, this@ProfileFragment.context)
+                        uri?.let {
+                            Picasso.get().load(uri).fetch(object : Callback {
+                                override fun onSuccess() {
+                                    Picasso.get().load(uri).into(object : Target {
+                                        override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
+
+                                        override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
+
+                                        override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+                                            profilePhoto.background = BitmapDrawable(resources, bitmap)
+                                        }
+                                    })
+                                }
+
+                                override fun onError(e: Exception?) {
+                                    Log.e(TAG, "something went wrong. ${e?.message}.")
+                                }
+                            })
+                            if (this::user.isInitialized) {
+                                photoViewModel.uploadPhoto(uri, user.userId)
+                                        .continueWith {
+                                            it.result.storage.downloadUrl.addOnSuccessListener {
+                                                photoViewModel.writeUserProfilePictureURL(it, user.userId)
+                                            }
+                                        }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
