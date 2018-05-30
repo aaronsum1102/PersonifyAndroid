@@ -3,6 +3,7 @@ package aaronsum.sda.com.personifyandroid
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -19,6 +20,7 @@ import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import kotlinx.android.synthetic.main.fragment_tasks_list.*
 import java.lang.Exception
+import kotlin.math.abs
 
 interface OnTaskClickListener {
     fun onTaskClick(task: Task, taskId: String)
@@ -130,6 +132,23 @@ class TaskListFragment : Fragment(), OnTaskClickListener {
             itemView.findViewById<TextView>(R.id.dueDate).text = task.dueDate
             itemView.findViewById<TextView>(R.id.status).text = task.status
             itemView.findViewById<TextView>(R.id.priority).text = task.priority
+            val daysLeft = task.daysLeft
+            if (daysLeft >= 0) {
+                if (daysLeft > 1) {
+                    itemView.findViewById<TextView>(R.id.daysLeftText).text = "$daysLeft days to due date"
+                } else {
+                    itemView.findViewById<TextView>(R.id.daysLeftText).text = "$daysLeft day to due date"
+                }
+            } else {
+                if (daysLeft < -1) {
+                    itemView.findViewById<TextView>(R.id.daysLeftText).text = "Overdue by ${abs(daysLeft)} days"
+                } else {
+                    itemView.findViewById<TextView>(R.id.daysLeftText).text = "Overdue by ${abs(daysLeft)} day"
+                }
+                itemView.findViewById<TextView>(R.id.daysLeftText).setTextColor(Color.RED)
+            }
+
+            itemView.findViewById<TextView>(R.id.daysLeftText).text
             itemView.setOnClickListener {
                 taskClickListener.onTaskClick(task, pair.first)
             }

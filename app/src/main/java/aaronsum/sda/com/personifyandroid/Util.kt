@@ -12,6 +12,8 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import java.io.File
 import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.*
 
 object Util {
     fun hideSoftKeyboard(activity: FragmentActivity?, view: View) {
@@ -54,5 +56,22 @@ object Util {
             }
         }
         return null
+    }
+
+    fun getCurrentDate(): String {
+        val calendar = Calendar.getInstance()
+        calendar.set(calendar[Calendar.YEAR],
+                calendar[Calendar.MONTH],
+                calendar[Calendar.DAY_OF_MONTH],
+                0, 0, 0)
+        val dateFormat = SimpleDateFormat.getDateInstance()
+        return dateFormat.format(calendar.time)
+    }
+
+    fun getDaysDifference(dueDate: String): Int {
+        val dateFormat = SimpleDateFormat.getDateInstance()
+        val date = dateFormat.parse(dueDate)
+        val currentDate = dateFormat.parse(getCurrentDate())
+        return ((date.time - currentDate.time) / (1000 * 60 * 60 * 24)).toInt()
     }
 }

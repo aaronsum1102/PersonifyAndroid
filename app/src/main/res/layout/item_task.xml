@@ -30,7 +30,7 @@
 
         <TextView
             android:id="@+id/dueDate"
-            android:layout_width="90dp"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:layout_marginTop="8dp"
@@ -41,13 +41,14 @@
             app:layout_constraintHorizontal_chainStyle="spread_inside"
             app:layout_constraintStart_toStartOf="@+id/taskName"
             app:layout_constraintTop_toBottomOf="@+id/taskName"
-            tools:text="2018-03-20" />
+            tools:text="May 20, 2017" />
 
         <TextView
             android:id="@+id/priority"
             android:layout_width="60dp"
             android:layout_height="0dp"
             android:layout_marginEnd="16dp"
+            android:textAlignment="textEnd"
             android:textAppearance="@style/TextAppearance.subtitle1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
@@ -65,5 +66,14 @@
             app:layout_constraintStart_toEndOf="@+id/dueDate"
             app:layout_constraintTop_toTopOf="@+id/dueDate"
             tools:text="in progress" />
+
+        <TextView
+            android:id="@+id/daysLeftText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.H6"
+            app:layout_constraintEnd_toEndOf="@+id/priority"
+            app:layout_constraintTop_toTopOf="@+id/taskName"
+            tools:text="0 days" />
     </android.support.constraint.ConstraintLayout>
 </android.support.v7.widget.CardView>

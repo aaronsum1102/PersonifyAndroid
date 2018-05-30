@@ -13,6 +13,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import kotlinx.android.synthetic.main.fragment_task_form.*
+import java.text.SimpleDateFormat
 import java.util.*
 
 class TaskFormFragment : Fragment() {
@@ -27,9 +28,7 @@ class TaskFormFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val calender = Calendar.getInstance()
-        val currentDate = "${calender[Calendar.YEAR]} - ${calender[Calendar.MONTH] + 1} - ${calender[Calendar.DAY_OF_MONTH]}"
-        dueDate.text = currentDate
+        dueDate.text = Util.getCurrentDate()
         prioritySpinner.setSelection(2)
 
         val viewModel = ViewModelProviders.of(activity!!)[TaskViewModel::class.java]
@@ -59,7 +58,7 @@ class TaskFormFragment : Fragment() {
 
         clearFormButton.setOnClickListener {
             taskNameText.text.clear()
-            dueDate.text = currentDate
+            dueDate.text = Util.getCurrentDate()
             remarksText.text.clear()
         }
 
@@ -67,8 +66,9 @@ class TaskFormFragment : Fragment() {
             val name = taskNameText.text.toString()
             val dueDate = dueDate.text.toString()
             val remarks = remarksText.text.toString()
+            val daysLeft = Util.getDaysDifference(dueDate)
             if (this::status.isInitialized && this::priority.isInitialized) {
-                val task = Task(name, dueDate, status, priority, remarks)
+                val task = Task(name, dueDate, status, priority, remarks, daysLeft)
                 val taskId = arguments?.getString(TaskListFragment.KEY_TASK_ID)
                 if (taskId != null) {
                     viewModel.modifyTask(taskId to task)
@@ -90,13 +90,18 @@ class TaskFormFragment : Fragment() {
         })
 
         calenderButton.setOnClickListener {
+            val calendar = Calendar.getInstance()
             val datePickerDialog = DatePickerDialog(context,
                     DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
-                        dueDate.text = "$year - ${month + 1} - $dayOfMonth"
+                        val dateFormat = SimpleDateFormat.getDateInstance()
+                        val calendar = dateFormat.calendar
+                        calendar.set(year, month, dayOfMonth)
+                        val date = dateFormat.format(calendar.time)
+                        dueDate.text = date
                     },
-                    calender[Calendar.YEAR],
-                    calender[Calendar.MONTH],
-                    calender[Calendar.DAY_OF_MONTH])
+                    calendar[Calendar.YEAR],
+                    calendar[Calendar.MONTH],
+                    calendar[Calendar.DAY_OF_MONTH])
             datePickerDialog.show()
         }
 

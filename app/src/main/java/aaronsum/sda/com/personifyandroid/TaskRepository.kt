@@ -9,7 +9,8 @@ data class Task(var name: String = "",
                 var dueDate: String = "",
                 var status: String = "",
                 var priority: String = "",
-                var remarks: String = "")
+                var remarks: String = "",
+                var daysLeft: Int = 0)
 
 class TaskRepository {
     companion object {
@@ -41,7 +42,12 @@ class TaskRepository {
                 if (task.isSuccessful) {
                     val tasks = mutableListOf<Pair<String, Task>>()
                     task.result.forEach { document ->
-                        tasks.add(document.id to document.toObject(Task::class.java))
+                        val taskFromDB = document.toObject(Task::class.java)
+                        val daysDifference = Util.getDaysDifference(taskFromDB.dueDate)
+                        if (daysDifference != taskFromDB.daysLeft) {
+                            taskFromDB.daysLeft = daysDifference
+                        }
+                        tasks.add(document.id to taskFromDB)
                     }
                     this.tasks.postValue(tasks)
                     Log.i(TAG, "task loaded from DB. Number of tasks: ${tasks.size}")
