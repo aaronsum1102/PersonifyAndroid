@@ -16,18 +16,23 @@ data class UserStatistics(val taskCompletionRate: Int = 0,
                           val earliestCompletion: Int = 0,
                           val longestOverdue: Int = 0)
 
+data class UserCompletionStatistic(var earliestCompletion: Int,
+                                   var longestOverdue: Int)
+
 class UserStatisticRepository {
     companion object {
         const val TAG = "UserStatisticRepository"
         const val COMPLETION_ON_TIME = "completionOnTime"
         const val OVERDUE = "overdue"
         const val NEW_TASK = "newTask"
+        const val UPDATE_COMPLETION_STATISTICS = "updateCompletionStatistics"
     }
 
     private val collectionName = "userStatistics"
     private val db = FirebaseFirestore.getInstance()
     private lateinit var document: DocumentReference
     val userStatistics: MutableLiveData<UserStatistics> = MutableLiveData()
+    private var taskStatistic: TaskStatistic? = null
 
     init {
         db.firestoreSettings = Util.setupDBForPersistence(db)
@@ -45,10 +50,10 @@ class UserStatisticRepository {
             Log.i(TAG, "document was initialised")
             document.get().addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    val statistic = task.result.toObject(TaskStatistic::class.java)
-                    if (statistic != null) {
+                    taskStatistic = task.result.toObject(TaskStatistic::class.java)
+                    if (taskStatistic != null) {
                         Log.i(TAG, "Statistic loaded from db")
-                        userStatistics.postValue(transformData(statistic))
+                        userStatistics.postValue(transformData(taskStatistic!!))
                     } else {
                         Log.i(TAG, "initialise document in db")
                         userStatistics.postValue(UserStatistics())
@@ -72,32 +77,47 @@ class UserStatisticRepository {
         return UserStatistics(completionRate, overdueRate, taskStatistic.earliestCompletion, taskStatistic.longestOverdue)
     }
 
-    fun incrementTaskNumber(command: String) {
-        document.get()
-                .addOnSuccessListener {
-                    val statistic = it.toObject(TaskStatistic::class.java)
-                    statistic?.let {
-                        when (command) {
-                            COMPLETION_ON_TIME -> {
-                                Log.i(TAG, "taskCompletion on time")
-                                it.taskCompletedOnTime += 1
-                            }
-                            OVERDUE -> {
-                                Log.i(TAG, "task overdue")
-                                it.taskOverdue += 1
-                            }
-                            NEW_TASK -> {
-                                Log.i(TAG, "number of task")
-                                it.numberOfTasks += 1
-                            }
-                        }
-                        if (this::document.isInitialized) {
-                            document.set(statistic as Any)
-                                    .addOnSuccessListener {
-                                        userStatistics.postValue(transformData(statistic))
-                                    }
-                        }
-                    }
+    fun updateStatistic(command: String) {
+        taskStatistic?.let {
+            when (command) {
+                COMPLETION_ON_TIME -> {
+                    Log.i(TAG, "task completed on time")
+                    it.taskCompletedOnTime += 1
                 }
+                OVERDUE -> {
+                    Log.i(TAG, "task overdue")
+                    it.taskOverdue += 1
+                }
+                NEW_TASK -> {
+                    Log.i(TAG, "new task added")
+                    it.numberOfTasks += 1
+                }
+            }
+            if (this::document.isInitialized) {
+                document.set(taskStatistic as Any)
+                        .addOnSuccessListener {
+                            userStatistics.postValue(transformData(taskStatistic!!))
+                        }
+            }
+        }
+    }
+
+    fun updateCompletionStatistic(newStatistic: UserCompletionStatistic) {
+        taskStatistic?.let {
+            Log.i(TAG, "update completion record")
+            if (newStatistic.earliestCompletion > it.earliestCompletion) {
+                it.earliestCompletion = newStatistic.earliestCompletion
+            }
+            if (newStatistic.longestOverdue < it.longestOverdue) {
+                it.longestOverdue = newStatistic.longestOverdue
+            }
+            if (this::document.isInitialized) {
+                document.set(taskStatistic as Any)
+                        .addOnSuccessListener {
+                            userStatistics.postValue(transformData(taskStatistic!!))
+                        }
+            }
+        }
     }
 }
+

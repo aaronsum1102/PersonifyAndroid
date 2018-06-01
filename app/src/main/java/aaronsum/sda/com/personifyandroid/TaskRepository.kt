@@ -2,8 +2,10 @@ package aaronsum.sda.com.personifyandroid
 
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
-import com.google.firebase.firestore.*
-
+import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.DocumentChange
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
 
 data class Task(var name: String = "",
                 var dueDate: String = "",

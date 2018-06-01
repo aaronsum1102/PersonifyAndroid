@@ -43,8 +43,13 @@ class TaskFormFragment : Fragment() {
                             existingTask = it
                             taskNameText.setText(it.name)
                             dueDate.text = it.dueDate
+
                             val statusArrayAdapter: ArrayAdapter<String> = statusSpinner.adapter as ArrayAdapter<String>
                             statusSpinner.setSelection(statusArrayAdapter.getPosition(it.status))
+                            if (it.status == taskIsDone) {
+                                statusSpinner.isEnabled = false
+                                addTaskButton.isEnabled = false
+                            }
                             val priorityArrayAdapter = prioritySpinner.adapter as ArrayAdapter<String>
                             prioritySpinner.setSelection(priorityArrayAdapter.getPosition(it.priority))
                             remarksText.setText(it.remarks)
@@ -77,14 +82,14 @@ class TaskFormFragment : Fragment() {
                     viewModel.modifyTask(taskId to task)
                     if (status == taskIsDone) {
                         if (daysLeft >= 0) {
-                            userStatisticViewModel.incrementTotalNumber(UserStatisticRepository.COMPLETION_ON_TIME)
+                            userStatisticViewModel.updateStatistic(UserStatisticRepository.COMPLETION_ON_TIME)
                         } else {
-                            userStatisticViewModel.incrementTotalNumber(UserStatisticRepository.OVERDUE)
+                            userStatisticViewModel.updateStatistic(UserStatisticRepository.OVERDUE)
                         }
                     }
                 } else {
                     viewModel.addTask(task)
-                    userStatisticViewModel.incrementTotalNumber(UserStatisticRepository.NEW_TASK)
+                    userStatisticViewModel.updateStatistic(UserStatisticRepository.NEW_TASK)
                 }
                 fragmentManager?.popBackStack()
             }
@@ -117,7 +122,9 @@ class TaskFormFragment : Fragment() {
         }
 
         statusSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                status = statusSpinner.selectedItem.toString()
+            }
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 status = statusSpinner.selectedItem.toString()

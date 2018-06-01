@@ -2,7 +2,6 @@ package aaronsum.sda.com.personifyandroid
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
-import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
@@ -32,9 +31,8 @@ class TaskListFragment : Fragment(), OnTaskClickListener {
     companion object {
         const val KEY_TASK_ID = "task id"
         const val TASK_LIST_BACK_STACK = "taskList"
+        private const val TAG = "TaskListFragment"
     }
-
-    private val TAG = "TaskListFragment"
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_tasks_list, container, false)
@@ -47,6 +45,7 @@ class TaskListFragment : Fragment(), OnTaskClickListener {
 
         val viewModel = ViewModelProviders.of(activity!!)[TaskViewModel::class.java]
         val photoViewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
+        val userStatisticViewModel = ViewModelProviders.of(activity!!)[UserStatisticViewModel::class.java]
 
         photoViewModel.profilePhotoUrl.observe(this, Observer { uri ->
             uri?.let {
@@ -78,6 +77,12 @@ class TaskListFragment : Fragment(), OnTaskClickListener {
             tasks?.let {
                 adaptor.tasks = tasks
                 adaptor.notifyDataSetChanged()
+                val earliestCompletion = tasks.maxBy { it.second.daysLeft }?.second?.daysLeft
+                val longestOverdue = tasks.minBy { it.second.daysLeft }?.second?.daysLeft
+                if (earliestCompletion != null && longestOverdue != null) {
+                    userStatisticViewModel.updateCompletionStatistic(
+                            UserCompletionStatistic(earliestCompletion, longestOverdue))
+                }
             }
         })
 
