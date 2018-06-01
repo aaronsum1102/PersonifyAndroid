@@ -39,14 +39,21 @@ class UserStatisticRepository {
 
     private fun initialiseCollection(userId: String) {
         document = db.collection(collectionName).document(userId)
-
+        document.addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
+            firebaseFirestoreException?.let {
+                Log.i(TAG, "Unable to add listener for task stat. ${it.localizedMessage}")
+                return@addSnapshotListener
+            }
+            documentSnapshot?.let {
+                taskStatistic = documentSnapshot.toObject(TaskStatistic::class.java)
+                userStatistics.postValue(transformData(taskStatistic!!))
+            }
+        }
     }
 
     fun loadStatistic(userId: String) {
         initialiseCollection(userId)
-        Log.i(TAG, "loadStatistic")
         if (this::document.isInitialized) {
-            Log.i(TAG, "document was initialised")
             document.get().addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     taskStatistic = task.result.toObject(TaskStatistic::class.java)
