@@ -10,6 +10,8 @@ import android.support.v4.content.FileProvider
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreSettings
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -73,5 +75,11 @@ object Util {
         val date = dateFormat.parse(dueDate)
         val currentDate = dateFormat.parse(getCurrentDate())
         return ((date.time - currentDate.time) / (1000 * 60 * 60 * 24)).toInt()
+    }
+
+    fun setupDBForPersistence(db: FirebaseFirestore): FirebaseFirestoreSettings {
+        return FirebaseFirestoreSettings.Builder()
+                .setPersistenceEnabled(true)
+                .build()
     }
 }

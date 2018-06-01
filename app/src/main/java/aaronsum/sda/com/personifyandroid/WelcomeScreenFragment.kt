@@ -69,6 +69,8 @@ class WelcomeScreenFragment : Fragment() {
                                 }
                                 val photoViewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
                                 photoViewModel.loadUserProfilePic(userId)
+                                val userStatisticViewModel = ViewModelProviders.of(activity!!)[UserStatisticViewModel::class.java]
+                                userStatisticViewModel.loadUserStatistic(userId)
                                 val taskListFragment = TaskListFragment()
                                 val bundle = Bundle()
                                 bundle.putString(USER_ID, userId)

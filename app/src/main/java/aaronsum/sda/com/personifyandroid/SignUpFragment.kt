@@ -68,6 +68,7 @@ class SignUpFragment : Fragment(), TextWatcher {
                         it.continueWith {
                             val userId = it.result.user.uid
                             addTaskEventListener(userId)
+                            initalisedUserStatisticCollection(userId)
                             uploadProfilePhoto(userId)
                             context?.let {
                                 Toast.makeText(context,
@@ -97,6 +98,11 @@ class SignUpFragment : Fragment(), TextWatcher {
     private fun addTaskEventListener(userId: String) {
         val taskViewModel = ViewModelProviders.of(activity!!)[TaskViewModel::class.java]
         taskViewModel.addEventListenerToDB(userId)
+    }
+
+    private fun initalisedUserStatisticCollection(userId: String) {
+        val userStatisticViewModel = ViewModelProviders.of(activity!!)[UserStatisticViewModel::class.java]
+        userStatisticViewModel.loadUserStatistic(userId)
     }
 
     private fun uploadProfilePhoto(userId: String) {

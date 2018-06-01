@@ -55,13 +55,15 @@ class LogInFragment : Fragment(), TextWatcher {
                                         Toast.LENGTH_SHORT)
                                         .show()
                             }
+                            val userId = result.user.uid
                             val photoViewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
-                            photoViewModel.loadUserProfilePic(result.user.uid)
+                            photoViewModel.loadUserProfilePic(userId)
                             val taskViewModel = ViewModelProviders.of(activity!!)[TaskViewModel::class.java]
-                            taskViewModel.addEventListenerToDB(result.user.uid)
+                            taskViewModel.addEventListenerToDB(userId)
                             taskViewModel.loadAllTask()
+                            val userStatisticViewModel = ViewModelProviders.of(activity!!)[UserStatisticViewModel::class.java]
+                            userStatisticViewModel.loadUserStatistic(userId)
                             view?.let { Util.hideSoftKeyboard(activity, view as View) }
-
                             val taskListFragment = TaskListFragment()
                             fragmentManager?.popBackStack("welcome",
                                     FragmentManager.POP_BACK_STACK_INCLUSIVE)

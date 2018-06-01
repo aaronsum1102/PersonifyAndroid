@@ -24,28 +24,20 @@ class TaskRepository {
     val tasks: MutableLiveData<List<Pair<String, Task>>> = MutableLiveData()
 
     init {
-        setupDBForPersistence(db)
-    }
-
-    private fun setupDBForPersistence(db: FirebaseFirestore) {
-        val dbSetting = FirebaseFirestoreSettings.Builder()
-                .setPersistenceEnabled(true)
-                .build()
-        db.firestoreSettings = dbSetting
+        db.firestoreSettings = Util.setupDBForPersistence(db)
     }
 
     fun loadAllTasks(): com.google.android.gms.tasks.Task<QuerySnapshot>? {
         var task: com.google.android.gms.tasks.Task<QuerySnapshot>? = null
         if (this::taskCollection.isInitialized) {
-            taskCollection.orderBy("daysLeft")
-            task = taskCollection.get()
+            task = taskCollection.orderBy("daysLeft").get()
             task.addOnCompleteListener {
                 if (task.isSuccessful) {
                     val tasks = mutableListOf<Pair<String, Task>>()
                     task.result.forEach { document ->
                         val taskFromDB = document.toObject(Task::class.java)
                         val daysDifference = Util.getDaysDifference(taskFromDB.dueDate)
-                        if (daysDifference != taskFromDB.daysLeft) {
+                        if (daysDifference != taskFromDB.daysLeft && taskFromDB.status != "Done") {
                             taskFromDB.daysLeft = daysDifference
                         }
                         tasks.add(document.id to taskFromDB)

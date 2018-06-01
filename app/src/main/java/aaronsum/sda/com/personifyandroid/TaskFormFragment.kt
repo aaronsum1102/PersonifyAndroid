@@ -20,6 +20,7 @@ class TaskFormFragment : Fragment() {
     private var existingTask: Task? = null
     private lateinit var status: String
     private lateinit var priority: String
+    private val taskIsDone = "Done"
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_task_form, container, false)
@@ -32,6 +33,8 @@ class TaskFormFragment : Fragment() {
         prioritySpinner.setSelection(2)
 
         val viewModel = ViewModelProviders.of(activity!!)[TaskViewModel::class.java]
+        val userStatisticViewModel = ViewModelProviders.of(activity!!)[UserStatisticViewModel::class.java]
+
         val taskId: String = arguments?.getString(TaskListFragment.KEY_TASK_ID) ?: ""
         if (taskId.isNotEmpty()) {
             viewModel.loadTask(taskId)
@@ -72,8 +75,16 @@ class TaskFormFragment : Fragment() {
                 val taskId = arguments?.getString(TaskListFragment.KEY_TASK_ID)
                 if (taskId != null) {
                     viewModel.modifyTask(taskId to task)
+                    if (status == taskIsDone) {
+                        if (daysLeft >= 0) {
+                            userStatisticViewModel.incrementTotalNumber(UserStatisticRepository.COMPLETION_ON_TIME)
+                        } else {
+                            userStatisticViewModel.incrementTotalNumber(UserStatisticRepository.OVERDUE)
+                        }
+                    }
                 } else {
                     viewModel.addTask(task)
+                    userStatisticViewModel.incrementTotalNumber(UserStatisticRepository.NEW_TASK)
                 }
                 fragmentManager?.popBackStack()
             }

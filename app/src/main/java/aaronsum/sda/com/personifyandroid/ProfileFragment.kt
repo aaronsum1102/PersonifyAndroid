@@ -23,9 +23,9 @@ import java.lang.Exception
 class ProfileFragment : Fragment() {
     companion object {
         const val PROFILE_BACK_STACK = "profile"
+        private const val TAG = "ProfileFragment"
     }
 
-    private val TAG = "ProfileFragment"
     private lateinit var userViewModel: UserViewModel
     private lateinit var photoViewModel: PhotoViewModel
     private var uploadedFile: File? = null
@@ -72,6 +72,36 @@ class ProfileFragment : Fragment() {
         changeProfilePicButton.setOnClickListener {
             uploadedFile = Util.cameraIntent(this)
         }
+
+        val userStatisticViewModel = ViewModelProviders.of(activity!!)[UserStatisticViewModel::class.java]
+        userStatisticViewModel.userStatistics.observe(this, Observer { userStatistics ->
+            userStatistics?.let {
+                val earliestCompletion = userStatistics.earliestCompletion
+                if (earliestCompletion != 0) {
+                    if (earliestCompletion > 1) {
+                        earliestCompletionText.text = "$earliestCompletion days"
+                    } else {
+                        earliestCompletionText.text = "$earliestCompletion day"
+                    }
+                }
+                val longestOverdue = userStatistics.longestOverdue
+                if (longestOverdue != 0) {
+                    if (longestOverdue > 1) {
+                        longestOverDueText.text = "$longestOverdue days"
+                    } else {
+                        longestOverDueText.text = "$longestOverdue day"
+                    }
+                }
+                val taskCompletionRate = userStatistics.taskCompletionRate
+                if (taskCompletionRate != 0) {
+                    completionRateText.text = "$taskCompletionRate%"
+                }
+                val taskOverdueRate = userStatistics.taskOverdueRate
+                if (taskOverdueRate != 0) {
+                    overDueRateText.text = "$taskOverdueRate%"
+                }
+            }
+        })
     }
 
     private fun initialisedToolbar(username: String) {
