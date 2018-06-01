@@ -10,7 +10,6 @@ import android.support.v4.content.FileProvider
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import java.io.File
 import java.io.IOException
@@ -18,6 +17,11 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 object Util {
+    val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
+    val persistenceDBSetting = FirebaseFirestoreSettings.Builder()
+            .setPersistenceEnabled(true)
+            .build()
+
     fun hideSoftKeyboard(activity: FragmentActivity?, view: View) {
         val inputMethodManager = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.hideSoftInputFromWindow(view.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
@@ -66,20 +70,12 @@ object Util {
                 calendar[Calendar.MONTH],
                 calendar[Calendar.DAY_OF_MONTH],
                 0, 0, 0)
-        val dateFormat = SimpleDateFormat.getDateInstance()
         return dateFormat.format(calendar.time)
     }
 
     fun getDaysDifference(dueDate: String): Int {
-        val dateFormat = SimpleDateFormat.getDateInstance()
         val date = dateFormat.parse(dueDate)
         val currentDate = dateFormat.parse(getCurrentDate())
         return ((date.time - currentDate.time) / (1000 * 60 * 60 * 24)).toInt()
-    }
-
-    fun setupDBForPersistence(db: FirebaseFirestore): FirebaseFirestoreSettings {
-        return FirebaseFirestoreSettings.Builder()
-                .setPersistenceEnabled(true)
-                .build()
     }
 }

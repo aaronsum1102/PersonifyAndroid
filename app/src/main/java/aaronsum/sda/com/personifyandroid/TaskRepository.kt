@@ -26,7 +26,7 @@ class TaskRepository {
     val tasks: MutableLiveData<List<Pair<String, Task>>> = MutableLiveData()
 
     init {
-        db.firestoreSettings = Util.setupDBForPersistence(db)
+        db.firestoreSettings = Util.persistenceDBSetting
     }
 
     fun loadAllTasks(): com.google.android.gms.tasks.Task<QuerySnapshot>? {
@@ -137,7 +137,6 @@ class TaskRepository {
     }
 
     fun deleteTask(id: String) {
-        Log.d("delete", "user id $id")
         taskCollection.document(id).delete()
     }
 

@@ -25,7 +25,6 @@ class UserStatisticRepository {
         const val COMPLETION_ON_TIME = "completionOnTime"
         const val OVERDUE = "overdue"
         const val NEW_TASK = "newTask"
-        const val UPDATE_COMPLETION_STATISTICS = "updateCompletionStatistics"
     }
 
     private val collectionName = "userStatistics"
@@ -35,7 +34,7 @@ class UserStatisticRepository {
     private var taskStatistic: TaskStatistic? = null
 
     init {
-        db.firestoreSettings = Util.setupDBForPersistence(db)
+        db.firestoreSettings = Util.persistenceDBSetting
     }
 
     private fun initialiseCollection(userId: String) {
@@ -56,6 +55,7 @@ class UserStatisticRepository {
                         userStatistics.postValue(transformData(taskStatistic!!))
                     } else {
                         Log.i(TAG, "initialise document in db")
+                        taskStatistic = TaskStatistic()
                         userStatistics.postValue(UserStatistics())
                     }
                 } else {
@@ -118,6 +118,13 @@ class UserStatisticRepository {
                         }
             }
         }
+    }
+
+    fun deleteStatistic() {
+        if (this::document.isInitialized) {
+            document.delete()
+        }
+        userStatistics.postValue(UserStatistics())
     }
 }
 

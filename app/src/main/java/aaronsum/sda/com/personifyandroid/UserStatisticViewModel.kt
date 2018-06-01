@@ -18,4 +18,8 @@ class UserStatisticViewModel : ViewModel() {
     fun updateCompletionStatistic(newStatistic: UserCompletionStatistic) {
         repository.updateCompletionStatistic(newStatistic)
     }
+
+    fun deleteStatistic() {
+        repository.deleteStatistic()
+    }
 }

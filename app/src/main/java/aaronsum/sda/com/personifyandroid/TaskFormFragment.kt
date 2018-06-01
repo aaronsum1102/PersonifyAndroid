@@ -13,7 +13,6 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import kotlinx.android.synthetic.main.fragment_task_form.*
-import java.text.SimpleDateFormat
 import java.util.*
 
 class TaskFormFragment : Fragment() {
@@ -109,7 +108,7 @@ class TaskFormFragment : Fragment() {
             val calendar = Calendar.getInstance()
             val datePickerDialog = DatePickerDialog(context,
                     DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
-                        val dateFormat = SimpleDateFormat.getDateInstance()
+                        val dateFormat = Util.dateFormat
                         val calendar = dateFormat.calendar
                         calendar.set(year, month, dayOfMonth)
                         val date = dateFormat.format(calendar.time)

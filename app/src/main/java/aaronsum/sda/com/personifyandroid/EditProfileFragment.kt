@@ -81,7 +81,10 @@ class EditProfileFragment : Fragment(), TextWatcher {
                             val photoViewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
                             user?.userId?.let {
                                 photoViewModel.clearProfilePicAfterUserSession(it)
-                                photoViewModel.deleteUserProfile(it) }
+                                photoViewModel.deleteUserProfile(it)
+                            }
+                            val userStatisticViewModel = ViewModelProviders.of(activity!!)[UserStatisticViewModel::class.java]
+                            userStatisticViewModel.deleteStatistic()
                             fragmentManager?.apply {
                                 popBackStack(TaskListFragment.TASK_LIST_BACK_STACK,
                                         FragmentManager.POP_BACK_STACK_INCLUSIVE)
