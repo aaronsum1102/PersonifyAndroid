@@ -37,6 +37,7 @@ class TaskRepository {
     fun loadAllTasks(): com.google.android.gms.tasks.Task<QuerySnapshot>? {
         var task: com.google.android.gms.tasks.Task<QuerySnapshot>? = null
         if (this::taskCollection.isInitialized) {
+            taskCollection.orderBy("daysLeft")
             task = taskCollection.get()
             task.addOnCompleteListener {
                 if (task.isSuccessful) {
@@ -92,6 +93,7 @@ class TaskRepository {
         tasks.value?.let { temporaryTasks.addAll(it) }
         val document = change.document
         temporaryTasks.add(document.id to document.toObject(Task::class.java))
+        temporaryTasks.sortBy { it.second.daysLeft }
         tasks.value = temporaryTasks
         Log.i(TAG, "New document added. Number of tasks: ${tasks.value?.size}")
     }
@@ -104,6 +106,7 @@ class TaskRepository {
             val taskPair = temporaryTasks.find { it.first == taskId }
             temporaryTasks.remove(taskPair)
             temporaryTasks.add(taskId to change.document.toObject(Task::class.java))
+            temporaryTasks.sortBy { it.second.daysLeft }
             tasks.value = temporaryTasks
             Log.i(TAG, "Document has been modified. Number of tasks :${tasks.value?.size}")
         }

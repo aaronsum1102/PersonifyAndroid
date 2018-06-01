@@ -2,12 +2,14 @@ package aaronsum.sda.com.personifyandroid
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
 import android.util.Log
@@ -133,22 +135,25 @@ class TaskListFragment : Fragment(), OnTaskClickListener {
             itemView.findViewById<TextView>(R.id.status).text = task.status
             itemView.findViewById<TextView>(R.id.priority).text = task.priority
             val daysLeft = task.daysLeft
+            val daysLeftText = itemView.findViewById<TextView>(R.id.daysLeftText)
             if (daysLeft >= 0) {
                 if (daysLeft > 1) {
-                    itemView.findViewById<TextView>(R.id.daysLeftText).text = "$daysLeft days to due date"
+                    daysLeftText.text = "$daysLeft days to due date"
                 } else {
-                    itemView.findViewById<TextView>(R.id.daysLeftText).text = "$daysLeft day to due date"
+                    daysLeftText.text = "$daysLeft day to due date"
                 }
+                val textColor = ContextCompat.getColor(itemView.context, R.color.primaryTextColor)
+                daysLeftText.setTextColor(textColor)
             } else {
                 if (daysLeft < -1) {
-                    itemView.findViewById<TextView>(R.id.daysLeftText).text = "Overdue by ${abs(daysLeft)} days"
+                    daysLeftText.text = "Overdue by ${abs(daysLeft)} days"
                 } else {
-                    itemView.findViewById<TextView>(R.id.daysLeftText).text = "Overdue by ${abs(daysLeft)} day"
+                    daysLeftText.text = "Overdue by ${abs(daysLeft)} day"
                 }
-                itemView.findViewById<TextView>(R.id.daysLeftText).setTextColor(Color.RED)
+                daysLeftText.setTextColor(Color.RED)
             }
 
-            itemView.findViewById<TextView>(R.id.daysLeftText).text
+            daysLeftText.text
             itemView.setOnClickListener {
                 taskClickListener.onTaskClick(task, pair.first)
             }
