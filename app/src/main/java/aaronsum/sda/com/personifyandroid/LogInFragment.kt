@@ -57,7 +57,8 @@ class LogInFragment : Fragment(), TextWatcher {
                             }
                             val userId = result.user.uid
                             val photoViewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
-                            photoViewModel.loadUserProfilePic(userId)
+                            photoViewModel.initProfilePhotoDocument(userId)
+                            photoViewModel.loadUserProfilePic()
                             val taskViewModel = ViewModelProviders.of(activity!!)[TaskViewModel::class.java]
                             taskViewModel.addEventListenerToDB(userId)
                             taskViewModel.loadAllTask()

@@ -150,7 +150,7 @@ class ProfileFragment : Fragment() {
 
             R.id.actionLogOut -> {
                 val userId = userViewModel.currentUser.value?.userId
-                userId?.let { photoViewModel.clearProfilePicAfterUserSession(userId) }
+                userId?.let { photoViewModel.clearProfilePicAfterUserSession() }
                 userViewModel.signOut()
                 fragmentManager?.apply {
                     popBackStack()
@@ -188,10 +188,10 @@ class ProfileFragment : Fragment() {
                                 }
                             })
                             if (this::user.isInitialized) {
-                                photoViewModel.uploadPhoto(uri, user.userId)
-                                        .continueWith {
+                                photoViewModel.uploadPhoto(uri)
+                                        ?.continueWith {
                                             it.result.storage.downloadUrl.addOnSuccessListener {
-                                                photoViewModel.writeUserProfilePictureURL(it, user.userId)
+                                                photoViewModel.writeUserProfilePictureURL(it)
                                             }
                                         }
                             }

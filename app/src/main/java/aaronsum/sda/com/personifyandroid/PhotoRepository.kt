@@ -3,62 +3,85 @@ package aaronsum.sda.com.personifyandroid
 import android.arch.lifecycle.MutableLiveData
 import android.net.Uri
 import android.util.Log
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
 
 class PhotoRepository {
-    private val collectionName = "userProfilePic"
-    private val dataName = "url"
-    private val firebaseStore = FirebaseFirestore.getInstance()
+    companion object {
+        private const val TAG = "PhotoRepository"
+        private const val COLLECTION_NAME = "userProfilePic"
+        private const val URL = "url"
+    }
 
-    private val photoReference = FirebaseStorage.getInstance().getReference(collectionName)
+    private val db = FirebaseFirestore.getInstance()
+    private val photoReference = FirebaseStorage.getInstance().getReference(COLLECTION_NAME)
+    private val collection = db.collection(COLLECTION_NAME)
+    private lateinit var document: DocumentReference
+
     val profilePhoto: MutableLiveData<String> = MutableLiveData()
-    private val collection = firebaseStore.collection(collectionName)
 
     init {
-        setupDBForPersistence(firebaseStore)
+        db.firestoreSettings = Util.persistenceDBSetting
     }
 
-    private fun setupDBForPersistence(db: FirebaseFirestore) {
-        val dbSetting = FirebaseFirestoreSettings.Builder()
-                .setPersistenceEnabled(true)
-                .build()
-        db.firestoreSettings = dbSetting
+    fun initDocument(userId: String) {
+        document = collection.document(userId)
+        document.addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
+            firebaseFirestoreException?.let {
+                Log.i(TAG, "Unable to add snapshot listener. ${firebaseFirestoreException.localizedMessage}")
+            }
+            val url = documentSnapshot?.get(URL) as String?
+            url?.let { profilePhoto.postValue(url) }
+        }
     }
 
-    fun writeUserProfilePictureURL(url: Uri, userId: String) {
+    fun writeUserProfilePictureURL(url: Uri) {
         profilePhoto.postValue(url.toString())
         val dataMap: Map<String, String> = mutableMapOf()
         dataMap as MutableMap
-        dataMap[dataName] = url.toString()
-        collection.document(userId).set(dataMap)
+        dataMap[URL] = url.toString()
+        if (this::document.isInitialized) {
+            document.set(dataMap)
+            Log.i(TAG, "record profile pic url")
+        }
     }
 
-    fun uploadProfilePhoto(file: Uri, userId: String): UploadTask {
-        val reference = photoReference.child("$userId.jpg")
-        return reference.putFile(file)
+    fun uploadProfilePhoto(file: Uri): UploadTask? {
+        if (this::document.isInitialized) {
+            Log.i(TAG, "upload profile pic")
+            val fileName = "${document.id}.jpg"
+            val reference = photoReference.child(fileName)
+            return reference.putFile(file)
+        }
+        return null
     }
 
-    fun loadUserProfile(userId: String) {
-        collection.document(userId).get()
-                .addOnSuccessListener {
-                    val url = it.get(dataName)
-                    url?.let {
-                        url as String
-                        profilePhoto.postValue(url)
+    fun loadUserProfile() {
+        if (this::document.isInitialized) {
+            Log.i(TAG, "load profile pic")
+            document.get()
+                    .addOnSuccessListener {
+                        val url = it.get(URL)
+                        url?.let {
+                            url as String
+                            profilePhoto.postValue(url)
+                        }
                     }
-                }
+        }
     }
 
-    fun deleteUserProfilePic(userId: String) {
-        Log.d("delete", "user id in photo repository $userId")
-        collection.document(userId).delete()
-        photoReference.child("$userId.jpg").delete()
+    fun deleteUserProfilePic() {
+        if (this::document.isInitialized) {
+            document.delete()
+            photoReference.child("${document.id}.jpg").delete()
+            Log.i(TAG, "delete user profile pic when deleting account")
+        }
     }
 
-    fun clearProfilePic(userId: String) {
+    fun clearProfilePic() {
+        Log.i(TAG, "clear profile pic after log out")
         profilePhoto.postValue(null)
     }
 }

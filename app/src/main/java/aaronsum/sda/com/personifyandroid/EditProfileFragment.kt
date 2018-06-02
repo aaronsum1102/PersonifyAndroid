@@ -80,8 +80,8 @@ class EditProfileFragment : Fragment(), TextWatcher {
                             val user = userViewModel.currentUser.value
                             val photoViewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
                             user?.userId?.let {
-                                photoViewModel.clearProfilePicAfterUserSession(it)
-                                photoViewModel.deleteUserProfile(it)
+                                photoViewModel.clearProfilePicAfterUserSession()
+                                photoViewModel.deleteUserProfile()
                             }
                             val userStatisticViewModel = ViewModelProviders.of(activity!!)[UserStatisticViewModel::class.java]
                             userStatisticViewModel.deleteStatistic()

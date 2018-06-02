@@ -107,12 +107,13 @@ class SignUpFragment : Fragment(), TextWatcher {
 
     private fun uploadProfilePhoto(userId: String) {
         val photoViewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
+        photoViewModel.initProfilePhotoDocument(userId)
         val uri = Util.getUriForFile(fileToUpload, context)
         uri?.let {
-            photoViewModel.uploadPhoto(it, userId)
-                    .continueWith {
+            photoViewModel.uploadPhoto(it)
+                    ?.continueWith {
                         it.result.storage.downloadUrl.addOnSuccessListener {
-                            photoViewModel.writeUserProfilePictureURL(it, userId)
+                            photoViewModel.writeUserProfilePictureURL(it)
                         }
                     }
         }

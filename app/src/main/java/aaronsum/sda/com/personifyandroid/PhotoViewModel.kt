@@ -8,21 +8,25 @@ class PhotoViewModel : ViewModel() {
     private val photoRepository: PhotoRepository = PhotoRepository()
     val profilePhotoUrl: LiveData<String> = photoRepository.profilePhoto
 
-    fun uploadPhoto(file: Uri, userId: String) = photoRepository.uploadProfilePhoto(file, userId)
-
-    fun writeUserProfilePictureURL(url: Uri, userId: String) {
-        photoRepository.writeUserProfilePictureURL(url, userId)
+    fun initProfilePhotoDocument(userId: String) {
+        photoRepository.initDocument(userId)
     }
 
-    fun loadUserProfilePic(userId: String) {
-        photoRepository.loadUserProfile(userId)
+    fun uploadPhoto(file: Uri) = photoRepository.uploadProfilePhoto(file)
+
+    fun writeUserProfilePictureURL(url: Uri) {
+        photoRepository.writeUserProfilePictureURL(url)
     }
 
-    fun deleteUserProfile(userId: String) {
-        photoRepository.deleteUserProfilePic(userId)
+    fun loadUserProfilePic() {
+        photoRepository.loadUserProfile()
     }
 
-    fun clearProfilePicAfterUserSession(userId: String) {
-        photoRepository.clearProfilePic(userId)
+    fun deleteUserProfile() {
+        photoRepository.deleteUserProfilePic()
+    }
+
+    fun clearProfilePicAfterUserSession() {
+        photoRepository.clearProfilePic()
     }
 }
