@@ -59,8 +59,7 @@ class LogInFragment : Fragment(), TextWatcher {
                             val photoViewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
                             photoViewModel.initProfilePhotoDocument(userId)
                             val taskViewModel = ViewModelProviders.of(activity!!)[TaskViewModel::class.java]
-                            taskViewModel.addEventListenerToDB(userId)
-                            taskViewModel.loadAllTask()
+                            taskViewModel.initUserTaskDocument(userId)
                             val userStatisticViewModel = ViewModelProviders.of(activity!!)[UserStatisticViewModel::class.java]
                             userStatisticViewModel.loadUserStatistic(userId)
                             view?.let { Util.hideSoftKeyboard(activity, view as View) }

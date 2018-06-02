@@ -4,9 +4,7 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.os.Handler
-import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,7 +13,6 @@ import android.widget.Toast
 class WelcomeScreenFragment : Fragment() {
     companion object {
         const val USER_ID = "userId"
-        private const val TAG = "WelcomeScreenFragment"
     }
 
     private val welcomeScreenTime: Long = 1500
@@ -30,69 +27,69 @@ class WelcomeScreenFragment : Fragment() {
     }
 
     private fun signInStateCheckForAction() {
-        val userViewModel = ViewModelProviders.of(activity!!)[UserViewModel::class.java]
-        var currentUser: User?
-        userViewModel.currentUser.observe(this, Observer {
-            currentUser = it
-            when (currentUser) {
-                null -> {
-                    Handler().postDelayed(
-                            {
-                                fragmentManager
-                                        ?.beginTransaction()
-                                        ?.replace(R.id.container, UserManagementFragment())
-                                        ?.commit()
-                            },
-                            welcomeScreenTime)
-                }
-
-                else -> {
-                    currentUser?.let {
-                        val taskViewModel = ViewModelProviders.of(activity!!)[TaskViewModel::class.java]
-                        taskViewModel.addEventListenerToDB(it.userId)
-                        val message = "Welcome back, ${it.username}."
-                        initTaskList(taskViewModel, message, it.userId)
-                    }
-                }
+        val viewModel = ViewModelProviders.of(activity!!)[UserViewModel::class.java]
+        viewModel.currentUser.observe(this, Observer {
+            when (it) {
+                null -> noUserInSession()
+                else -> userExistInSession(it)
             }
         })
     }
 
-    private fun initTaskList(taskViewModel: TaskViewModel, message: String, userId: String) {
-        taskViewModel.loadAllTask()
-                ?.addOnSuccessListener {
-                    Handler().postDelayed(
-                            {
-                                this@WelcomeScreenFragment.context?.let {
-                                    Toast.makeText(this@WelcomeScreenFragment.context,
-                                            message,
-                                            Toast.LENGTH_SHORT)
-                                            .show()
-                                }
-                                val photoViewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
-                                Log.d(TAG, "view model : ${photoViewModel.hashCode()}")
-                                photoViewModel.initProfilePhotoDocument(userId)
-                                val userStatisticViewModel = ViewModelProviders.of(activity!!)[UserStatisticViewModel::class.java]
-                                userStatisticViewModel.loadUserStatistic(userId)
-                                val taskListFragment = TaskListFragment()
-                                val bundle = Bundle()
-                                bundle.putString(USER_ID, userId)
-                                taskListFragment.arguments = bundle
-                                fragmentManager
-                                        ?.beginTransaction()
-                                        ?.replace(R.id.container, taskListFragment)
-                                        ?.commit()
-                            },
-                            welcomeScreenTime)
-                }
-                ?.addOnFailureListener { exception ->
-                    val view = this@WelcomeScreenFragment.view
-                    view?.let {
-                        Snackbar.make(view,
-                                "Unable to load your data. ${exception.message}",
-                                Snackbar.LENGTH_LONG)
-                                .show()
-                    }
-                }
+    private fun noUserInSession() {
+        Handler().postDelayed({
+            fragmentManager
+                    ?.beginTransaction()
+                    ?.replace(R.id.container, UserManagementFragment())
+                    ?.commit()
+        }, welcomeScreenTime)
+    }
+
+    private fun userExistInSession(currentUser: User?) {
+        currentUser?.let {
+            val userId = it.userId
+            loadProfilePhoto(userId)
+            loadUserTaskStatistic(userId)
+            initUserTasks(userId, it.username)
+        }
+    }
+
+    private fun loadProfilePhoto(userId: String) {
+        val viewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
+        viewModel.initProfilePhotoDocument(userId)
+    }
+
+    private fun loadUserTaskStatistic(userId: String) {
+        val viewModel = ViewModelProviders.of(activity!!)[UserStatisticViewModel::class.java]
+        viewModel.loadUserStatistic(userId)
+    }
+
+    private fun initUserTasks(userId: String, userName: String) {
+        val viewModel = ViewModelProviders.of(activity!!)[TaskViewModel::class.java]
+        viewModel.initUserTaskDocument(userId)
+        Handler().postDelayed({
+            showWelcomeMessage(userName)
+            initTaskListFragment(userId)
+        }, welcomeScreenTime)
+    }
+
+    private fun showWelcomeMessage(userName: String) {
+        this@WelcomeScreenFragment.context?.let {
+            Toast.makeText(this@WelcomeScreenFragment.context,
+                    getString(R.string.welcome_user, userName),
+                    Toast.LENGTH_SHORT)
+                    .show()
+        }
+    }
+
+    private fun initTaskListFragment(userId: String) {
+        val taskListFragment = TaskListFragment()
+        val bundle = Bundle()
+        bundle.putString(USER_ID, userId)
+        taskListFragment.arguments = bundle
+        fragmentManager
+                ?.beginTransaction()
+                ?.replace(R.id.container, taskListFragment)
+                ?.commit()
     }
 }

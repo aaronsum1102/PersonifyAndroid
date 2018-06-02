@@ -5,7 +5,6 @@ import android.util.Log
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.QuerySnapshot
 
 data class Task(var name: String = "",
                 var dueDate: String = "",
@@ -29,33 +28,8 @@ class TaskRepository {
         db.firestoreSettings = Util.persistenceDBSetting
     }
 
-    fun loadAllTasks(): com.google.android.gms.tasks.Task<QuerySnapshot>? {
-        var task: com.google.android.gms.tasks.Task<QuerySnapshot>? = null
-        if (this::taskCollection.isInitialized) {
-            task = taskCollection.orderBy("daysLeft").get()
-            task.addOnCompleteListener {
-                if (task.isSuccessful) {
-                    val tasks = mutableListOf<Pair<String, Task>>()
-                    task.result.forEach { document ->
-                        val taskFromDB = document.toObject(Task::class.java)
-                        val daysDifference = Util.getDaysDifference(taskFromDB.dueDate)
-                        if (daysDifference != taskFromDB.daysLeft && taskFromDB.status != "Done") {
-                            taskFromDB.daysLeft = daysDifference
-                        }
-                        tasks.add(document.id to taskFromDB)
-                    }
-                    this.tasks.postValue(tasks)
-                    Log.i(TAG, "task loaded from DB. Number of tasks: ${tasks.size}")
-                } else {
-                    Log.w(TAG, "error getting document. ${task.exception?.message}")
-                }
-            }
-        }
-        return task
-    }
-
-    fun addEventListenerToDB(userId: String) {
-        initUserTaskCollectionPath(userId)
+    fun initUserTaskDocument(userId: String) {
+        initUserTaskCollection(userId)
         if (this::taskCollection.isInitialized) {
             taskCollection.addSnapshotListener { documentSnapshot, exception ->
                 if (exception != null) {
@@ -76,7 +50,7 @@ class TaskRepository {
         }
     }
 
-    private fun initUserTaskCollectionPath(userId: String) {
+    private fun initUserTaskCollection(userId: String) {
         taskCollection = db.collection(COLLECTION_NAME)
                 .document(userId)
                 .collection(SUB_COLLECTION_NAME)
@@ -86,7 +60,12 @@ class TaskRepository {
         val temporaryTasks = mutableListOf<Pair<String, Task>>()
         tasks.value?.let { temporaryTasks.addAll(it) }
         val document = change.document
-        temporaryTasks.add(document.id to document.toObject(Task::class.java))
+        val taskFromDB = document.toObject(Task::class.java)
+        val daysDifference = Util.getDaysDifference(taskFromDB.dueDate)
+        if (daysDifference != taskFromDB.daysLeft && taskFromDB.status != "Done") {
+            taskFromDB.daysLeft = daysDifference
+        }
+        temporaryTasks.add(document.id to taskFromDB)
         temporaryTasks.sortBy { it.second.daysLeft }
         tasks.value = temporaryTasks
         Log.i(TAG, "New document added. Number of tasks: ${tasks.value?.size}")

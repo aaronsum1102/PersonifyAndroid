@@ -97,7 +97,7 @@ class SignUpFragment : Fragment(), TextWatcher {
 
     private fun addTaskEventListener(userId: String) {
         val taskViewModel = ViewModelProviders.of(activity!!)[TaskViewModel::class.java]
-        taskViewModel.addEventListenerToDB(userId)
+        taskViewModel.initUserTaskDocument(userId)
     }
 
     private fun initalisedUserStatisticCollection(userId: String) {

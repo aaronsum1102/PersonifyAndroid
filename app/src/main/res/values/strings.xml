@@ -55,6 +55,7 @@
     <string name="do_you_want_to_change_your_email">Do you want to change your email?</string>
     <string name="save">save</string>
     <string name="delete_my_account">delete my account</string>
+    <string name="welcome_user">Welcome back, %s.</string>
     <string-array name="status">
         <item>To do</item>
         <item>In progress</item>

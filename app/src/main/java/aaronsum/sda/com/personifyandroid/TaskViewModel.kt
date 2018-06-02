@@ -8,11 +8,9 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
     private val repository = TaskRepository()
     val tasks: LiveData<List<Pair<String, Task>>> = repository.tasks
 
-    fun addEventListenerToDB(userId: String) {
-        repository.addEventListenerToDB(userId)
+    fun initUserTaskDocument(userId: String) {
+        repository.initUserTaskDocument(userId)
     }
-
-    fun loadAllTask() = repository.loadAllTasks()
 
     fun addTask(task: Task) = repository.addTask(task)
 
