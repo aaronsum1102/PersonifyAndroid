@@ -57,19 +57,14 @@ class UserRepository {
             if (currentUser != null) {
                 currentUser.reload()
                         .addOnFailureListener {
-                            auth.signOut()
-                            this.currentUser.postValue(null)
-                            Log.i(TAG, "account reload failed.")
+                            Log.i(TAG, "account reload failed. ${it.localizedMessage}")
                         }
-                        .addOnSuccessListener {
-                            val displayName = currentUser.displayName
-                            Log.i(TAG, "account reload successes. $displayName.")
-                            displayName?.let {
-                                Log.i(TAG, "show user display name.")
-                                val email = currentUser.email
-                                email?.let { this.currentUser.postValue(User(currentUser.uid, displayName, email)) }
-                            }
-                        }
+                val displayName = currentUser.displayName
+                displayName?.let {
+                    Log.i(TAG, "show user display name.")
+                    val email = currentUser.email
+                    email?.let { this.currentUser.postValue(User(currentUser.uid, displayName, email)) }
+                }
             } else {
                 Log.i(TAG, "not user in the session")
                 this.currentUser.postValue(null)

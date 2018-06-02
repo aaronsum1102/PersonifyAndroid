@@ -199,6 +199,6 @@ class ProfileFragment : Fragment(), Target {
     override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
 
     override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-        profilePhoto.background = BitmapDrawable(resources, bitmap)
+        profilePhoto?.background = BitmapDrawable(resources, bitmap)
     }
 }

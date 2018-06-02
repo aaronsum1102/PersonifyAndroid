@@ -15,6 +15,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
@@ -114,7 +115,7 @@ class TaskListFragment : Fragment(), OnTaskClickListener, Target {
     override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
 
     override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-        toProfilePage.background = BitmapDrawable(resources, bitmap)
+        toProfilePage?.background = BitmapDrawable(resources, bitmap)
     }
 }
 
