@@ -20,7 +20,7 @@ import kotlinx.android.synthetic.main.fragment_profile.*
 import java.io.File
 import java.lang.Exception
 
-class ProfileFragment : Fragment() {
+class ProfileFragment : Fragment(), Target {
     companion object {
         const val PROFILE_BACK_STACK = "profile"
         private const val TAG = "ProfileFragment"
@@ -51,19 +51,11 @@ class ProfileFragment : Fragment() {
             uri?.let {
                 Picasso.get().load(uri).fetch(object : Callback {
                     override fun onSuccess() {
-                        Picasso.get().load(uri).into(object : Target {
-                            override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
-
-                            override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
-
-                            override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                                profilePhoto.background = BitmapDrawable(resources, bitmap)
-                            }
-                        })
+                        Picasso.get().load(uri).into(this@ProfileFragment)
                     }
 
                     override fun onError(e: Exception?) {
-                        Log.e(TAG, "Something went wrong. $e.")
+                        Log.e(TAG, "Something went wrong. ${e?.localizedMessage}")
                     }
                 })
             }
@@ -200,5 +192,13 @@ class ProfileFragment : Fragment() {
                 }
             }
         }
+    }
+
+    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
+
+    override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
+
+    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+        profilePhoto.background = BitmapDrawable(resources, bitmap)
     }
 }

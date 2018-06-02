@@ -18,10 +18,6 @@ class PhotoViewModel : ViewModel() {
         photoRepository.writeUserProfilePictureURL(url)
     }
 
-    fun loadUserProfilePic() {
-        photoRepository.loadUserProfile()
-    }
-
     fun deleteUserProfile() {
         photoRepository.deleteUserProfilePic()
     }

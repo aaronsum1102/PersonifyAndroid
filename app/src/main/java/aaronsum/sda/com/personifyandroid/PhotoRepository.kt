@@ -58,20 +58,6 @@ class PhotoRepository {
         return null
     }
 
-    fun loadUserProfile() {
-        if (this::document.isInitialized) {
-            Log.i(TAG, "load profile pic")
-            document.get()
-                    .addOnSuccessListener {
-                        val url = it.get(URL)
-                        url?.let {
-                            url as String
-                            profilePhoto.postValue(url)
-                        }
-                    }
-        }
-    }
-
     fun deleteUserProfilePic() {
         if (this::document.isInitialized) {
             document.delete()

@@ -27,7 +27,7 @@ interface OnTaskClickListener {
     fun onTaskClick(task: Task, taskId: String)
 }
 
-class TaskListFragment : Fragment(), OnTaskClickListener {
+class TaskListFragment : Fragment(), OnTaskClickListener, Target {
     companion object {
         const val KEY_TASK_ID = "task id"
         const val TASK_LIST_BACK_STACK = "taskList"
@@ -44,27 +44,19 @@ class TaskListFragment : Fragment(), OnTaskClickListener {
         (activity as AppCompatActivity).supportActionBar?.setDisplayShowTitleEnabled(false)
 
         val viewModel = ViewModelProviders.of(activity!!)[TaskViewModel::class.java]
-        val photoViewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
         val userStatisticViewModel = ViewModelProviders.of(activity!!)[UserStatisticViewModel::class.java]
+        val photoViewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
 
         photoViewModel.profilePhotoUrl.observe(this, Observer { uri ->
             uri?.let {
+                Log.i(TAG, "profile image, $uri")
                 Picasso.get().load(uri).fetch(object : Callback {
                     override fun onSuccess() {
-                        Picasso.get().load(uri).into(object : Target {
-                            override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
-
-                            override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
-
-                            override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-
-                                toProfilePage.background = BitmapDrawable(resources, bitmap)
-                            }
-                        })
+                        Picasso.get().load(uri).into(this@TaskListFragment)
                     }
 
                     override fun onError(e: Exception?) {
-                        Log.e(TAG, "Something went wrong. $e.")
+                        Log.e(TAG, "Something went wrong. ${e?.localizedMessage}")
                     }
                 })
             }
@@ -117,51 +109,59 @@ class TaskListFragment : Fragment(), OnTaskClickListener {
                 ?.commit()
     }
 
-    class TaskViewAdaptor(private val taskClickListener: OnTaskClickListener) : RecyclerView.Adapter<TaskViewHolder>() {
-        var tasks: List<Pair<String, Task>> = listOf()
+    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.item_task, parent, false)
-            return TaskViewHolder(view)
-        }
+    override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
 
-        override fun getItemCount(): Int = tasks.size
+    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+        toProfilePage.background = BitmapDrawable(resources, bitmap)
+    }
+}
 
-        override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
-            holder.bind(tasks[position], taskClickListener)
-        }
+class TaskViewAdaptor(private val taskClickListener: OnTaskClickListener) : RecyclerView.Adapter<TaskViewHolder>() {
+    var tasks: List<Pair<String, Task>> = listOf()
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_task, parent, false)
+        return TaskViewHolder(view)
     }
 
-    class TaskViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        fun bind(pair: Pair<String, Task>, taskClickListener: OnTaskClickListener) {
-            val task = pair.second
-            itemView.findViewById<TextView>(R.id.taskName).text = task.name
-            itemView.findViewById<TextView>(R.id.dueDate).text = task.dueDate
-            itemView.findViewById<TextView>(R.id.status).text = task.status
-            itemView.findViewById<TextView>(R.id.priority).text = task.priority
-            val daysLeft = task.daysLeft
-            val daysLeftText = itemView.findViewById<TextView>(R.id.daysLeftText)
-            if (daysLeft >= 0) {
-                if (daysLeft > 1) {
-                    daysLeftText.text = "$daysLeft days to due date"
-                } else {
-                    daysLeftText.text = "$daysLeft day to due date"
-                }
-                val textColor = ContextCompat.getColor(itemView.context, R.color.primaryTextColor)
-                daysLeftText.setTextColor(textColor)
-            } else {
-                if (daysLeft < -1) {
-                    daysLeftText.text = "Overdue by ${abs(daysLeft)} days"
-                } else {
-                    daysLeftText.text = "Overdue by ${abs(daysLeft)} day"
-                }
-                daysLeftText.setTextColor(Color.RED)
-            }
+    override fun getItemCount(): Int = tasks.size
 
-            daysLeftText.text
-            itemView.setOnClickListener {
-                taskClickListener.onTaskClick(task, pair.first)
+    override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
+        holder.bind(tasks[position], taskClickListener)
+    }
+}
+
+class TaskViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    fun bind(pair: Pair<String, Task>, taskClickListener: OnTaskClickListener) {
+        val task = pair.second
+        itemView.findViewById<TextView>(R.id.taskName).text = task.name
+        itemView.findViewById<TextView>(R.id.dueDate).text = task.dueDate
+        itemView.findViewById<TextView>(R.id.status).text = task.status
+        itemView.findViewById<TextView>(R.id.priority).text = task.priority
+        val daysLeft = task.daysLeft
+        val daysLeftText = itemView.findViewById<TextView>(R.id.daysLeftText)
+        if (daysLeft >= 0) {
+            if (daysLeft > 1) {
+                daysLeftText.text = "$daysLeft days to due date"
+            } else {
+                daysLeftText.text = "$daysLeft day to due date"
             }
+            val textColor = ContextCompat.getColor(itemView.context, R.color.primaryTextColor)
+            daysLeftText.setTextColor(textColor)
+        } else {
+            if (daysLeft < -1) {
+                daysLeftText.text = "Overdue by ${abs(daysLeft)} days"
+            } else {
+                daysLeftText.text = "Overdue by ${abs(daysLeft)} day"
+            }
+            daysLeftText.setTextColor(Color.RED)
+        }
+
+        daysLeftText.text
+        itemView.setOnClickListener {
+            taskClickListener.onTaskClick(task, pair.first)
         }
     }
 }

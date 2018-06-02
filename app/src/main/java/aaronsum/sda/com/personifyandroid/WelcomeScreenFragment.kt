@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +15,7 @@ import android.widget.Toast
 class WelcomeScreenFragment : Fragment() {
     companion object {
         const val USER_ID = "userId"
+        private const val TAG = "WelcomeScreenFragment"
     }
 
     private val welcomeScreenTime: Long = 1500
@@ -68,8 +70,8 @@ class WelcomeScreenFragment : Fragment() {
                                             .show()
                                 }
                                 val photoViewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
+                                Log.d(TAG, "view model : ${photoViewModel.hashCode()}")
                                 photoViewModel.initProfilePhotoDocument(userId)
-                                photoViewModel.loadUserProfilePic()
                                 val userStatisticViewModel = ViewModelProviders.of(activity!!)[UserStatisticViewModel::class.java]
                                 userStatisticViewModel.loadUserStatistic(userId)
                                 val taskListFragment = TaskListFragment()
