@@ -125,4 +125,8 @@ class TaskRepository {
                     it.documents.forEach { it.reference.delete() }
                 }
     }
+
+    fun clearTask() {
+        tasks.postValue(null)
+    }
 }

@@ -25,13 +25,12 @@ import java.lang.Exception
 
 data class UserInfo(val name: String, val email: String, val password: String)
 
-class SignUpFragment : Fragment(), TextWatcher {
+class SignUpFragment : Fragment(), TextWatcher, Target {
     companion object {
         const val CAMERA_REQUEST_CODE = 100
+        private const val TAG = "SignUpFragment"
     }
 
-    private val TAG = "SignUpFragment"
-    private lateinit var userViewModel: UserViewModel
     private var fileToUpload: File? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -40,20 +39,13 @@ class SignUpFragment : Fragment(), TextWatcher {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        userViewModel = ViewModelProviders.of(activity!!)[UserViewModel::class.java]
-
-        createAccountButton.isEnabled = false
-
-        nameText.addTextChangedListener(this)
-        emailText.addTextChangedListener(this)
-        passwordText.addTextChangedListener(this)
-        verifyPasswordText.addTextChangedListener(this)
+        addTextWatcher()
 
         createAccountButton.setOnClickListener {
-            val userInfo = UserInfo(nameText.text.toString(),
+            createNewAccount(UserInfo(
+                    nameText.text.toString(),
                     emailText.text.toString(),
-                    passwordText.text.toString())
-            createNewAccount(userInfo)
+                    passwordText.text.toString()))
         }
 
         addPhoto.setOnClickListener {
@@ -62,28 +54,15 @@ class SignUpFragment : Fragment(), TextWatcher {
     }
 
     private fun createNewAccount(userInfo: UserInfo) {
+        val userViewModel = ViewModelProviders.of(activity!!)[UserViewModel::class.java]
         userViewModel.createNewUser(userInfo)
-                .addOnCompleteListener {
-                    if (it.isSuccessful) {
-                        it.continueWith {
-                            val userId = it.result.user.uid
-                            addTaskEventListener(userId)
-                            initalisedUserStatisticCollection(userId)
-                            uploadProfilePhoto(userId)
-                            context?.let {
-                                Toast.makeText(context,
-                                        "Welcome, ${userInfo.name}", Toast.LENGTH_SHORT)
-                                        .show()
-                            }
-                            view?.let { Util.hideSoftKeyboard(activity, view as View) }
-                            fragmentManager?.popBackStack("welcome",
-                                    FragmentManager.POP_BACK_STACK_INCLUSIVE)
-                            fragmentManager
-                                    ?.beginTransaction()
-                                    ?.replace(R.id.container, TaskListFragment())
-                                    ?.commit()
-                        }
-                    }
+                .addOnSuccessListener {
+                    val user = it.user
+                    addTaskEventListener(user.uid)
+                    initUserStatisticCollection(user.uid)
+                    uploadProfilePhoto(user.uid)
+                    view?.let { Util.hideSoftKeyboard(activity, view as View) }
+                    user.displayName?.let { initTaskListFragment(it) }
                 }
                 .addOnFailureListener { exception ->
                     context?.let {
@@ -100,9 +79,9 @@ class SignUpFragment : Fragment(), TextWatcher {
         taskViewModel.initUserTaskDocument(userId)
     }
 
-    private fun initalisedUserStatisticCollection(userId: String) {
+    private fun initUserStatisticCollection(userId: String) {
         val userStatisticViewModel = ViewModelProviders.of(activity!!)[UserStatisticViewModel::class.java]
-        userStatisticViewModel.loadUserStatistic(userId)
+        userStatisticViewModel.initUserStatistic(userId)
     }
 
     private fun uploadProfilePhoto(userId: String) {
@@ -119,6 +98,20 @@ class SignUpFragment : Fragment(), TextWatcher {
         }
     }
 
+    private fun initTaskListFragment(userName: String) {
+        context?.let {
+            Toast.makeText(context,
+                    getString(R.string.welcome_new_user, userName), Toast.LENGTH_SHORT)
+                    .show()
+        }
+        fragmentManager?.popBackStack(WelcomeScreenFragment.STACK_NAME,
+                FragmentManager.POP_BACK_STACK_INCLUSIVE)
+        fragmentManager
+                ?.beginTransaction()
+                ?.replace(R.id.container, TaskListFragment())
+                ?.commit()
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
@@ -129,19 +122,11 @@ class SignUpFragment : Fragment(), TextWatcher {
                         uri?.let {
                             Picasso.get().load(uri).fetch(object : Callback {
                                 override fun onSuccess() {
-                                    Picasso.get().load(uri).into(object : Target {
-                                        override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
-
-                                        override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
-
-                                        override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                                            profilePhoto.background = BitmapDrawable(resources, bitmap)
-                                        }
-                                    })
+                                    Picasso.get().load(uri).into(this@SignUpFragment)
                                 }
 
                                 override fun onError(e: Exception?) {
-                                    Log.e(TAG, "something went wrong. ${e?.message}.")
+                                    Log.e(TAG, "something went wrong. ${e?.localizedMessage}")
                                 }
                             })
                         }
@@ -149,6 +134,14 @@ class SignUpFragment : Fragment(), TextWatcher {
                 }
             }
         }
+    }
+
+    private fun addTextWatcher() {
+        val fragment = this@SignUpFragment
+        nameText.addTextChangedListener(fragment)
+        emailText.addTextChangedListener(fragment)
+        passwordText.addTextChangedListener(fragment)
+        verifyPasswordText.addTextChangedListener(fragment)
     }
 
     override fun afterTextChanged(s: Editable?) {
@@ -168,4 +161,12 @@ class SignUpFragment : Fragment(), TextWatcher {
     override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
     override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
+
+    override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
+
+    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+        profilePhoto.background = BitmapDrawable(resources, bitmap)
+    }
 }

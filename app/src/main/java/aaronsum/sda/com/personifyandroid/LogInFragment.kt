@@ -13,7 +13,9 @@ import android.widget.Toast
 import kotlinx.android.synthetic.main.fragment_user_login.*
 
 class LogInFragment : Fragment(), TextWatcher {
-    private lateinit var userViewModel: UserViewModel
+    companion object {
+        const val BACK_STACK = "login"
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_user_login, container, false)
@@ -22,9 +24,6 @@ class LogInFragment : Fragment(), TextWatcher {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        userViewModel = ViewModelProviders.of(activity!!)[UserViewModel::class.java]
-
-        confirmButton.isEnabled = false
         emailText.addTextChangedListener(this)
         passwordText.addTextChangedListener(this)
 
@@ -37,41 +36,19 @@ class LogInFragment : Fragment(), TextWatcher {
         newPasswordButton.setOnClickListener {
             fragmentManager
                     ?.beginTransaction()
-                    ?.addToBackStack("login")
+                    ?.addToBackStack(BACK_STACK)
                     ?.replace(R.id.container, ResetPasswordFragment())
                     ?.commit()
         }
     }
 
     private fun signInAuthentication(email: String, password: String) {
+        val userViewModel = ViewModelProviders.of(activity!!)[UserViewModel::class.java]
         userViewModel.signInWithDetails(email, password)
-                .addOnCompleteListener {
-                    if (it.isSuccessful) {
-                        it.continueWith {
-                            val result = it.result
-                            this@LogInFragment.context?.let {
-                                Toast.makeText(this@LogInFragment.context,
-                                        "Welcome back, ${result.user.displayName}.",
-                                        Toast.LENGTH_SHORT)
-                                        .show()
-                            }
-                            val userId = result.user.uid
-                            val photoViewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
-                            photoViewModel.initProfilePhotoDocument(userId)
-                            val taskViewModel = ViewModelProviders.of(activity!!)[TaskViewModel::class.java]
-                            taskViewModel.initUserTaskDocument(userId)
-                            val userStatisticViewModel = ViewModelProviders.of(activity!!)[UserStatisticViewModel::class.java]
-                            userStatisticViewModel.loadUserStatistic(userId)
-                            view?.let { Util.hideSoftKeyboard(activity, view as View) }
-                            val taskListFragment = TaskListFragment()
-                            fragmentManager?.popBackStack("welcome",
-                                    FragmentManager.POP_BACK_STACK_INCLUSIVE)
-                            fragmentManager
-                                    ?.beginTransaction()
-                                    ?.replace(R.id.container, taskListFragment)
-                                    ?.commit()
-                        }
-                    }
+                .addOnSuccessListener { result ->
+                    initCollections(result.user.uid)
+                    view?.let { Util.hideSoftKeyboard(activity, view as View) }
+                    result.user.displayName?.let { initTaskList(it) }
                 }
                 .addOnFailureListener { exception ->
                     this@LogInFragment.context?.let {
@@ -81,6 +58,31 @@ class LogInFragment : Fragment(), TextWatcher {
                                 .show()
                     }
                 }
+    }
+
+    private fun initCollections(userId: String) {
+        val photoViewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
+        val taskViewModel = ViewModelProviders.of(activity!!)[TaskViewModel::class.java]
+        val userStatisticViewModel = ViewModelProviders.of(activity!!)[UserStatisticViewModel::class.java]
+
+        photoViewModel.initProfilePhotoDocument(userId)
+        taskViewModel.initUserTaskDocument(userId)
+        userStatisticViewModel.initUserStatistic(userId)
+    }
+
+    private fun initTaskList(userName: String) {
+        this@LogInFragment.context?.let {
+            Toast.makeText(this@LogInFragment.context,
+                    getString(R.string.welcome_user, userName),
+                    Toast.LENGTH_SHORT)
+                    .show()
+        }
+        fragmentManager?.popBackStack(WelcomeScreenFragment.STACK_NAME,
+                FragmentManager.POP_BACK_STACK_INCLUSIVE)
+        fragmentManager
+                ?.beginTransaction()
+                ?.replace(R.id.container, TaskListFragment())
+                ?.commit()
     }
 
     override fun afterTextChanged(s: Editable?) {

@@ -37,7 +37,7 @@ class UserStatisticRepository {
         db.firestoreSettings = Util.persistenceDBSetting
     }
 
-    private fun initialiseCollection(userId: String) {
+    fun initialiseCollection(userId: String) {
         document = db.collection(collectionName).document(userId)
         document.addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
             firebaseFirestoreException?.let {
@@ -47,27 +47,6 @@ class UserStatisticRepository {
             documentSnapshot?.let {
                 taskStatistic = documentSnapshot.toObject(TaskStatistic::class.java)
                 userStatistics.postValue(transformData(taskStatistic!!))
-            }
-        }
-    }
-
-    fun loadStatistic(userId: String) {
-        initialiseCollection(userId)
-        if (this::document.isInitialized) {
-            document.get().addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    taskStatistic = task.result.toObject(TaskStatistic::class.java)
-                    if (taskStatistic != null) {
-                        Log.i(TAG, "Statistic loaded from db")
-                        userStatistics.postValue(transformData(taskStatistic!!))
-                    } else {
-                        Log.i(TAG, "initialise document in db")
-                        taskStatistic = TaskStatistic()
-                        userStatistics.postValue(UserStatistics())
-                    }
-                } else {
-                    Log.i(TAG, "${task.exception?.cause}")
-                }
             }
         }
     }
@@ -131,6 +110,9 @@ class UserStatisticRepository {
         if (this::document.isInitialized) {
             document.delete()
         }
+    }
+
+    fun clearStatistic() {
         userStatistics.postValue(UserStatistics())
     }
 }

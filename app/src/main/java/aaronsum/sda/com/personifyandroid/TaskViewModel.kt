@@ -22,6 +22,8 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
 
     fun deleteUserDocument() {
         repository.deleteUserDocument()
+        clearTaskWhenNoUserInSession()
     }
 
+    fun clearTaskWhenNoUserInSession() = repository.clearTask()
 }

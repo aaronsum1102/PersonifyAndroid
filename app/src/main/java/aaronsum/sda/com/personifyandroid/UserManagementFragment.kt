@@ -14,12 +14,11 @@ class UserManagementFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         if (savedInstanceState == null) {
-
             signUpButton.setOnClickListener {
                 fragmentManager
                         ?.beginTransaction()
                         ?.replace(R.id.container, SignUpFragment())
-                        ?.addToBackStack("welcome")
+                        ?.addToBackStack(WelcomeScreenFragment.STACK_NAME)
                         ?.commit()
             }
 
@@ -27,7 +26,7 @@ class UserManagementFragment : Fragment() {
                 fragmentManager
                         ?.beginTransaction()
                         ?.replace(R.id.container, LogInFragment())
-                        ?.addToBackStack("welcome")
+                        ?.addToBackStack(WelcomeScreenFragment.STACK_NAME)
                         ?.commit()
             }
         }

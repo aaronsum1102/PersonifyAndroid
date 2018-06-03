@@ -20,9 +20,10 @@ class PhotoViewModel : ViewModel() {
 
     fun deleteUserProfile() {
         photoRepository.deleteUserProfilePic()
+        clearProfilePicWhenNoUser()
     }
 
-    fun clearProfilePicAfterUserSession() {
+    fun clearProfilePicWhenNoUser() {
         photoRepository.clearProfilePic()
     }
 }

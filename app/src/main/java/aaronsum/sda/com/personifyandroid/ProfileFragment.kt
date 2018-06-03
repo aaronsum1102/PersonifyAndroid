@@ -1,5 +1,6 @@
 package aaronsum.sda.com.personifyandroid
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
@@ -7,6 +8,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
@@ -35,10 +37,13 @@ class ProfileFragment : Fragment(), Target {
         return inflater.inflate(R.layout.fragment_profile, container, false)
     }
 
+    @SuppressLint("StringFormatInvalid")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         userViewModel = ViewModelProviders.of(activity!!)[UserViewModel::class.java]
+        photoViewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
+
         userViewModel.currentUser.observe(this, Observer { user ->
             user?.let {
                 this.user = it
@@ -46,7 +51,6 @@ class ProfileFragment : Fragment(), Target {
             }
         })
 
-        photoViewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
         photoViewModel.profilePhotoUrl.observe(this, Observer { uri ->
             uri?.let {
                 Picasso.get().load(uri).fetch(object : Callback {
@@ -70,27 +74,19 @@ class ProfileFragment : Fragment(), Target {
             userStatistics?.let {
                 val earliestCompletion = userStatistics.earliestCompletion
                 if (earliestCompletion != 0) {
-                    if (earliestCompletion > 1) {
-                        earliestCompletionText.text = "$earliestCompletion days"
-                    } else {
-                        earliestCompletionText.text = "$earliestCompletion day"
-                    }
+                    earliestCompletionText.text = resources.getQuantityString(R.plurals.number_of_days, earliestCompletion, earliestCompletion)
                 }
                 val longestOverdue = userStatistics.longestOverdue
                 if (longestOverdue != 0) {
-                    if (longestOverdue > 1) {
-                        longestOverDueText.text = "$longestOverdue days"
-                    } else {
-                        longestOverDueText.text = "$longestOverdue day"
-                    }
+                    longestOverDueText.text = resources.getQuantityString(R.plurals.number_of_days, longestOverdue, longestOverdue)
                 }
                 val taskCompletionRate = userStatistics.taskCompletionRate
                 if (taskCompletionRate != 0) {
-                    completionRateText.text = "$taskCompletionRate%"
+                    completionRateText.text = getString(R.string.number_percent, taskCompletionRate)
                 }
                 val taskOverdueRate = userStatistics.taskOverdueRate
                 if (taskOverdueRate != 0) {
-                    overDueRateText.text = "$taskOverdueRate%"
+                    overDueRateText.text = getString(R.string.number_percent, taskOverdueRate)
                 }
             }
         })
@@ -118,9 +114,11 @@ class ProfileFragment : Fragment(), Target {
                 R.id.action_settings -> {
                     val anchor = activity?.findViewById<View>(R.id.action_settings)
                     val menu = PopupMenu(context, anchor)
-                    menu.setOnMenuItemClickListener { settingMenuSelector(it) }
-                    menu.inflate(R.menu.profile_setting_menu)
-                    menu.show()
+                    menu.run {
+                        setOnMenuItemClickListener { settingMenuSelector(it) }
+                        inflate(R.menu.profile_setting_menu)
+                        show()
+                    }
                 }
 
                 else -> activity?.onBackPressed()
@@ -142,13 +140,19 @@ class ProfileFragment : Fragment(), Target {
 
             R.id.actionLogOut -> {
                 val userId = userViewModel.currentUser.value?.userId
-                userId?.let { photoViewModel.clearProfilePicAfterUserSession() }
-                userViewModel.signOut()
-                fragmentManager?.apply {
-                    popBackStack()
-                    beginTransaction()
-                            .replace(R.id.container, UserManagementFragment())
-                            .commit()
+                userId?.let {
+                    val taskViewModel = ViewModelProviders.of(activity!!)[TaskViewModel::class.java]
+                    val userStatisticViewModel = ViewModelProviders.of(activity!!)[UserStatisticViewModel::class.java]
+                    userViewModel.signOut()
+                    photoViewModel.clearProfilePicWhenNoUser()
+                    taskViewModel.clearTaskWhenNoUserInSession()
+                    userStatisticViewModel.clearStatisticWhenNoUser()
+                    fragmentManager?.apply {
+                        popBackStack()
+                        beginTransaction()
+                                .replace(R.id.container, UserManagementFragment())
+                                .commit()
+                    }
                 }
             }
         }
@@ -162,36 +166,36 @@ class ProfileFragment : Fragment(), Target {
                     uploadedFile?.let {
                         val uri = Util.getUriForFile(uploadedFile, this@ProfileFragment.context)
                         uri?.let {
-                            Picasso.get().load(uri).fetch(object : Callback {
-                                override fun onSuccess() {
-                                    Picasso.get().load(uri).into(object : Target {
-                                        override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
-
-                                        override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
-
-                                        override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                                            profilePhoto.background = BitmapDrawable(resources, bitmap)
-                                        }
-                                    })
-                                }
-
-                                override fun onError(e: Exception?) {
-                                    Log.e(TAG, "something went wrong. ${e?.message}.")
-                                }
-                            })
-                            if (this::user.isInitialized) {
-                                photoViewModel.uploadPhoto(uri)
-                                        ?.continueWith {
-                                            it.result.storage.downloadUrl.addOnSuccessListener {
-                                                photoViewModel.writeUserProfilePictureURL(it)
-                                            }
-                                        }
-                            }
+                            updateProfileImage(uri)
                         }
                     }
                 }
             }
         }
+    }
+
+    private fun updateProfileImage(uri: Uri) {
+        if (this::user.isInitialized) {
+            photoViewModel.uploadPhoto(uri)
+                    ?.continueWith {
+                        it.result.storage.downloadUrl.addOnSuccessListener {
+                            photoViewModel.writeUserProfilePictureURL(it)
+                            displayProfileImage(uri)
+                        }
+                    }
+        }
+    }
+
+    private fun displayProfileImage(uri: Uri) {
+        Picasso.get().load(uri).fetch(object : Callback {
+            override fun onSuccess() {
+                Picasso.get().load(uri).into(this@ProfileFragment)
+            }
+
+            override fun onError(e: Exception?) {
+                Log.e(TAG, "something went wrong. ${e?.message}.")
+            }
+        })
     }
 
     override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}

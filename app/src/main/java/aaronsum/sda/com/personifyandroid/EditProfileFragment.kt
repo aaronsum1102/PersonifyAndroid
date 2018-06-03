@@ -14,6 +14,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import com.google.android.gms.tasks.Task
 import kotlinx.android.synthetic.main.fragment_edit_profile.*
 
 class EditProfileFragment : Fragment(), TextWatcher {
@@ -24,31 +25,35 @@ class EditProfileFragment : Fragment(), TextWatcher {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val userViewModel = ViewModelProviders.of(activity!!)[UserViewModel::class.java]
-        val taskViewModel = ViewModelProviders.of(activity!!)[TaskViewModel::class.java]
+        initialisedToolbar()
+        addTextWatcher()
 
-        newEmailText.addTextChangedListener(this)
-        passwordText.addTextChangedListener(this)
+        val userViewModel = ViewModelProviders.of(activity!!)[UserViewModel::class.java]
 
         userViewModel.currentUser.observe(this, Observer {
             newNameText.setText(it?.username)
             newEmailText.setText(it?.email)
         })
 
-        initialisedToolbar()
-
         deleteProfileButton.setOnClickListener {
-            deleteProfile(userViewModel, taskViewModel)
-
+            context?.let { context ->
+                AlertDialog.Builder(context)
+                        .setTitle(getString(R.string.alert_title_delete_profile))
+                        .setMessage(getString(R.string.alert_content_delete_profile))
+                        .setPositiveButton(getString(R.string.confirm), { dialog, _ ->
+                            deleteProfile(userViewModel)
+                                    ?.addOnSuccessListener { dialog.dismiss() }
+                        })
+                        .setNegativeButton(R.string.cancel, { dialog, _ -> dialog.dismiss() })
+                        .create()
+                        .show()
+            }
         }
 
         saveButton.setOnClickListener {
             userViewModel.verifyPassword(passwordText.text.toString())
                     ?.addOnSuccessListener {
-                        val userInfo = UserInfo(newNameText.text.toString(),
-                                newEmailText.text.toString(),
-                                passwordText.text.toString())
-                        userViewModel.editProfile(userInfo)
+                        registerNewProfileInfo(userViewModel)
                         Util.hideSoftKeyboard(activity, view)
                         fragmentManager?.popBackStack(TaskListFragment.TASK_LIST_BACK_STACK,
                                 FragmentManager.POP_BACK_STACK_INCLUSIVE)
@@ -63,41 +68,34 @@ class EditProfileFragment : Fragment(), TextWatcher {
         }
     }
 
-    private fun deleteProfile(userViewModel: UserViewModel, taskViewModel: TaskViewModel) {
-        context?.let { context ->
-            AlertDialog.Builder(context)
-                    .setTitle("Warning!!!")
-                    .setMessage("Are you sure you want to delete your account? All data will be removed and unrecoverable after that.")
-                    .setPositiveButton("Confirm", { dialog, _ ->
-                        run {
-                            taskViewModel.deleteUserDocument()
-                            userViewModel.deleteProfile()
-                                    ?.addOnFailureListener {
-                                        Toast.makeText(context,
-                                                "Unable to delete your account. ${it.message}",
-                                                Toast.LENGTH_LONG).show()
-                                    }
-                            val user = userViewModel.currentUser.value
-                            val photoViewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
-                            user?.userId?.let {
-                                photoViewModel.clearProfilePicAfterUserSession()
-                                photoViewModel.deleteUserProfile()
-                            }
-                            val userStatisticViewModel = ViewModelProviders.of(activity!!)[UserStatisticViewModel::class.java]
-                            userStatisticViewModel.deleteStatistic()
-                            fragmentManager?.apply {
-                                popBackStack(TaskListFragment.TASK_LIST_BACK_STACK,
-                                        FragmentManager.POP_BACK_STACK_INCLUSIVE)
-                                beginTransaction()
-                                        .replace(R.id.container, UserManagementFragment())
-                                        .commit()
-                            }
-                            dialog.dismiss()
-                        }
-                    })
-                    .setNegativeButton("Cancel", { dialog, _ -> dialog.dismiss() })
-                    .create()
-                    .show()
+    private fun deleteProfile(userViewModel: UserViewModel): Task<Void>? {
+        val taskViewModel = ViewModelProviders.of(activity!!)[TaskViewModel::class.java]
+        val photoViewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
+        val userStatisticViewModel = ViewModelProviders.of(activity!!)[UserStatisticViewModel::class.java]
+
+        userViewModel.deleteProfile()
+                ?.continueWith {
+                    taskViewModel.deleteUserDocument()
+                    photoViewModel.deleteUserProfile()
+                    userStatisticViewModel.deleteStatistic()
+                    initUserManagementFragment()
+                    return@continueWith it
+                }
+                ?.addOnFailureListener {
+                    Toast.makeText(context,
+                            "Unable to delete your account. ${it.message}",
+                            Toast.LENGTH_LONG).show()
+                }
+        return null
+    }
+
+    private fun initUserManagementFragment() {
+        fragmentManager?.apply {
+            popBackStack(TaskListFragment.TASK_LIST_BACK_STACK,
+                    FragmentManager.POP_BACK_STACK_INCLUSIVE)
+            beginTransaction()
+                    .replace(R.id.container, UserManagementFragment())
+                    .commit()
         }
     }
 
@@ -107,6 +105,18 @@ class EditProfileFragment : Fragment(), TextWatcher {
         appCompatActivity.setSupportActionBar(editProfileToolbar)
         val supportActionBar = appCompatActivity.supportActionBar
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    private fun addTextWatcher() {
+        newEmailText.addTextChangedListener(this@EditProfileFragment)
+        passwordText.addTextChangedListener(this@EditProfileFragment)
+    }
+
+    private fun registerNewProfileInfo(userViewModel: UserViewModel) {
+        val userInfo = UserInfo(newNameText.text.toString(),
+                newEmailText.text.toString(),
+                passwordText.text.toString())
+        userViewModel.editProfile(userInfo)
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {

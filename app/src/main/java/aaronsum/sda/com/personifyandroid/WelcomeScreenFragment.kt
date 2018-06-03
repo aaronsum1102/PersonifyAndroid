@@ -13,6 +13,7 @@ import android.widget.Toast
 class WelcomeScreenFragment : Fragment() {
     companion object {
         const val USER_ID = "userId"
+        const val STACK_NAME = "welcome"
     }
 
     private val welcomeScreenTime: Long = 1500
@@ -61,7 +62,7 @@ class WelcomeScreenFragment : Fragment() {
 
     private fun loadUserTaskStatistic(userId: String) {
         val viewModel = ViewModelProviders.of(activity!!)[UserStatisticViewModel::class.java]
-        viewModel.loadUserStatistic(userId)
+        viewModel.initUserStatistic(userId)
     }
 
     private fun initUserTasks(userId: String, userName: String) {

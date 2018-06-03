@@ -15,7 +15,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
@@ -144,19 +143,11 @@ class TaskViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val daysLeft = task.daysLeft
         val daysLeftText = itemView.findViewById<TextView>(R.id.daysLeftText)
         if (daysLeft >= 0) {
-            if (daysLeft > 1) {
-                daysLeftText.text = "$daysLeft days to due date"
-            } else {
-                daysLeftText.text = "$daysLeft day to due date"
-            }
+            daysLeftText.text = itemView.context.resources.getQuantityString(R.plurals.to_due, daysLeft, daysLeft)
             val textColor = ContextCompat.getColor(itemView.context, R.color.primaryTextColor)
             daysLeftText.setTextColor(textColor)
         } else {
-            if (daysLeft < -1) {
-                daysLeftText.text = "Overdue by ${abs(daysLeft)} days"
-            } else {
-                daysLeftText.text = "Overdue by ${abs(daysLeft)} day"
-            }
+            daysLeftText.text = itemView.context.resources.getQuantityString(R.plurals.overdue, abs(daysLeft), abs(daysLeft))
             daysLeftText.setTextColor(Color.RED)
         }
 

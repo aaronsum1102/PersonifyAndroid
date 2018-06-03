@@ -7,8 +7,8 @@ class UserStatisticViewModel : ViewModel() {
     private val repository = UserStatisticRepository()
     val userStatistics: LiveData<UserStatistics> = repository.userStatistics
 
-    fun loadUserStatistic(userId: String) {
-        repository.loadStatistic(userId)
+    fun initUserStatistic(userId: String) {
+        repository.initialiseCollection(userId)
     }
 
     fun updateStatistic(command: String) {
@@ -21,5 +21,8 @@ class UserStatisticViewModel : ViewModel() {
 
     fun deleteStatistic() {
         repository.deleteStatistic()
+        clearStatisticWhenNoUser()
     }
+
+    fun clearStatisticWhenNoUser() = repository.clearStatistic()
 }

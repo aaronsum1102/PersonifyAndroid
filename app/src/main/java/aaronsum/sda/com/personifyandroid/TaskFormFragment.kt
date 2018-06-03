@@ -42,16 +42,16 @@ class TaskFormFragment : Fragment() {
                             existingTask = it
                             taskNameText.setText(it.name)
                             dueDate.text = it.dueDate
-
                             val statusArrayAdapter: ArrayAdapter<String> = statusSpinner.adapter as ArrayAdapter<String>
                             statusSpinner.setSelection(statusArrayAdapter.getPosition(it.status))
+                            val priorityArrayAdapter = prioritySpinner.adapter as ArrayAdapter<String>
+                            prioritySpinner.setSelection(priorityArrayAdapter.getPosition(it.priority))
+                            remarksText.setText(it.remarks)
+
                             if (it.status == taskIsDone) {
                                 statusSpinner.isEnabled = false
                                 addTaskButton.isEnabled = false
                             }
-                            val priorityArrayAdapter = prioritySpinner.adapter as ArrayAdapter<String>
-                            prioritySpinner.setSelection(priorityArrayAdapter.getPosition(it.priority))
-                            remarksText.setText(it.remarks)
                         }
                     })
             removeTaskButton.visibility = View.VISIBLE
@@ -76,8 +76,7 @@ class TaskFormFragment : Fragment() {
             val daysLeft = Util.getDaysDifference(dueDate)
             if (this::status.isInitialized && this::priority.isInitialized) {
                 val task = Task(name, dueDate, status, priority, remarks, daysLeft)
-                val taskId = arguments?.getString(TaskListFragment.KEY_TASK_ID)
-                if (taskId != null) {
+                if (taskId.isNotEmpty()) {
                     viewModel.modifyTask(taskId to task)
                     if (status == taskIsDone) {
                         if (daysLeft >= 0) {
@@ -105,7 +104,7 @@ class TaskFormFragment : Fragment() {
         })
 
         calenderButton.setOnClickListener {
-            val calendar = Calendar.getInstance()
+            val currentDateCalender = Calendar.getInstance()
             val datePickerDialog = DatePickerDialog(context,
                     DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
                         val dateFormat = Util.dateFormat
@@ -114,9 +113,9 @@ class TaskFormFragment : Fragment() {
                         val date = dateFormat.format(calendar.time)
                         dueDate.text = date
                     },
-                    calendar[Calendar.YEAR],
-                    calendar[Calendar.MONTH],
-                    calendar[Calendar.DAY_OF_MONTH])
+                    currentDateCalender[Calendar.YEAR],
+                    currentDateCalender[Calendar.MONTH],
+                    currentDateCalender[Calendar.DAY_OF_MONTH])
             datePickerDialog.show()
         }
 

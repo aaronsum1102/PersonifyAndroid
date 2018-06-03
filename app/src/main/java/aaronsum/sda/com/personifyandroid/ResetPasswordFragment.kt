@@ -21,8 +21,6 @@ class ResetPasswordFragment : Fragment() {
 
         val userViewModel = ViewModelProviders.of(activity!!)[UserViewModel::class.java]
 
-        confirmButton.isEnabled = false
-
         emailText.addTextChangedListener(
                 object : TextWatcher {
                     override fun afterTextChanged(s: Editable?) {
