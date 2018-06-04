@@ -2,6 +2,8 @@ package aaronsum.sda.com.personifyandroid
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.MediaStore
 import android.support.v4.app.Fragment
@@ -11,6 +13,7 @@ import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import com.google.firebase.firestore.FirebaseFirestoreSettings
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -62,6 +65,22 @@ object Util {
             }
         }
         return null
+    }
+
+    fun resizeImage(uri:Uri?, file:File, context: Context?) : File {
+        uri?.let {
+            val openInputStream = context?.contentResolver?.openInputStream(uri)
+            openInputStream?.let {
+                val bitmap = BitmapFactory.decodeStream(openInputStream)
+                val targetWidth = 400
+                val targetHeight = bitmap.height / (bitmap.width / targetWidth)
+                val newImage = Bitmap.createScaledBitmap(bitmap, targetWidth, targetHeight, false)
+                val outputStream = ByteArrayOutputStream()
+                newImage.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+                file.writeBytes(outputStream.toByteArray())
+            }
+        }
+        return file
     }
 
     fun getCurrentDate(): String {

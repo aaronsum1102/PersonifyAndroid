@@ -32,24 +32,20 @@ class TaskListFragment : Fragment(), OnTaskClickListener, Target {
         const val KEY_TASK_ID = "task id"
         const val TASK_LIST_BACK_STACK = "taskList"
         private const val TAG = "TaskListFragment"
+        private const val IS_PROFILE_PIC_LOADED = "isProfilePicLoaded"
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_tasks_list, container, false)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        (activity as AppCompatActivity).setSupportActionBar(toolbar)
-        (activity as AppCompatActivity).supportActionBar?.setDisplayShowTitleEnabled(false)
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
 
-        val viewModel = ViewModelProviders.of(activity!!)[TaskViewModel::class.java]
-        val userStatisticViewModel = ViewModelProviders.of(activity!!)[UserStatisticViewModel::class.java]
         val photoViewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
 
         photoViewModel.profilePhotoUrl.observe(this, Observer { uri ->
             uri?.let {
-                Log.i(TAG, "profile image, $uri")
                 Picasso.get().load(uri).fetch(object : Callback {
                     override fun onSuccess() {
                         Picasso.get().load(uri).into(this@TaskListFragment)
@@ -61,6 +57,15 @@ class TaskListFragment : Fragment(), OnTaskClickListener, Target {
                 })
             }
         })
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        (activity as AppCompatActivity).setSupportActionBar(toolbar)
+        (activity as AppCompatActivity).supportActionBar?.setDisplayShowTitleEnabled(false)
+
+        val viewModel = ViewModelProviders.of(activity!!)[TaskViewModel::class.java]
+        val userStatisticViewModel = ViewModelProviders.of(activity!!)[UserStatisticViewModel::class.java]
 
         val adaptor = TaskViewAdaptor(this)
         taskRecyclerView.adapter = adaptor

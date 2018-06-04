@@ -40,16 +40,16 @@ class ResetPasswordFragment : Fragment() {
                     .addOnSuccessListener {
                         context?.let {
                             Toast.makeText(context,
-                                    "An email has been sent to your email address.",
+                                    getString(R.string.reset_password),
                                     Toast.LENGTH_LONG)
                                     .show()
                         }
                         fragmentManager?.popBackStack()
                     }
-                    .addOnFailureListener { exception ->
+                    .addOnFailureListener {
                         context?.let {
                             Toast.makeText(context,
-                                    "Failed to request new password. ${exception.localizedMessage}",
+                                    getString(R.string.failed_request_password),
                                     Toast.LENGTH_LONG)
                                     .show()
                         }

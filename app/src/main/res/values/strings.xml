@@ -85,4 +85,6 @@
         <item>Medium</item>
         <item>High</item>
     </string-array>
+    <string name="reset_password">An email has been sent to your mailbox.</string>
+    <string name="failed_request_password">"Failed to request new password."</string>
 </resources>

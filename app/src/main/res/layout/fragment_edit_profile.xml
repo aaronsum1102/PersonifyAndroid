@@ -1,131 +1,136 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/textVsPrimary">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/editProfileToolbar"
+    <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.Toolbar"
-        android:minHeight="56dp"
-        app:titleTextAppearance="@style/AppBarTitle"
-        app:title="Edit profile">
-    </android.support.v7.widget.Toolbar>
+        android:layout_height="wrap_content">
 
-    <EditText
-        android:id="@+id/newNameText"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="24dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="32dp"
-        android:hint="@string/display_name"
-        android:inputType="text"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.493"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editProfileToolbar"
-        app:layout_constraintWidth_percent="0.7"
-        tools:text="aaron" />
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/editProfileToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="56dp"
+            android:theme="@style/AppTheme.Toolbar"
+            app:title="Edit profile"
+            app:titleTextAppearance="@style/AppBarTitle" />
 
-    <TextView
-        android:id="@+id/newNameTitle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="4dp"
-        android:layout_marginStart="4dp"
-        android:text="@string/how_would_you_like_me_to_call_you"
-        android:textAppearance="@style/TextAppearance.subtitle2"
-        app:layout_constraintEnd_toEndOf="@+id/newNameText"
-        app:layout_constraintStart_toStartOf="@+id/newNameText"
-        app:layout_constraintTop_toBottomOf="@+id/newNameText" />
+        <EditText
+            android:id="@+id/newNameText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="24dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="32dp"
+            android:hint="@string/display_name"
+            android:inputType="text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.493"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/editProfileToolbar"
+            app:layout_constraintWidth_percent="0.7"
+            tools:text="aaron" />
 
-    <EditText
-        android:id="@+id/passwordText"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:ems="10"
-        android:hint="@string/your_current_password"
-        android:inputType="textPassword"
-        android:textAppearance="@style/TextAppearance.subtitle1"
-        app:layout_constraintEnd_toEndOf="@+id/newNameText"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/newNameText"
-        app:layout_constraintTop_toBottomOf="@+id/emailTitle" />
+        <TextView
+            android:id="@+id/newNameTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:layout_marginStart="4dp"
+            android:text="@string/how_would_you_like_me_to_call_you"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.subtitle2"
+            app:layout_constraintEnd_toEndOf="@+id/newNameText"
+            app:layout_constraintStart_toStartOf="@+id/newNameText"
+            app:layout_constraintTop_toBottomOf="@+id/newNameText" />
 
-    <TextView
-        android:id="@+id/passwordTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:text="@string/current_password"
-        android:textAppearance="@style/TextAppearance.subtitle2"
-        app:layout_constraintEnd_toEndOf="@+id/passwordText"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="@+id/passwordText"
-        app:layout_constraintTop_toBottomOf="@+id/passwordText" />
+        <EditText
+            android:id="@+id/passwordText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:ems="10"
+            android:hint="@string/your_current_password"
+            android:inputType="textPassword"
+            android:textAppearance="@style/TextAppearance.subtitle1"
+            app:layout_constraintEnd_toEndOf="@+id/newNameText"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/newNameText"
+            app:layout_constraintTop_toBottomOf="@+id/emailTitle" />
 
-    <EditText
-        android:id="@+id/newEmailText"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:ems="10"
-        android:hint="@string/enter_your_new_email_here"
-        android:inputType="textEmailAddress"
-        android:textAppearance="@style/TextAppearance.subtitle1"
-        app:layout_constraintEnd_toEndOf="@+id/newNameText"
-        app:layout_constraintStart_toStartOf="@+id/newNameText"
-        app:layout_constraintTop_toBottomOf="@+id/newNameTitle"
-        tools:text="abc@gmail.com" />
+        <TextView
+            android:id="@+id/passwordTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/current_password"
+            android:textAppearance="@style/TextAppearance.subtitle2"
+            app:layout_constraintEnd_toEndOf="@+id/passwordText"
+            app:layout_constraintHorizontal_bias="0.497"
+            app:layout_constraintStart_toStartOf="@+id/passwordText"
+            app:layout_constraintTop_toBottomOf="@+id/passwordText" />
 
-    <TextView
-        android:id="@+id/emailTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="@string/do_you_want_to_change_your_email"
-        android:textAppearance="@style/TextAppearance.subtitle2"
-        app:layout_constraintEnd_toEndOf="@+id/newEmailText"
-        app:layout_constraintStart_toStartOf="@+id/newEmailText"
-        app:layout_constraintTop_toBottomOf="@+id/newEmailText" />
+        <EditText
+            android:id="@+id/newEmailText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:ems="10"
+            android:hint="@string/enter_your_new_email_here"
+            android:inputType="textEmailAddress"
+            android:textAppearance="@style/TextAppearance.subtitle1"
+            app:layout_constraintEnd_toEndOf="@+id/newNameText"
+            app:layout_constraintStart_toStartOf="@+id/newNameText"
+            app:layout_constraintTop_toBottomOf="@+id/newNameTitle"
+            tools:text="abc@gmail.com" />
 
-    <Button
-        android:id="@+id/saveButton"
-        style="@style/AppTheme.PrimaryButtonStyle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:background="@drawable/my_button_background"
-        android:enabled="false"
-        android:text="@string/save"
-        android:textColor="@color/textVsPrimary"
-        app:layout_constraintBottom_toTopOf="@+id/deleteProfileButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/passwordTitle"
-        app:layout_constraintVertical_chainStyle="spread_inside"
-        app:layout_constraintWidth_percent="0.6" />
+        <TextView
+            android:id="@+id/emailTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/do_you_want_to_change_your_email"
+            android:textAppearance="@style/TextAppearance.subtitle2"
+            app:layout_constraintEnd_toEndOf="@+id/newEmailText"
+            app:layout_constraintStart_toStartOf="@+id/newEmailText"
+            app:layout_constraintTop_toBottomOf="@+id/newEmailText" />
 
-    <Button
-        android:id="@+id/deleteProfileButton"
-        style="@style/AppTheme.PrimaryButtonStyle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp"
-        android:background="@drawable/my_button_background"
-        android:text="@string/delete_my_account"
-        android:textColor="@color/textVsPrimary"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/saveButton"
-        app:layout_constraintWidth_percent="0.6" />
+        <Button
+            android:id="@+id/saveButton"
+            style="@style/AppTheme.PrimaryButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/my_button_background"
+            android:enabled="false"
+            android:text="@string/save"
+            android:textColor="@color/textVsPrimary"
+            app:layout_constraintBottom_toTopOf="@+id/deleteProfileButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/passwordTitle"
+            app:layout_constraintVertical_bias="1.0"
+            app:layout_constraintVertical_chainStyle="spread_inside"
+            app:layout_constraintWidth_percent="0.6" />
 
-</android.support.constraint.ConstraintLayout>
+        <Button
+            android:id="@+id/deleteProfileButton"
+            style="@style/AppTheme.PrimaryButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="32dp"
+            android:layout_marginTop="152dp"
+            android:background="@drawable/my_button_background"
+            android:text="@string/delete_my_account"
+            android:textColor="@color/textVsPrimary"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/saveButton"
+            app:layout_constraintWidth_percent="0.6" />
+
+    </android.support.constraint.ConstraintLayout>
+</ScrollView>

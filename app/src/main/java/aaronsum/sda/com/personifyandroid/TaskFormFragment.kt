@@ -58,6 +58,7 @@ class TaskFormFragment : Fragment() {
             removeTaskButton.setOnClickListener {
                 existingTask?.let {
                     viewModel.deleteTask(taskId)
+                    view.let { Util.hideSoftKeyboard(activity, view) }
                     fragmentManager?.popBackStack()
                 }
             }
@@ -89,6 +90,7 @@ class TaskFormFragment : Fragment() {
                     viewModel.addTask(task)
                     userStatisticViewModel.updateStatistic(UserStatisticRepository.NEW_TASK)
                 }
+                view.let { Util.hideSoftKeyboard(activity, view) }
                 fragmentManager?.popBackStack()
             }
         }

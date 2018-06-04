@@ -52,17 +52,7 @@ class ProfileFragment : Fragment(), Target {
         })
 
         photoViewModel.profilePhotoUrl.observe(this, Observer { uri ->
-            uri?.let {
-                Picasso.get().load(uri).fetch(object : Callback {
-                    override fun onSuccess() {
-                        Picasso.get().load(uri).into(this@ProfileFragment)
-                    }
-
-                    override fun onError(e: Exception?) {
-                        Log.e(TAG, "Something went wrong. ${e?.localizedMessage}")
-                    }
-                })
-            }
+            uri?.let { displayProfileImage(Uri.parse(uri)) }
         })
 
         changeProfilePicButton.setOnClickListener {
@@ -163,8 +153,9 @@ class ProfileFragment : Fragment(), Target {
         when (requestCode) {
             SignUpFragment.CAMERA_REQUEST_CODE -> {
                 if (resultCode == Activity.RESULT_OK) {
-                    uploadedFile?.let {
-                        val uri = Util.getUriForFile(uploadedFile, this@ProfileFragment.context)
+                    uploadedFile?.let { file ->
+                        val uri = Util.getUriForFile(file, this@ProfileFragment.context)
+                        uploadedFile = Util.resizeImage(uri, file, this@ProfileFragment.context)
                         uri?.let {
                             updateProfileImage(uri)
                         }

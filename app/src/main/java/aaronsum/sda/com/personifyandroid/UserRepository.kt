@@ -24,29 +24,20 @@ class UserRepository {
         checkUserSignInState()
     }
 
-    fun createNewUser(userInfo: UserInfo): Task<AuthResult> {
-        val task = auth.createUserWithEmailAndPassword(userInfo.email, userInfo.password)
-        task.addOnCompleteListener {
-            it.continueWith {
-                val result = it.result
-                updateUserProfile(userInfo, result.user)
-                val email = result.user?.email
-                email?.let { currentUser.value = User(result.user.uid, userInfo.name, email) }
-                Log.i(TAG, "create new account, ${currentUser.value?.username}")
-            }
-        }
-        return task
+    fun createNewUser(userInfo: UserInfo): Task<AuthResult>? {
+        return auth.createUserWithEmailAndPassword(userInfo.email, userInfo.password)
     }
 
-    private fun updateUserProfile(userInfo: UserInfo, newUser: FirebaseUser) {
+    fun updateUserProfile(userInfo: UserInfo, newUser: FirebaseUser): Task<Void> {
         val userProfileChangeRequest = UserProfileChangeRequest
                 .Builder()
                 .setDisplayName(userInfo.name)
                 .build()
-        newUser.updateProfile(userProfileChangeRequest)
-                .addOnSuccessListener {
-                    Log.i(TAG, "Account created and updated user info")
-                }
+        val task = newUser.updateProfile(userProfileChangeRequest)
+        task.addOnSuccessListener {
+            currentUser.postValue(User(newUser.uid, userInfo.name, userInfo.email))
+        }
+        return task
     }
 
     fun signInUser(email: String, password: String) = auth.signInWithEmailAndPassword(email, password)

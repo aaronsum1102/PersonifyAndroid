@@ -42,6 +42,7 @@ class SignUpFragment : Fragment(), TextWatcher, Target {
         addTextWatcher()
 
         createAccountButton.setOnClickListener {
+            createAccountButton.isEnabled = false
             createNewAccount(UserInfo(
                     nameText.text.toString(),
                     emailText.text.toString(),
@@ -56,20 +57,27 @@ class SignUpFragment : Fragment(), TextWatcher, Target {
     private fun createNewAccount(userInfo: UserInfo) {
         val userViewModel = ViewModelProviders.of(activity!!)[UserViewModel::class.java]
         userViewModel.createNewUser(userInfo)
-                .addOnSuccessListener {
+                ?.addOnSuccessListener {
                     val user = it.user
-                    addTaskEventListener(user.uid)
-                    initUserStatisticCollection(user.uid)
-                    uploadProfilePhoto(user.uid)
-                    view?.let { Util.hideSoftKeyboard(activity, view as View) }
-                    user.displayName?.let { initTaskListFragment(it) }
+                    userViewModel.updateUserProfile(userInfo, user)
+                            .addOnSuccessListener {
+                                addTaskEventListener(user.uid)
+                                initUserStatisticCollection(user.uid)
+                                uploadProfilePhoto(user.uid)
+                                view?.let { Util.hideSoftKeyboard(activity, view as View) }
+                                user.displayName?.let { initTaskListFragment(it) }
+                            }
+                            .addOnFailureListener {
+                                Log.i(TAG, "unable to update profile. ${it.localizedMessage}")
+                            }
                 }
-                .addOnFailureListener { exception ->
+                ?.addOnFailureListener { exception ->
                     context?.let {
                         Toast.makeText(context,
                                 "Failed to create an account. ${exception.localizedMessage}",
                                 Toast.LENGTH_LONG)
                                 .show()
+                        createAccountButton.isEnabled = true
                     }
                 }
     }
@@ -88,8 +96,8 @@ class SignUpFragment : Fragment(), TextWatcher, Target {
         val photoViewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
         photoViewModel.initProfilePhotoDocument(userId)
         val uri = Util.getUriForFile(fileToUpload, context)
-        uri?.let {
-            photoViewModel.uploadPhoto(it)
+        uri?.let { internalUri ->
+            photoViewModel.uploadPhoto(internalUri)
                     ?.continueWith {
                         it.result.storage.downloadUrl.addOnSuccessListener {
                             photoViewModel.writeUserProfilePictureURL(it)
@@ -117,8 +125,9 @@ class SignUpFragment : Fragment(), TextWatcher, Target {
         when (requestCode) {
             CAMERA_REQUEST_CODE -> {
                 if (resultCode == Activity.RESULT_OK) {
-                    fileToUpload?.let {
-                        val uri = Util.getUriForFile(fileToUpload!!, context)
+                    fileToUpload?.let {file ->
+                        val uri = Util.getUriForFile(file, context)
+                        fileToUpload = Util.resizeImage(uri, file, this@SignUpFragment.context)
                         uri?.let {
                             Picasso.get().load(uri).fetch(object : Callback {
                                 override fun onSuccess() {
