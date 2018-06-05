@@ -35,18 +35,6 @@ class TaskListFragment : Fragment(), OnTaskClickListener, Target {
         return inflater.inflate(R.layout.fragment_tasks_list, container, false)
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-
-        val photoViewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
-
-        photoViewModel.profilePhotoMetadata.observe(this, Observer { picMetadata ->
-            picMetadata?.let {
-                Util.fetchPhoto(this, it)
-            }
-        })
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         (activity as AppCompatActivity).setSupportActionBar(toolbar)
@@ -54,14 +42,31 @@ class TaskListFragment : Fragment(), OnTaskClickListener, Target {
 
         val viewModel = ViewModelProviders.of(activity!!)[TaskViewModel::class.java]
         val userStatisticViewModel = ViewModelProviders.of(activity!!)[UserStatisticViewModel::class.java]
+        val photoViewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
 
-        val adaptor = TaskViewAdaptor(this)
-        taskRecyclerView.adapter = adaptor
+        photoViewModel.profilePhotoMetadata.observe(this, Observer { picMetadata ->
+            picMetadata?.let {
+                Util.fetchPhoto(this, it)
+            }
+        })
 
+        val adapter = TaskViewAdaptor(this)
+        taskRecyclerView.adapter = adapter
+
+        if (viewModel.tasks.value == null) {
+            noTasksNow.visibility = View.VISIBLE
+        } else {
+            noTasksNow.visibility = View.INVISIBLE
+        }
         viewModel.tasks.observe(this, Observer { tasks ->
             tasks?.let {
-                adaptor.tasks = tasks
-                adaptor.notifyDataSetChanged()
+                if (tasks.isEmpty()) {
+                    noTasksNow.visibility = View.VISIBLE
+                } else {
+                    noTasksNow.visibility = View.INVISIBLE
+                }
+                adapter.tasks = tasks
+                adapter.notifyDataSetChanged()
                 val earliestCompletion = tasks.maxBy { it.second.daysLeft }?.second?.daysLeft
                 val longestOverdue = tasks.minBy { it.second.daysLeft }?.second?.daysLeft
                 if (earliestCompletion != null && longestOverdue != null) {
@@ -85,6 +90,14 @@ class TaskListFragment : Fragment(), OnTaskClickListener, Target {
             fragmentManager
                     ?.beginTransaction()
                     ?.replace(R.id.container, ProfileFragment())
+                    ?.addToBackStack(TASK_LIST_BACK_STACK)
+                    ?.commit()
+        }
+
+        showDoneTasks.setOnClickListener {
+            fragmentManager
+                    ?.beginTransaction()
+                    ?.replace(R.id.container, DoneTasksFragment())
                     ?.addToBackStack(TASK_LIST_BACK_STACK)
                     ?.commit()
         }
@@ -144,7 +157,6 @@ class TaskViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             daysLeftText.setTextColor(Color.RED)
         }
 
-        daysLeftText.text
         itemView.setOnClickListener {
             taskClickListener.onTaskClick(task, pair.first)
         }

@@ -7,6 +7,7 @@ import android.arch.lifecycle.LiveData
 class TaskViewModel(application: Application) : AndroidViewModel(application) {
     private val repository = TaskRepository()
     val tasks: LiveData<List<Pair<String, Task>>> = repository.tasks
+    val doneTasks: LiveData<List<Pair<String, Task>>> = repository.doneTasks
 
     fun initUserTaskDocument(userId: String) {
         repository.initUserTaskDocument(userId)

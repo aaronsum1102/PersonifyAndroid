@@ -17,7 +17,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:text="@string/app_title"
+            android:text="@string/done_tasks"
             android:textAppearance="@style/AppBarTitle" />
 
         <ImageView
@@ -32,23 +32,10 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:srcCompat="@drawable/rectangle_image" />
-
-        <ImageView
-            android:id="@+id/showDoneTasks"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_gravity="end"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="16dp"
-            android:contentDescription="@string/show_tasks_that_were_completed"
-            android:scaleType="fitCenter"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:srcCompat="@drawable/ic_done_24px" />
     </android.support.v7.widget.Toolbar>
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/taskRecyclerView"
+        android:id="@+id/doneTasksRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_gravity="center"
@@ -63,22 +50,6 @@
 
     </android.support.v7.widget.RecyclerView>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/addTaskFab"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
-        android:layout_marginBottom="16dp"
-        android:layout_marginEnd="16dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:scaleType="center"
-        app:backgroundTint="@color/secondaryColor"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/ic_add_black_24dp" />
-
     <TextView
         android:id="@+id/noTasksNow"
         android:layout_width="0dp"
@@ -92,8 +63,7 @@
         android:textAppearance="@style/TextAppearance.H5"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/taskRecyclerView"
+        app:layout_constraintEnd_toEndOf="@+id/doneTasksRecyclerView"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/taskRecyclerView" />
-
+        app:layout_constraintTop_toTopOf="@+id/doneTasksRecyclerView" />
 </android.support.constraint.ConstraintLayout>

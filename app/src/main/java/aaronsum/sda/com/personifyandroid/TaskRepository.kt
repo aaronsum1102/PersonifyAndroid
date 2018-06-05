@@ -23,6 +23,7 @@ class TaskRepository {
     private val db = FirebaseFirestore.getInstance()
     private lateinit var taskCollection: CollectionReference
     val tasks: MutableLiveData<List<Pair<String, Task>>> = MutableLiveData()
+    val doneTasks: MutableLiveData<List<Pair<String, Task>>> = MutableLiveData()
 
     init {
         db.firestoreSettings = Util.persistenceDBSetting
@@ -59,34 +60,59 @@ class TaskRepository {
     private fun onDocumentAdded(change: DocumentChange) {
         val temporaryTasks = mutableListOf<Pair<String, Task>>()
         tasks.value?.let { temporaryTasks.addAll(it) }
+        val temporaryDoneTasks = mutableListOf<Pair<String, Task>>()
+        doneTasks.value?.let { temporaryDoneTasks.addAll(it) }
+
         val document = change.document
         val taskFromDB = document.toObject(Task::class.java)
         val daysDifference = Util.getDaysDifference(taskFromDB.dueDate)
         if (daysDifference != taskFromDB.daysLeft && taskFromDB.status != "Done") {
             taskFromDB.daysLeft = daysDifference
         }
-        temporaryTasks.add(document.id to taskFromDB)
+        if (taskFromDB.status != "Done") {
+            temporaryTasks.add(document.id to taskFromDB)
+        } else {
+            temporaryDoneTasks.add(document.id to taskFromDB)
+        }
         temporaryTasks.sortBy { it.second.daysLeft }
+        temporaryDoneTasks.sortBy { it.second.daysLeft }
         tasks.value = temporaryTasks
-        Log.i(TAG, "New document added. Number of tasks: ${tasks.value?.size}")
+        doneTasks.value = temporaryDoneTasks
+        Log.i(TAG, "New document added. Number of tasks to be done: ${tasks.value?.size}")
+        Log.i(TAG, "New document added. Number of tasks done: ${tasks.value?.size}")
     }
 
     private fun onDocumentModified(change: DocumentChange) {
         val taskId = change.document.id
         val temporaryTasks = mutableListOf<Pair<String, Task>>()
-        tasks.value?.let { taskList ->
-            temporaryTasks.addAll(taskList)
-            val taskPair = temporaryTasks.find { it.first == taskId }
-            temporaryTasks.remove(taskPair)
-            temporaryTasks.add(taskId to change.document.toObject(Task::class.java))
-            temporaryTasks.sortBy { it.second.daysLeft }
-            tasks.value = temporaryTasks
-            Log.i(TAG, "Document has been modified. Number of tasks :${tasks.value?.size}")
+        tasks.value?.let { temporaryTasks.addAll(it) }
+        val temporaryDoneTasks = mutableListOf<Pair<String, Task>>()
+        doneTasks.value?.let { temporaryDoneTasks.addAll(it) }
+
+        val taskToRemove = temporaryTasks.find { it.first == taskId }
+        taskToRemove?.let { temporaryTasks.remove(taskToRemove) }
+        val taskToRemoveIfAny = temporaryDoneTasks.find { it.first == taskId }
+        taskToRemoveIfAny?.let { temporaryDoneTasks.remove(taskToRemoveIfAny) }
+
+        val taskChanged = change.document.toObject(Task::class.java)
+        if (taskChanged.status != "Done") {
+            temporaryTasks.add(taskId to taskChanged)
+        } else {
+            temporaryDoneTasks.add(taskId to taskChanged)
         }
+
+        temporaryTasks.sortBy { it.second.daysLeft }
+        temporaryDoneTasks.sortBy { it.second.daysLeft }
+        tasks.value = temporaryTasks
+        doneTasks.value = temporaryDoneTasks
+        Log.i(TAG, "Document has been modified. Number of tasks to be done :${tasks.value?.size}")
+        Log.i(TAG, "Document has been modified. Number of tasks done:${doneTasks.value?.size}")
     }
 
     private fun onDocumentRemoved(change: DocumentChange) {
         val temporaryTasks = tasks.value
+        val temporaryDoneTasks = doneTasks.value
+
         temporaryTasks?.let {
             temporaryTasks as MutableList<Pair<String, Task>>
             val taskToRemove = temporaryTasks.find { it.first == change.document.id }
@@ -94,6 +120,16 @@ class TaskRepository {
                 temporaryTasks.remove(taskToRemove)
                 tasks.value = temporaryTasks
                 Log.i(TAG, "Document has been deleted. Number of tasks :${tasks.value?.size}")
+            }
+        }
+
+        temporaryDoneTasks?.let {
+            temporaryDoneTasks as MutableList<Pair<String, Task>>
+            val taskToRemove = temporaryDoneTasks.find { it.first == change.document.id }
+            taskToRemove?.let {
+                temporaryDoneTasks.remove(taskToRemove)
+                doneTasks.value = temporaryDoneTasks
+                Log.i(TAG, "Document has been deleted. Number of tasks :${doneTasks.value?.size}")
             }
         }
     }
@@ -128,5 +164,6 @@ class TaskRepository {
 
     fun clearTask() {
         tasks.postValue(null)
+        doneTasks.postValue(null)
     }
 }
