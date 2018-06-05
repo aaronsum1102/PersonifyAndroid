@@ -12,10 +12,8 @@ import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.view.*
 import android.widget.PopupMenu
-import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import kotlinx.android.synthetic.main.fragment_profile.*
@@ -25,7 +23,6 @@ import java.lang.Exception
 class ProfileFragment : Fragment(), Target {
     companion object {
         const val PROFILE_BACK_STACK = "profile"
-        private const val TAG = "ProfileFragment"
     }
 
     private lateinit var userViewModel: UserViewModel
@@ -51,8 +48,8 @@ class ProfileFragment : Fragment(), Target {
             }
         })
 
-        photoViewModel.profilePhotoUrl.observe(this, Observer { uri ->
-            uri?.let { displayProfileImage(Uri.parse(uri)) }
+        photoViewModel.profilePhotoMetadata.observe(this, Observer { picMetadata ->
+            picMetadata?.let { Util.fetchPhoto(this, it) }
         })
 
         changeProfilePicButton.setOnClickListener {
@@ -154,10 +151,11 @@ class ProfileFragment : Fragment(), Target {
             SignUpFragment.CAMERA_REQUEST_CODE -> {
                 if (resultCode == Activity.RESULT_OK) {
                     uploadedFile?.let { file ->
-                        val uri = Util.getUriForFile(file, this@ProfileFragment.context)
-                        uploadedFile = Util.resizeImage(uri, file, this@ProfileFragment.context)
-                        uri?.let {
-                            updateProfileImage(uri)
+                        val internalUri = Util.getUriForFile(file, this@ProfileFragment.context)
+                        val orientation = Util.getPicOrientation(internalUri, context)
+                        uploadedFile = Util.resizeImage(internalUri, file, this@ProfileFragment.context)
+                        if (internalUri != null && orientation != null) {
+                            updateProfileImage(internalUri, orientation)
                         }
                     }
                 }
@@ -165,28 +163,15 @@ class ProfileFragment : Fragment(), Target {
         }
     }
 
-    private fun updateProfileImage(uri: Uri) {
+    private fun updateProfileImage(internalUri: Uri, orientation: String) {
         if (this::user.isInitialized) {
-            photoViewModel.uploadPhoto(uri)
+            photoViewModel.uploadPhoto(internalUri)
                     ?.continueWith {
-                        it.result.storage.downloadUrl.addOnSuccessListener {
-                            photoViewModel.writeUserProfilePictureURL(it)
-                            displayProfileImage(uri)
+                        it.result.storage.downloadUrl.addOnSuccessListener { url ->
+                            photoViewModel.writeUserProfilePictureURL(PicMetadata(url.toString(), orientation))
                         }
                     }
         }
-    }
-
-    private fun displayProfileImage(uri: Uri) {
-        Picasso.get().load(uri).fetch(object : Callback {
-            override fun onSuccess() {
-                Picasso.get().load(uri).into(this@ProfileFragment)
-            }
-
-            override fun onError(e: Exception?) {
-                Log.e(TAG, "something went wrong. ${e?.message}.")
-            }
-        })
     }
 
     override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
@@ -194,6 +179,8 @@ class ProfileFragment : Fragment(), Target {
     override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
 
     override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-        profilePhoto?.background = BitmapDrawable(resources, bitmap)
+        bitmap?.let {
+            profilePhoto?.background = BitmapDrawable(resources, bitmap)
+        }
     }
 }

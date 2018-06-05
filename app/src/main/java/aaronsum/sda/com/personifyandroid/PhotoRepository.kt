@@ -8,11 +8,13 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
 
+data class PicMetadata(val url: String = "",
+                       val orientation: String = "")
+
 class PhotoRepository {
     companion object {
         private const val TAG = "PhotoRepository"
         private const val COLLECTION_NAME = "userProfilePic"
-        private const val URL = "url"
     }
 
     private val db = FirebaseFirestore.getInstance()
@@ -20,7 +22,7 @@ class PhotoRepository {
     private val collection = db.collection(COLLECTION_NAME)
     private lateinit var document: DocumentReference
 
-    val profilePhoto: MutableLiveData<String> = MutableLiveData()
+    val profilePhotoMetadata: MutableLiveData<PicMetadata> = MutableLiveData()
 
     init {
         db.firestoreSettings = Util.persistenceDBSetting
@@ -32,18 +34,15 @@ class PhotoRepository {
             firebaseFirestoreException?.let {
                 Log.i(TAG, "Unable to add snapshot listener. ${firebaseFirestoreException.localizedMessage}")
             }
-            val url = documentSnapshot?.get(URL) as String?
-            url?.let { profilePhoto.postValue(url) }
+            val profilePic = documentSnapshot?.toObject(PicMetadata::class.java)
+            profilePic?.let { profilePhotoMetadata.postValue(profilePic) }
         }
     }
 
-    fun writeUserProfilePictureURL(url: Uri) {
-        profilePhoto.postValue(url.toString())
-        val dataMap: Map<String, String> = mutableMapOf()
-        dataMap as MutableMap
-        dataMap[URL] = url.toString()
+    fun writeUserProfilePictureURL(picMetadata: PicMetadata) {
         if (this::document.isInitialized) {
-            document.set(dataMap)
+            document.set(picMetadata)
+
             Log.i(TAG, "record profile pic url")
         }
     }
@@ -68,6 +67,6 @@ class PhotoRepository {
 
     fun clearProfilePic() {
         Log.i(TAG, "clear profile pic after log out")
-        profilePhoto.postValue(null)
+        profilePhotoMetadata.postValue(null)
     }
 }

@@ -16,7 +16,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import kotlinx.android.synthetic.main.fragment_signup.*
@@ -97,10 +96,16 @@ class SignUpFragment : Fragment(), TextWatcher, Target {
         photoViewModel.initProfilePhotoDocument(userId)
         val uri = Util.getUriForFile(fileToUpload, context)
         uri?.let { internalUri ->
+            val orientation = Util.getPicOrientation(internalUri, context)
+            fileToUpload?.let { Util.resizeImage(internalUri, it, context) }
             photoViewModel.uploadPhoto(internalUri)
                     ?.continueWith {
-                        it.result.storage.downloadUrl.addOnSuccessListener {
-                            photoViewModel.writeUserProfilePictureURL(it)
+                        it.result.storage.downloadUrl.addOnSuccessListener { url ->
+                            orientation?.let {
+                                photoViewModel.writeUserProfilePictureURL(PicMetadata(
+                                        url.toString(),
+                                        orientation))
+                            }
                         }
                     }
         }
@@ -125,19 +130,11 @@ class SignUpFragment : Fragment(), TextWatcher, Target {
         when (requestCode) {
             CAMERA_REQUEST_CODE -> {
                 if (resultCode == Activity.RESULT_OK) {
-                    fileToUpload?.let {file ->
+                    fileToUpload?.let { file ->
                         val uri = Util.getUriForFile(file, context)
-                        fileToUpload = Util.resizeImage(uri, file, this@SignUpFragment.context)
-                        uri?.let {
-                            Picasso.get().load(uri).fetch(object : Callback {
-                                override fun onSuccess() {
-                                    Picasso.get().load(uri).into(this@SignUpFragment)
-                                }
-
-                                override fun onError(e: Exception?) {
-                                    Log.e(TAG, "something went wrong. ${e?.localizedMessage}")
-                                }
-                            })
+                        val picOrientation = Util.getPicOrientation(uri, this@SignUpFragment.context)
+                        if (uri != null && picOrientation != null) {
+                            Util.fetchPhoto(this, PicMetadata(uri.toString(), picOrientation))
                         }
                     }
                 }

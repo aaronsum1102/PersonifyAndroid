@@ -51,7 +51,7 @@
         android:id="@+id/overDueRateTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/over_due"
+        android:text="@string/overdue"
         android:textAppearance="@style/TextAppearance.subtitle1"
         app:layout_constraintStart_toStartOf="@+id/completionRateText"
         app:layout_constraintTop_toTopOf="@+id/longestOverDueTitle" />
@@ -122,7 +122,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="24dp"
         android:layout_marginTop="24dp"
-        android:text="@string/longest_over_due"
+        android:text="@string/longest_overdue"
         android:textAppearance="@style/TextAppearance.subtitle1"
         app:layout_constraintBottom_toTopOf="@+id/longestOverDueText"
         app:layout_constraintEnd_toEndOf="parent"

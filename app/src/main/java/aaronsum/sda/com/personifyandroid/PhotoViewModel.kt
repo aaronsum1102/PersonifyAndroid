@@ -6,7 +6,7 @@ import android.net.Uri
 
 class PhotoViewModel : ViewModel() {
     private val photoRepository: PhotoRepository = PhotoRepository()
-    val profilePhotoUrl: LiveData<String> = photoRepository.profilePhoto
+    val profilePhotoMetadata: LiveData<PicMetadata> = photoRepository.profilePhotoMetadata
 
     fun initProfilePhotoDocument(userId: String) {
         photoRepository.initDocument(userId)
@@ -14,8 +14,8 @@ class PhotoViewModel : ViewModel() {
 
     fun uploadPhoto(file: Uri) = photoRepository.uploadProfilePhoto(file)
 
-    fun writeUserProfilePictureURL(url: Uri) {
-        photoRepository.writeUserProfilePictureURL(url)
+    fun writeUserProfilePictureURL(picMetadata: PicMetadata) {
+        photoRepository.writeUserProfilePictureURL(picMetadata)
     }
 
     fun deleteUserProfile() {

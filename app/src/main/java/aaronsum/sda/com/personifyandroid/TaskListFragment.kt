@@ -11,12 +11,10 @@ import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import kotlinx.android.synthetic.main.fragment_tasks_list.*
@@ -31,8 +29,6 @@ class TaskListFragment : Fragment(), OnTaskClickListener, Target {
     companion object {
         const val KEY_TASK_ID = "task id"
         const val TASK_LIST_BACK_STACK = "taskList"
-        private const val TAG = "TaskListFragment"
-        private const val IS_PROFILE_PIC_LOADED = "isProfilePicLoaded"
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -44,17 +40,9 @@ class TaskListFragment : Fragment(), OnTaskClickListener, Target {
 
         val photoViewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
 
-        photoViewModel.profilePhotoUrl.observe(this, Observer { uri ->
-            uri?.let {
-                Picasso.get().load(uri).fetch(object : Callback {
-                    override fun onSuccess() {
-                        Picasso.get().load(uri).into(this@TaskListFragment)
-                    }
-
-                    override fun onError(e: Exception?) {
-                        Log.e(TAG, "Something went wrong. ${e?.localizedMessage}")
-                    }
-                })
+        photoViewModel.profilePhotoMetadata.observe(this, Observer { picMetadata ->
+            picMetadata?.let {
+                Util.fetchPhoto(this, it)
             }
         })
     }
