@@ -46,8 +46,8 @@ class UserStatisticRepository {
             }
             documentSnapshot?.let {
                 taskStatistic = documentSnapshot.toObject(TaskStatistic::class.java)
-                if (taskStatistic != null) {
-                    userStatistics.postValue(transformData(taskStatistic!!))
+                taskStatistic?.let {
+                    userStatistics.postValue(transformData(it))
                 }
             }
         }

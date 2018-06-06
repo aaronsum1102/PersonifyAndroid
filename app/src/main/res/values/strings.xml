@@ -6,8 +6,6 @@
     <string name="priority">Priority :</string>
     <string name="remarks">Remarks :</string>
     <string name="eg_laundry">eg. Laundry</string>
-    <string name="eg_status">eg. To do, In progress, Done, Overdue</string>
-    <string name="eg_priority">eg. Low, Medium, High</string>
     <string name="description_of_the_task">Description of the task. eg. Weekly laundry for my family.</string>
     <string name="delete">delete</string>
     <string name="clear">clear</string>
@@ -37,13 +35,9 @@
     <string name="confirm">confirm</string>
     <string name="cancel">Cancel</string>
     <string name="app_title">Personify</string>
-    <string name="tasks">Tasks</string>
-    <string name="profile">Profile</string>
     <string name="settings">settings</string>
     <string name="edit_profile">Edit Profile</string>
-    <string name="change_password">Change password</string>
     <string name="log_out">Log Out</string>
-    <string name="delete_account">Delete account</string>
     <string name="no_data_yet">No data yet&#8230;</string>
     <string name="longest_overdue">Longest overdue:</string>
     <string name="earliest_completion">Earliest completion:</string>

@@ -5,6 +5,7 @@ import android.util.Log
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 
 data class Task(var name: String = "",
                 var dueDate: String = "",
@@ -27,6 +28,7 @@ class TaskRepository {
     private lateinit var taskCollection: CollectionReference
     val tasks: MutableLiveData<List<Pair<String, Task>>> = MutableLiveData()
     val doneTasks: MutableLiveData<List<Pair<String, Task>>> = MutableLiveData()
+    private lateinit var snapshotListener : ListenerRegistration
 
     init {
         db.firestoreSettings = Util.persistenceDBSetting
@@ -35,7 +37,7 @@ class TaskRepository {
     fun initUserTaskDocument(userId: String) {
         initUserTaskCollection(userId)
         if (this::taskCollection.isInitialized) {
-            taskCollection.addSnapshotListener { documentSnapshot, exception ->
+            snapshotListener = taskCollection.addSnapshotListener { documentSnapshot, exception ->
                 if (exception != null) {
                     Log.w(TAG, "Failed to add event listener to tasks collection. ${exception.message}")
                     return@addSnapshotListener
@@ -156,6 +158,7 @@ class TaskRepository {
     }
 
     fun deleteUserDocument() {
+        clearTask()
         taskCollection.get()
                 .addOnSuccessListener {
                     it.documents.forEach { it.reference.delete() }
@@ -164,6 +167,9 @@ class TaskRepository {
     }
 
     fun clearTask() {
+        if (this::snapshotListener.isInitialized) {
+            snapshotListener.remove()
+        }
         tasks.postValue(null)
         doneTasks.postValue(null)
     }

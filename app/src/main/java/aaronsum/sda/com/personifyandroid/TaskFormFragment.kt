@@ -123,6 +123,7 @@ class TaskFormFragment : Fragment() {
                     }
                 }
                 task?.let {
+                    existingTask = it
                     taskNameText.setText(it.name)
                     dueDate.text = it.dueDate
                     val statusArrayAdapter: ArrayAdapter<String> = statusSpinner.adapter as ArrayAdapter<String>

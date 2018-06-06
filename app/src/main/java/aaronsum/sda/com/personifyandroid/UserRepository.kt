@@ -7,10 +7,11 @@ import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.UserProfileChangeRequest
+import com.google.firebase.firestore.FirebaseFirestore
 
-data class User(val userId: String,
-                val username: String,
-                val email: String)
+data class User(val userId: String = "",
+                val username: String = "",
+                val email: String = "")
 
 class UserRepository {
     companion object {
@@ -19,9 +20,22 @@ class UserRepository {
 
     private val auth = FirebaseAuth.getInstance()
     val currentUser: MutableLiveData<User?> = MutableLiveData()
+    private val db = FirebaseFirestore.getInstance()
+    private val collection = db.collection("userMetadata")
 
     init {
         checkUserSignInState()
+        db.firestoreSettings = Util.persistenceDBSetting
+    }
+
+    private fun addDocumentChangeListener(userId: String) {
+        collection.document(userId).addSnapshotListener { documentSnapshot, exception ->
+            Log.d(TAG, "error adding listener to user metadata doc. ${exception?.localizedMessage}")
+            documentSnapshot?.let {
+                val user = it.toObject(User::class.java)
+                currentUser.postValue(user)
+            }
+        }
     }
 
     fun createNewUser(userInfo: UserInfo): Task<AuthResult>? {
@@ -29,15 +43,20 @@ class UserRepository {
     }
 
     fun updateUserProfile(userInfo: UserInfo, newUser: FirebaseUser): Task<Void> {
+        writeUserMetadataToDB(userInfo, newUser.uid)
         val userProfileChangeRequest = UserProfileChangeRequest
                 .Builder()
                 .setDisplayName(userInfo.name)
                 .build()
         val task = newUser.updateProfile(userProfileChangeRequest)
         task.addOnSuccessListener {
-            currentUser.postValue(User(newUser.uid, userInfo.name, userInfo.email))
+            addDocumentChangeListener(newUser.uid)
         }
         return task
+    }
+
+    private fun writeUserMetadataToDB(userInfo: UserInfo, userId: String) {
+        collection.document(userId).set(User(userId, userInfo.name, userInfo.email))
     }
 
     fun signInUser(email: String, password: String) = auth.signInWithEmailAndPassword(email, password)
@@ -50,11 +69,7 @@ class UserRepository {
                         .addOnFailureListener {
                             Log.e(TAG, "account reload failed. ${it.localizedMessage}")
                         }
-                val displayName = currentUser.displayName
-                displayName?.let {
-                    val email = currentUser.email
-                    email?.let { this.currentUser.postValue(User(currentUser.uid, displayName, email)) }
-                }
+                addDocumentChangeListener(currentUser.uid)
             } else {
                 this.currentUser.postValue(null)
             }
@@ -69,8 +84,6 @@ class UserRepository {
         val currentUser = auth.currentUser
         currentUser?.let {
             updateUserProfile(userInfo, currentUser)
-            this.currentUser.postValue(User(currentUser.uid, userInfo.name, userInfo.email))
-            currentUser.updateEmail(userInfo.email)
         }
     }
 
@@ -81,6 +94,10 @@ class UserRepository {
 
     fun deleteProfile(): Task<Void>? {
         Log.i(TAG, "current user before delete account, ${auth.currentUser}")
+        auth.currentUser?.uid?.let {
+            collection.document(it).delete()
+        }
+        currentUser.postValue(null)
         return auth.currentUser?.delete()
     }
 

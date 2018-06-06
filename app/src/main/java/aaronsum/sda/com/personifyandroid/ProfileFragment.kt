@@ -12,7 +12,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.view.*
 import android.widget.PopupMenu
 import com.squareup.picasso.Picasso
@@ -39,6 +38,7 @@ class ProfileFragment : Fragment(), Target {
     @SuppressLint("StringFormatInvalid")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initialisedToolbar()
 
         userViewModel = ViewModelProviders.of(activity!!)[UserViewModel::class.java]
         photoViewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
@@ -46,7 +46,7 @@ class ProfileFragment : Fragment(), Target {
         userViewModel.currentUser.observe(this, Observer { user ->
             user?.let {
                 this.user = it
-                initialisedToolbar(this.user.username)
+                toolbarTitle.text = it.username
             }
         })
 
@@ -81,14 +81,13 @@ class ProfileFragment : Fragment(), Target {
         })
     }
 
-    private fun initialisedToolbar(username: String) {
+    private fun initialisedToolbar() {
         setHasOptionsMenu(true)
         val appCompatActivity = activity as AppCompatActivity
         appCompatActivity.setSupportActionBar(profileToolbar)
         val supportActionBar = appCompatActivity.supportActionBar
         supportActionBar?.setDisplayShowTitleEnabled(false)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        toolbarTitle.text = username
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
@@ -111,7 +110,6 @@ class ProfileFragment : Fragment(), Target {
                 }
 
                 else -> {
-                    Log.d("special", "on back pressed.")
                     activity?.onBackPressed()
                 }
             }

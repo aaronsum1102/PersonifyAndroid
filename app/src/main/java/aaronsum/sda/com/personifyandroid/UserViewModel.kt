@@ -2,7 +2,6 @@ package aaronsum.sda.com.personifyandroid
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.ViewModel
-import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseUser
 
 class UserViewModel : ViewModel() {
@@ -11,7 +10,7 @@ class UserViewModel : ViewModel() {
 
     fun createNewUser(userInfo: UserInfo) = userRepository.createNewUser(userInfo)
 
-    fun updateUserProfile(userInfo:UserInfo, user:FirebaseUser) = userRepository.updateUserProfile(userInfo, user)
+    fun updateUserProfile(userInfo: UserInfo, user: FirebaseUser) = userRepository.updateUserProfile(userInfo, user)
 
     fun signInWithDetails(email: String, password: String) = userRepository.signInUser(email, password)
 

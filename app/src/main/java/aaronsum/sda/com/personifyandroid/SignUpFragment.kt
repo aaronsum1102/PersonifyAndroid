@@ -22,7 +22,9 @@ import kotlinx.android.synthetic.main.fragment_signup.*
 import java.io.File
 import java.lang.Exception
 
-data class UserInfo(val name: String, val email: String, val password: String)
+data class UserInfo(val name: String,
+                    val email: String,
+                    val password: String)
 
 class SignUpFragment : Fragment(), TextWatcher, Target {
     companion object {
