@@ -11,13 +11,16 @@ data class Task(var name: String = "",
                 var status: String = "",
                 var priority: String = "",
                 var remarks: String = "",
-                var daysLeft: Int = 0)
+                var daysLeft: Int = 0,
+                var datesMarkedAsDone: String = "")
 
 class TaskRepository {
     companion object {
         private const val TAG = "RepositoryTask"
         private const val COLLECTION_NAME = "tasks"
         private const val SUB_COLLECTION_NAME = "user tasks"
+        private const val TASK_IS_DONE = "Done"
+        private const val REMOVE_AFTER_NUMBER_OF_DAYS = -7
     }
 
     private val db = FirebaseFirestore.getInstance()
@@ -65,11 +68,12 @@ class TaskRepository {
 
         val document = change.document
         val taskFromDB = document.toObject(Task::class.java)
-        val daysDifference = Util.getDaysDifference(taskFromDB.dueDate)
-        if (daysDifference != taskFromDB.daysLeft && taskFromDB.status != "Done") {
-            taskFromDB.daysLeft = daysDifference
-        }
-        if (taskFromDB.status != "Done") {
+
+        removedTaskAfterMarkedAsDone(taskFromDB, document.id)
+
+        taskFromDB.daysLeft = Util.getDaysDifference(taskFromDB.dueDate)
+
+        if (taskFromDB.status != TASK_IS_DONE) {
             temporaryTasks.add(document.id to taskFromDB)
         } else {
             temporaryDoneTasks.add(document.id to taskFromDB)
@@ -78,24 +82,37 @@ class TaskRepository {
         temporaryDoneTasks.sortBy { it.second.daysLeft }
         tasks.value = temporaryTasks
         doneTasks.value = temporaryDoneTasks
-        Log.i(TAG, "New document added. Number of tasks to be done: ${tasks.value?.size}")
-        Log.i(TAG, "New document added. Number of tasks done: ${tasks.value?.size}")
+    }
+
+    private fun removedTaskAfterMarkedAsDone(task: Task, id: String) {
+        if (task.status == TASK_IS_DONE) {
+            if (task.datesMarkedAsDone.isEmpty()) {
+                task.datesMarkedAsDone = Util.getCurrentDate()
+            }
+            val daysSinceMarkedAsDone = Util.getDaysDifference(task.datesMarkedAsDone)
+            if (daysSinceMarkedAsDone <= REMOVE_AFTER_NUMBER_OF_DAYS && this::taskCollection.isInitialized) {
+                taskCollection.document(id).delete()
+                        .addOnFailureListener {
+                            Log.e(TAG, "Failed to remove done task after days limit. ${it.localizedMessage}")
+                        }
+            }
+        }
     }
 
     private fun onDocumentModified(change: DocumentChange) {
-        val taskId = change.document.id
         val temporaryTasks = mutableListOf<Pair<String, Task>>()
         tasks.value?.let { temporaryTasks.addAll(it) }
         val temporaryDoneTasks = mutableListOf<Pair<String, Task>>()
         doneTasks.value?.let { temporaryDoneTasks.addAll(it) }
 
+        val taskId = change.document.id
         val taskToRemove = temporaryTasks.find { it.first == taskId }
         taskToRemove?.let { temporaryTasks.remove(taskToRemove) }
         val taskToRemoveIfAny = temporaryDoneTasks.find { it.first == taskId }
         taskToRemoveIfAny?.let { temporaryDoneTasks.remove(taskToRemoveIfAny) }
 
         val taskChanged = change.document.toObject(Task::class.java)
-        if (taskChanged.status != "Done") {
+        if (taskChanged.status != TASK_IS_DONE) {
             temporaryTasks.add(taskId to taskChanged)
         } else {
             temporaryDoneTasks.add(taskId to taskChanged)
@@ -105,8 +122,6 @@ class TaskRepository {
         temporaryDoneTasks.sortBy { it.second.daysLeft }
         tasks.value = temporaryTasks
         doneTasks.value = temporaryDoneTasks
-        Log.i(TAG, "Document has been modified. Number of tasks to be done :${tasks.value?.size}")
-        Log.i(TAG, "Document has been modified. Number of tasks done:${doneTasks.value?.size}")
     }
 
     private fun onDocumentRemoved(change: DocumentChange) {
@@ -119,7 +134,6 @@ class TaskRepository {
             taskToRemove?.let {
                 temporaryTasks.remove(taskToRemove)
                 tasks.value = temporaryTasks
-                Log.i(TAG, "Document has been deleted. Number of tasks :${tasks.value?.size}")
             }
         }
 
@@ -129,7 +143,6 @@ class TaskRepository {
             taskToRemove?.let {
                 temporaryDoneTasks.remove(taskToRemove)
                 doneTasks.value = temporaryDoneTasks
-                Log.i(TAG, "Document has been deleted. Number of tasks :${doneTasks.value?.size}")
             }
         }
     }
@@ -138,22 +151,8 @@ class TaskRepository {
 
     fun modifyTask(pair: Pair<String, Task>) = taskCollection.document(pair.first).set(pair.second)
 
-    fun loadTask(id: String): MutableLiveData<Task> {
-        val taskLiveData: MutableLiveData<Task> = MutableLiveData()
-        taskCollection.document(id).get()
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        taskLiveData.postValue(task.result.toObject(Task::class.java))
-                    } else {
-                        Log.w(TAG, "error getting specific document. ${task.exception?.message}")
-                    }
-                }
-        return taskLiveData
-    }
-
     fun deleteTask(id: String) {
         taskCollection.document(id).delete()
-        Log.i(TAG, "specific task deleted")
     }
 
     fun deleteUserDocument() {

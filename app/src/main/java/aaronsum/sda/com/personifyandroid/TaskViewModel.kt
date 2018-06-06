@@ -17,8 +17,6 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
 
     fun modifyTask(pair: Pair<String, Task>) = repository.modifyTask(pair)
 
-    fun loadTask(taskId: String): LiveData<Task> = repository.loadTask(taskId)
-
     fun deleteTask(taskId: String) = repository.deleteTask(taskId)
 
     fun deleteUserDocument() {

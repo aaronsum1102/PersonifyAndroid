@@ -111,8 +111,8 @@ object Util {
         return dateFormat.format(calendar.time)
     }
 
-    fun getDaysDifference(dueDate: String): Int {
-        val date = dateFormat.parse(dueDate)
+    fun getDaysDifference(date: String): Int {
+        val date = dateFormat.parse(date)
         val currentDate = dateFormat.parse(getCurrentDate())
         return ((date.time - currentDate.time) / (1000 * 60 * 60 * 24)).toInt()
     }

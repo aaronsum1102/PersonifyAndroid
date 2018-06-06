@@ -40,7 +40,7 @@
             android:layout_gravity="end"
             android:layout_marginBottom="8dp"
             android:layout_marginEnd="16dp"
-            android:contentDescription="@string/show_tasks_that_were_completed"
+            android:contentDescription="@string/view_tasks_that_were_completed"
             android:scaleType="fitCenter"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

@@ -3,7 +3,10 @@ package aaronsum.sda.com.personifyandroid
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
 import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.*
+import com.google.firebase.auth.AuthResult
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.UserProfileChangeRequest
 
 data class User(val userId: String,
                 val username: String,
@@ -45,17 +48,14 @@ class UserRepository {
             if (currentUser != null) {
                 currentUser.reload()
                         .addOnFailureListener {
-                            Log.i(TAG, "account reload failed. ${it.localizedMessage}")
+                            Log.e(TAG, "account reload failed. ${it.localizedMessage}")
                         }
-                Log.i(TAG, "user in this session")
                 val displayName = currentUser.displayName
                 displayName?.let {
-                    Log.i(TAG, "show user display name.")
                     val email = currentUser.email
                     email?.let { this.currentUser.postValue(User(currentUser.uid, displayName, email)) }
                 }
             } else {
-                Log.i(TAG, "no user in this session")
                 this.currentUser.postValue(null)
             }
         }
@@ -84,5 +84,5 @@ class UserRepository {
         return auth.currentUser?.delete()
     }
 
-    fun authenticateUser(email:String, password: String) = auth.signInWithEmailAndPassword(email, password)
+    fun authenticateUser(email: String, password: String) = auth.signInWithEmailAndPassword(email, password)
 }

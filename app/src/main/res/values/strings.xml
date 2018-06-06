@@ -88,7 +88,7 @@
     <string name="reset_password">An email has been sent to your mailbox.</string>
     <string name="failed_request_password">"Failed to request new password."</string>
     <string name="profile_picture">profile picture</string>
-    <string name="show_tasks_that_were_completed">Show tasks that were completed.</string>
+    <string name="view_tasks_that_were_completed">View tasks that were completed.</string>
     <string name="done_tasks">Done Tasks</string>
     <string name="you_have_no_tasks_to_display">You have no tasks to display</string>
 </resources>

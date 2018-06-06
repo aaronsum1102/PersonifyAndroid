@@ -15,6 +15,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import kotlinx.android.synthetic.main.fragment_tasks_list.*
@@ -67,8 +68,14 @@ class TaskListFragment : Fragment(), OnTaskClickListener, Target {
                 }
                 adapter.tasks = tasks
                 adapter.notifyDataSetChanged()
-                val earliestCompletion = tasks.maxBy { it.second.daysLeft }?.second?.daysLeft
-                val longestOverdue = tasks.minBy { it.second.daysLeft }?.second?.daysLeft
+
+            }
+        })
+
+        viewModel.doneTasks.observe(this, Observer { doneTasksPair ->
+            doneTasksPair?.let {
+                val earliestCompletion = doneTasksPair.maxBy { it.second.daysLeft }?.second?.daysLeft
+                val longestOverdue = doneTasksPair.minBy { it.second.daysLeft }?.second?.daysLeft
                 if (earliestCompletion != null && longestOverdue != null) {
                     userStatisticViewModel.updateCompletionStatistic(
                             UserCompletionStatistic(earliestCompletion, longestOverdue))
@@ -92,6 +99,14 @@ class TaskListFragment : Fragment(), OnTaskClickListener, Target {
                     ?.replace(R.id.container, ProfileFragment())
                     ?.addToBackStack(TASK_LIST_BACK_STACK)
                     ?.commit()
+        }
+
+        showDoneTasks.setOnLongClickListener {
+            Toast.makeText(context,
+                    getString(R.string.view_tasks_that_were_completed),
+                    Toast.LENGTH_SHORT)
+                    .show()
+            true
         }
 
         showDoneTasks.setOnClickListener {

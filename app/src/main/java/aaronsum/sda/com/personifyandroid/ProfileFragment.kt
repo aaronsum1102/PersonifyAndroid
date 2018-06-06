@@ -20,6 +20,7 @@ import com.squareup.picasso.Target
 import kotlinx.android.synthetic.main.fragment_profile.*
 import java.io.File
 import java.lang.Exception
+import kotlin.math.abs
 
 class ProfileFragment : Fragment(), Target {
     companion object {
@@ -66,7 +67,7 @@ class ProfileFragment : Fragment(), Target {
                 }
                 val longestOverdue = userStatistics.longestOverdue
                 if (longestOverdue != 0) {
-                    longestOverDueText.text = resources.getQuantityString(R.plurals.number_of_days, longestOverdue, longestOverdue)
+                    longestOverDueText.text = resources.getQuantityString(R.plurals.number_of_days, abs(longestOverdue), abs(longestOverdue))
                 }
                 val taskCompletionRate = userStatistics.taskCompletionRate
                 if (taskCompletionRate != 0) {

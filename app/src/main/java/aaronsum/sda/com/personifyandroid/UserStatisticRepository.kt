@@ -41,7 +41,7 @@ class UserStatisticRepository {
         document = db.collection(collectionName).document(userId)
         document.addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
             firebaseFirestoreException?.let {
-                Log.i(TAG, "Unable to add listener for task stat. ${it.localizedMessage}")
+                Log.e(TAG, "Unable to add listener for task stat. ${it.localizedMessage}")
                 return@addSnapshotListener
             }
             documentSnapshot?.let {
@@ -61,7 +61,6 @@ class UserStatisticRepository {
             completionRate = taskStatistic.taskCompletedOnTime * 100 / numberOfTasks
             overdueRate = taskStatistic.taskOverdue * 100 / numberOfTasks
         }
-        Log.i(TAG, "transform data. completion rate : $completionRate, overdue rate : $overdueRate")
         return UserStatistics(completionRate, overdueRate, taskStatistic.earliestCompletion, taskStatistic.longestOverdue)
     }
 
@@ -72,15 +71,12 @@ class UserStatisticRepository {
         taskStatistic?.let {
             when (command) {
                 COMPLETION_ON_TIME -> {
-                    Log.i(TAG, "task completed on time")
                     it.taskCompletedOnTime += 1
                 }
                 OVERDUE -> {
-                    Log.i(TAG, "task overdue")
                     it.taskOverdue += 1
                 }
                 NEW_TASK -> {
-                    Log.i(TAG, "new task added")
                     it.numberOfTasks += 1
                 }
             }
@@ -91,24 +87,21 @@ class UserStatisticRepository {
     }
 
     fun updateCompletionStatistic(newStatistic: UserCompletionStatistic) {
-        var flageToUpdateDocument = false
+        var flagToUpdateDocument = false
         if (taskStatistic == null) {
             taskStatistic = TaskStatistic()
         }
         taskStatistic?.let {
             if (newStatistic.earliestCompletion > it.earliestCompletion) {
-                flageToUpdateDocument = true
+                flagToUpdateDocument = true
                 it.earliestCompletion = newStatistic.earliestCompletion
-                Log.i(TAG, "update earliest completion")
             }
             if (newStatistic.longestOverdue < it.longestOverdue) {
-                flageToUpdateDocument = true
+                flagToUpdateDocument = true
                 it.longestOverdue = newStatistic.longestOverdue
-                Log.i(TAG, "update longest overdue")
             }
-            if (this::document.isInitialized && flageToUpdateDocument) {
+            if (this::document.isInitialized && flagToUpdateDocument) {
                 document.set(taskStatistic as Any)
-                Log.i(TAG, "update completion record")
             }
         }
     }

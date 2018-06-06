@@ -32,12 +32,11 @@ class PhotoRepository {
         document = collection.document(userId)
         document.addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
             firebaseFirestoreException?.let {
-                Log.i(TAG, "Unable to add snapshot listener for profile photo metadata. ${firebaseFirestoreException.localizedMessage}")
+                Log.e(TAG, "Unable to add snapshot listener for profile photo metadata. ${firebaseFirestoreException.localizedMessage}")
             }
             val profilePic = documentSnapshot?.toObject(PicMetadata::class.java)
             profilePic?.let {
                 profilePhotoMetadata.postValue(profilePic)
-                Log.i(TAG, "changes in profilePic metadata posted.")
             }
         }
     }
@@ -45,13 +44,11 @@ class PhotoRepository {
     fun writeUserProfilePictureURL(picMetadata: PicMetadata) {
         if (this::document.isInitialized) {
             document.set(picMetadata)
-            Log.i(TAG, "persist profile pic url")
         }
     }
 
     fun uploadProfilePhoto(file: Uri): UploadTask? {
         if (this::document.isInitialized) {
-            Log.i(TAG, "upload profile pic")
             val fileName = "${document.id}.jpg"
             val reference = photoReference.child(fileName)
             return reference.putFile(file)
@@ -68,7 +65,6 @@ class PhotoRepository {
     }
 
     fun clearProfilePic() {
-        Log.i(TAG, "clear profile pic after log out")
         profilePhotoMetadata.postValue(null)
     }
 }

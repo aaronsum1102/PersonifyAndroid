@@ -1,7 +1,6 @@
 package aaronsum.sda.com.personifyandroid
 
 import android.app.DatePickerDialog
-import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -35,32 +34,14 @@ class TaskFormFragment : Fragment() {
         val userStatisticViewModel = ViewModelProviders.of(activity!!)[UserStatisticViewModel::class.java]
 
         val taskId: String = arguments?.getString(TaskListFragment.KEY_TASK_ID) ?: ""
-        if (taskId.isNotEmpty()) {
-            viewModel.loadTask(taskId)
-                    .observe(this, Observer {
-                        it?.let {
-                            existingTask = it
-                            taskNameText.setText(it.name)
-                            dueDate.text = it.dueDate
-                            val statusArrayAdapter: ArrayAdapter<String> = statusSpinner.adapter as ArrayAdapter<String>
-                            statusSpinner.setSelection(statusArrayAdapter.getPosition(it.status))
-                            val priorityArrayAdapter = prioritySpinner.adapter as ArrayAdapter<String>
-                            prioritySpinner.setSelection(priorityArrayAdapter.getPosition(it.priority))
-                            remarksText.setText(it.remarks)
 
-                            if (it.status == taskIsDone) {
-                                statusSpinner.isEnabled = false
-                                addTaskButton.isEnabled = false
-                            }
-                        }
-                    })
-            removeTaskButton.visibility = View.VISIBLE
-            removeTaskButton.setOnClickListener {
-                existingTask?.let {
-                    viewModel.deleteTask(taskId)
-                    Util.hideSoftKeyboard(activity, view)
-                    fragmentManager?.popBackStack()
-                }
+        recoverTaskData(viewModel, taskId)
+
+        removeTaskButton.setOnClickListener {
+            existingTask?.let {
+                viewModel.deleteTask(taskId)
+                Util.hideSoftKeyboard(activity, view)
+                fragmentManager?.popBackStack()
             }
         }
 
@@ -71,28 +52,18 @@ class TaskFormFragment : Fragment() {
         }
 
         addTaskButton.setOnClickListener {
-            val name = taskNameText.text.toString()
-            val dueDate = dueDate.text.toString()
-            val remarks = remarksText.text.toString()
-            val daysLeft = Util.getDaysDifference(dueDate)
-            if (this::status.isInitialized && this::priority.isInitialized) {
-                val task = Task(name, dueDate, status, priority, remarks, daysLeft)
-                if (taskId.isNotEmpty()) {
-                    viewModel.modifyTask(taskId to task)
-                    if (status == taskIsDone) {
-                        if (daysLeft >= 0) {
-                            userStatisticViewModel.updateStatistic(UserStatisticRepository.COMPLETION_ON_TIME)
-                        } else {
-                            userStatisticViewModel.updateStatistic(UserStatisticRepository.OVERDUE)
-                        }
-                    }
-                } else {
-                    viewModel.addTask(task)
-                    userStatisticViewModel.updateStatistic(UserStatisticRepository.NEW_TASK)
+            val task = collectTaskData()
+            if (taskId.isNotEmpty()) {
+                viewModel.modifyTask(taskId to task)
+                if (status == taskIsDone) {
+                    updateUserTaskStatistic(task.daysLeft, userStatisticViewModel)
                 }
-                Util.hideSoftKeyboard(activity, view)
-                fragmentManager?.popBackStack()
+            } else {
+                viewModel.addTask(task)
+                userStatisticViewModel.updateStatistic(UserStatisticRepository.NEW_TASK)
             }
+            Util.hideSoftKeyboard(activity, view)
+            fragmentManager?.popBackStack()
         }
 
         taskNameText.addTextChangedListener(object : TextWatcher {
@@ -137,6 +108,49 @@ class TaskFormFragment : Fragment() {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 priority = prioritySpinner.selectedItem.toString()
             }
+        }
+    }
+
+    private fun recoverTaskData(viewModel: TaskViewModel, taskId: String) {
+        if (taskId.isNotEmpty()) {
+            val tasks = viewModel.tasks.value
+            tasks?.let {
+                var task = tasks.find { it.first == taskId }?.second
+                if (task == null) {
+                    val doneTasks = viewModel.doneTasks.value
+                    doneTasks?.let {
+                        task = doneTasks.find { it.first == taskId }?.second
+                    }
+                }
+                task?.let {
+                    taskNameText.setText(it.name)
+                    dueDate.text = it.dueDate
+                    val statusArrayAdapter: ArrayAdapter<String> = statusSpinner.adapter as ArrayAdapter<String>
+                    statusSpinner.setSelection(statusArrayAdapter.getPosition(it.status))
+                    val priorityArrayAdapter = prioritySpinner.adapter as ArrayAdapter<String>
+                    prioritySpinner.setSelection(priorityArrayAdapter.getPosition(it.priority))
+                    remarksText.setText(it.remarks)
+                }
+            }
+            removeTaskButton.visibility = View.VISIBLE
+            addTaskButton.isEnabled = true
+        }
+    }
+
+    private fun collectTaskData(): Task {
+        val name = taskNameText.text.toString()
+        val dueDate = dueDate.text.toString()
+        val remarks = remarksText.text.toString()
+        val daysLeft = Util.getDaysDifference(dueDate)
+        val datesMarkedAsDone: String = if (status == taskIsDone) Util.getCurrentDate() else ""
+        return Task(name, dueDate, status, priority, remarks, daysLeft, datesMarkedAsDone)
+    }
+
+    private fun updateUserTaskStatistic(daysLeft: Int, userStatisticViewModel: UserStatisticViewModel) {
+        if (daysLeft >= 0) {
+            userStatisticViewModel.updateStatistic(UserStatisticRepository.COMPLETION_ON_TIME)
+        } else {
+            userStatisticViewModel.updateStatistic(UserStatisticRepository.OVERDUE)
         }
     }
 }
