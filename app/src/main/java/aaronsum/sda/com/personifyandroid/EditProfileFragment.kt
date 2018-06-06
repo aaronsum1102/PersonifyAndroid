@@ -2,6 +2,7 @@ package aaronsum.sda.com.personifyandroid
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
@@ -37,16 +38,7 @@ class EditProfileFragment : Fragment(), TextWatcher {
 
         deleteProfileButton.setOnClickListener {
             context?.let { context ->
-                AlertDialog.Builder(context)
-                        .setTitle(getString(R.string.alert_title_delete_profile))
-                        .setMessage(getString(R.string.alert_content_delete_profile))
-                        .setPositiveButton(getString(R.string.confirm), { dialog, _ ->
-                            deleteProfile(userViewModel)
-                                    ?.addOnSuccessListener { dialog.dismiss() }
-                        })
-                        .setNegativeButton(R.string.cancel, { dialog, _ -> dialog.dismiss() })
-                        .create()
-                        .show()
+                createDialogForAccountDeletionConfirmation(context, userViewModel)
             }
         }
 
@@ -68,28 +60,54 @@ class EditProfileFragment : Fragment(), TextWatcher {
         }
     }
 
+    private fun createDialogForAccountDeletionConfirmation(context: Context, userViewModel: UserViewModel) {
+        val email = newEmailText.text.toString()
+        val password = passwordText.text.toString()
+        AlertDialog.Builder(context)
+                .setTitle(getString(R.string.alert_title_delete_profile))
+                .setMessage(getString(R.string.alert_content_delete_profile))
+                .setPositiveButton(getString(R.string.confirm), { dialog, _ ->
+                    if (password.isEmpty()) {
+                        Toast.makeText(context,
+                                "Please enter your current password in the form for confirmation.",
+                                Toast.LENGTH_LONG).show()
+                    } else {
+                        userViewModel.authenticateUserBeforeDelete(email, password)
+                                .addOnSuccessListener {
+                                    deleteProfile(userViewModel)
+                                            ?.addOnSuccessListener {
+                                                initUserManagementFragment()
+                                                dialog.dismiss()
+                                            }
+                                            ?.addOnFailureListener {
+                                                Toast.makeText(context,
+                                                        "Unable to delete your account. ${it.message}",
+                                                        Toast.LENGTH_LONG).show()
+                                            }
+                                }
+                                .addOnFailureListener {
+                                    Toast.makeText(context, it.localizedMessage, Toast.LENGTH_LONG).show()
+                                }
+                    }
+                })
+                .setNegativeButton(R.string.cancel, { dialog, _ -> dialog.dismiss() })
+                .create()
+                .show()
+    }
+
     private fun deleteProfile(userViewModel: UserViewModel): Task<Void>? {
         val taskViewModel = ViewModelProviders.of(activity!!)[TaskViewModel::class.java]
         val photoViewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
         val userStatisticViewModel = ViewModelProviders.of(activity!!)[UserStatisticViewModel::class.java]
 
-        userViewModel.deleteProfile()
-                ?.continueWith {
-                    taskViewModel.deleteUserDocument()
-                    photoViewModel.deleteUserProfile()
-                    userStatisticViewModel.deleteStatistic()
-                    initUserManagementFragment()
-                    return@continueWith it
-                }
-                ?.addOnFailureListener {
-                    Toast.makeText(context,
-                            "Unable to delete your account. ${it.message}",
-                            Toast.LENGTH_LONG).show()
-                }
-        return null
+        taskViewModel.deleteUserDocument()
+        photoViewModel.deleteUserProfile()
+        userStatisticViewModel.deleteStatistic()
+        return userViewModel.deleteProfile()
     }
 
     private fun initUserManagementFragment() {
+        view?.let { Util.hideSoftKeyboard(activity, it) }
         fragmentManager?.apply {
             popBackStack(TaskListFragment.TASK_LIST_BACK_STACK,
                     FragmentManager.POP_BACK_STACK_INCLUSIVE)

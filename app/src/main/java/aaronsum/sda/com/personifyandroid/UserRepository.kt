@@ -3,10 +3,7 @@ package aaronsum.sda.com.personifyandroid
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
 import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.AuthResult
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.UserProfileChangeRequest
+import com.google.firebase.auth.*
 
 data class User(val userId: String,
                 val username: String,
@@ -14,7 +11,7 @@ data class User(val userId: String,
 
 class UserRepository {
     companion object {
-        private const val TAG = "UserRepository"
+        private const val TAG = "RepositoryUser"
     }
 
     private val auth = FirebaseAuth.getInstance()
@@ -50,6 +47,7 @@ class UserRepository {
                         .addOnFailureListener {
                             Log.i(TAG, "account reload failed. ${it.localizedMessage}")
                         }
+                Log.i(TAG, "user in this session")
                 val displayName = currentUser.displayName
                 displayName?.let {
                     Log.i(TAG, "show user display name.")
@@ -57,7 +55,7 @@ class UserRepository {
                     email?.let { this.currentUser.postValue(User(currentUser.uid, displayName, email)) }
                 }
             } else {
-                Log.i(TAG, "not user in the session")
+                Log.i(TAG, "no user in this session")
                 this.currentUser.postValue(null)
             }
         }
@@ -81,5 +79,10 @@ class UserRepository {
         return email?.let { auth.signInWithEmailAndPassword(email, password) }
     }
 
-    fun deleteProfile() = auth.currentUser?.delete()
+    fun deleteProfile(): Task<Void>? {
+        Log.i(TAG, "current user before delete account, ${auth.currentUser}")
+        return auth.currentUser?.delete()
+    }
+
+    fun authenticateUser(email:String, password: String) = auth.signInWithEmailAndPassword(email, password)
 }

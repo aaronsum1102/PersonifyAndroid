@@ -13,7 +13,7 @@ data class PicMetadata(val url: String = "",
 
 class PhotoRepository {
     companion object {
-        private const val TAG = "PhotoRepository"
+        private const val TAG = "RepositoryPhoto"
         private const val COLLECTION_NAME = "userProfilePic"
     }
 
@@ -32,18 +32,20 @@ class PhotoRepository {
         document = collection.document(userId)
         document.addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
             firebaseFirestoreException?.let {
-                Log.i(TAG, "Unable to add snapshot listener. ${firebaseFirestoreException.localizedMessage}")
+                Log.i(TAG, "Unable to add snapshot listener for profile photo metadata. ${firebaseFirestoreException.localizedMessage}")
             }
             val profilePic = documentSnapshot?.toObject(PicMetadata::class.java)
-            profilePic?.let { profilePhotoMetadata.postValue(profilePic) }
+            profilePic?.let {
+                profilePhotoMetadata.postValue(profilePic)
+                Log.i(TAG, "changes in profilePic metadata posted.")
+            }
         }
     }
 
     fun writeUserProfilePictureURL(picMetadata: PicMetadata) {
         if (this::document.isInitialized) {
             document.set(picMetadata)
-
-            Log.i(TAG, "record profile pic url")
+            Log.i(TAG, "persist profile pic url")
         }
     }
 

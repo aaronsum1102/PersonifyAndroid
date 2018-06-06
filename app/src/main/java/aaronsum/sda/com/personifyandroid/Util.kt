@@ -78,7 +78,7 @@ object Util {
             val openInputStream = context?.contentResolver?.openInputStream(uri)
             openInputStream?.let {
                 val bitmap = BitmapFactory.decodeStream(openInputStream)
-                val ratio = 0.4
+                val ratio = 0.5
                 val newImage = Bitmap.createScaledBitmap(bitmap,
                         (bitmap.width * ratio).toInt(),
                         (bitmap.height * ratio).toInt(), false)
@@ -125,16 +125,16 @@ object Util {
                     val orientation = picMetadataMetaData.orientation.toInt()
                     when (orientation) {
                         ExifInterface.ORIENTATION_ROTATE_90 -> {
-                            requestCreator.rotate(90f).into(target)
+                            requestCreator.rotate(90f).centerCrop().resize(600, 600).into(target)
                         }
                         ExifInterface.ORIENTATION_ROTATE_180 -> {
-                            requestCreator.rotate(180f).into(target)
+                            requestCreator.rotate(180f).centerCrop().resize(600, 600).into(target)
                         }
                         ExifInterface.ORIENTATION_ROTATE_270 -> {
-                            requestCreator.rotate(270f).into(target)
+                            requestCreator.rotate(270f).centerCrop().resize(600, 600).into(target)
                         }
                         else -> {
-                            requestCreator.into(target)
+                            requestCreator.centerCrop().resize(600, 600).into(target)
                         }
                     }
                 } catch (exception: NumberFormatException) {

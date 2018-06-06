@@ -2,6 +2,7 @@ package aaronsum.sda.com.personifyandroid
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.ViewModel
+import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseUser
 
 class UserViewModel : ViewModel() {
@@ -19,6 +20,8 @@ class UserViewModel : ViewModel() {
     fun signOut() = userRepository.signOut()
 
     fun deleteProfile() = userRepository.deleteProfile()
+
+    fun authenticateUserBeforeDelete(email: String, password: String) = userRepository.authenticateUser(email, password)
 
     fun verifyPassword(password: String) = userRepository.verifyPassword(password)
 

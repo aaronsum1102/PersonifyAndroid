@@ -15,7 +15,7 @@ data class Task(var name: String = "",
 
 class TaskRepository {
     companion object {
-        private const val TAG = "TaskRepository"
+        private const val TAG = "RepositoryTask"
         private const val COLLECTION_NAME = "tasks"
         private const val SUB_COLLECTION_NAME = "user tasks"
     }
@@ -34,7 +34,7 @@ class TaskRepository {
         if (this::taskCollection.isInitialized) {
             taskCollection.addSnapshotListener { documentSnapshot, exception ->
                 if (exception != null) {
-                    Log.w(TAG, "Failed to add event listener to DB. ${exception.message}")
+                    Log.w(TAG, "Failed to add event listener to tasks collection. ${exception.message}")
                     return@addSnapshotListener
                 }
                 val source = if (documentSnapshot != null &&
@@ -153,6 +153,7 @@ class TaskRepository {
 
     fun deleteTask(id: String) {
         taskCollection.document(id).delete()
+        Log.i(TAG, "specific task deleted")
     }
 
     fun deleteUserDocument() {
@@ -160,6 +161,7 @@ class TaskRepository {
                 .addOnSuccessListener {
                     it.documents.forEach { it.reference.delete() }
                 }
+        Log.i(TAG, "deleted user's tasks data")
     }
 
     fun clearTask() {
