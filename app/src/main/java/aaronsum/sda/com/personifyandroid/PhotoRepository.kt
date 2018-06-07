@@ -2,7 +2,6 @@ package aaronsum.sda.com.personifyandroid
 
 import android.arch.lifecycle.MutableLiveData
 import android.net.Uri
-import android.util.Log
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
@@ -13,7 +12,6 @@ data class PicMetadata(val url: String = "",
 
 class PhotoRepository {
     companion object {
-        private const val TAG = "RepositoryPhoto"
         private const val COLLECTION_NAME = "userProfilePic"
     }
 
@@ -30,10 +28,7 @@ class PhotoRepository {
 
     fun initDocument(userId: String) {
         document = collection.document(userId)
-        document.addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
-            firebaseFirestoreException?.let {
-                Log.e(TAG, "Unable to add snapshot listener for profile photo metadata. ${firebaseFirestoreException.localizedMessage}")
-            }
+        document.addSnapshotListener { documentSnapshot, _ ->
             val profilePic = documentSnapshot?.toObject(PicMetadata::class.java)
             profilePic?.let {
                 profilePhotoMetadata.postValue(profilePic)
@@ -60,7 +55,6 @@ class PhotoRepository {
         if (this::document.isInitialized) {
             document.delete()
             photoReference.child("${document.id}.jpg").delete()
-            Log.i(TAG, "delete user profile pic when deleting account")
         }
     }
 

@@ -5,6 +5,7 @@ import android.app.Activity
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
@@ -14,10 +15,10 @@ import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.view.*
 import android.widget.PopupMenu
+import android.widget.Toast
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import kotlinx.android.synthetic.main.fragment_profile.*
-import java.io.File
 import java.lang.Exception
 import kotlin.math.abs
 
@@ -28,7 +29,6 @@ class ProfileFragment : Fragment(), Target {
 
     private lateinit var userViewModel: UserViewModel
     private lateinit var photoViewModel: PhotoViewModel
-    private var uploadedFile: File? = null
     private lateinit var user: User
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -55,7 +55,7 @@ class ProfileFragment : Fragment(), Target {
         })
 
         changeProfilePicButton.setOnClickListener {
-            uploadedFile = Util.cameraIntent(this)
+            Util.checkForPermission(this)
         }
 
         val userStatisticViewModel = ViewModelProviders.of(activity!!)[UserStatisticViewModel::class.java]
@@ -151,13 +151,13 @@ class ProfileFragment : Fragment(), Target {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
-            SignUpFragment.CAMERA_REQUEST_CODE -> {
+            SignUpFragment.IMAGE_REQUEST_CODE -> {
                 if (resultCode == Activity.RESULT_OK) {
-                    uploadedFile?.let { file ->
-                        val internalUri = Util.getUriForFile(file, this@ProfileFragment.context)
-                        val orientation = Util.getPicOrientation(internalUri, context)
-                        uploadedFile = Util.resizeImage(internalUri, file, this@ProfileFragment.context)
-                        if (internalUri != null && orientation != null) {
+                    val uri = data?.data
+                    uri?.let {
+                        val orientation = Util.getPicOrientation(uri, context)
+                        val internalUri = Util.resizeImage(uri, this@ProfileFragment.context)
+                        if (orientation != null && internalUri != null) {
                             updateProfileImage(internalUri, orientation)
                         }
                     }
@@ -184,6 +184,21 @@ class ProfileFragment : Fragment(), Target {
     override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
         bitmap?.let {
             profilePhoto?.background = BitmapDrawable(resources, bitmap)
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        when (requestCode) {
+            Util.PERMISSION_REQUEST_CODE -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Util.chooseImage(this@ProfileFragment)
+                } else {
+                    Toast.makeText(this@ProfileFragment.context,
+                            "Please enable permission to access you device storage for selection of profile photo.",
+                            Toast.LENGTH_LONG)
+                            .show()
+                }
+            }
         }
     }
 }

@@ -6,12 +6,12 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,7 +19,6 @@ import android.widget.Toast
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import kotlinx.android.synthetic.main.fragment_signup.*
-import java.io.File
 import java.lang.Exception
 
 data class UserInfo(val name: String,
@@ -28,11 +27,10 @@ data class UserInfo(val name: String,
 
 class SignUpFragment : Fragment(), TextWatcher, Target {
     companion object {
-        const val CAMERA_REQUEST_CODE = 100
-        private const val TAG = "SignUpFragment"
+        const val IMAGE_REQUEST_CODE = 100
     }
 
-    private var fileToUpload: File? = null
+    private lateinit var uriOfFileToUpload: Uri
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_signup, container, false)
@@ -51,7 +49,7 @@ class SignUpFragment : Fragment(), TextWatcher, Target {
         }
 
         addPhoto.setOnClickListener {
-            fileToUpload = Util.cameraIntent(this)
+            Util.checkForPermission(this)
         }
     }
 
@@ -67,9 +65,6 @@ class SignUpFragment : Fragment(), TextWatcher, Target {
                                 uploadProfilePhoto(user.uid)
                                 view?.let { Util.hideSoftKeyboard(activity, view as View) }
                                 user.displayName?.let { initTaskListFragment(it) }
-                            }
-                            .addOnFailureListener {
-                                Log.i(TAG, "unable to update profile. ${it.localizedMessage}")
                             }
                 }
                 ?.addOnFailureListener { exception ->
@@ -94,22 +89,24 @@ class SignUpFragment : Fragment(), TextWatcher, Target {
     }
 
     private fun uploadProfilePhoto(userId: String) {
-        val photoViewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
-        photoViewModel.initProfilePhotoDocument(userId)
-        val uri = Util.getUriForFile(fileToUpload, context)
-        uri?.let { internalUri ->
-            val orientation = Util.getPicOrientation(internalUri, context)
-            fileToUpload?.let { Util.resizeImage(internalUri, it, context) }
-            photoViewModel.uploadPhoto(internalUri)
-                    ?.continueWith {
-                        it.result.storage.downloadUrl.addOnSuccessListener { url ->
-                            orientation?.let {
-                                photoViewModel.writeUserProfilePictureURL(PicMetadata(
-                                        url.toString(),
-                                        orientation))
+        if (this::uriOfFileToUpload.isInitialized) {
+            val photoViewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
+            photoViewModel.initProfilePhotoDocument(userId)
+
+            val picOrientation = Util.getPicOrientation(uriOfFileToUpload, this@SignUpFragment.context)
+            val internalUri = Util.resizeImage(uriOfFileToUpload, this@SignUpFragment.context)
+            internalUri?.let {
+                photoViewModel.uploadPhoto(internalUri)
+                        ?.continueWith {
+                            it.result.storage.downloadUrl.addOnSuccessListener { url ->
+                                picOrientation?.let {
+                                    photoViewModel.writeUserProfilePictureURL(PicMetadata(
+                                            url.path,
+                                            picOrientation))
+                                }
                             }
                         }
-                    }
+            }
         }
     }
 
@@ -130,13 +127,15 @@ class SignUpFragment : Fragment(), TextWatcher, Target {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
-            CAMERA_REQUEST_CODE -> {
+            IMAGE_REQUEST_CODE -> {
                 if (resultCode == Activity.RESULT_OK) {
-                    fileToUpload?.let { file ->
-                        val uri = Util.getUriForFile(file, context)
-                        val picOrientation = Util.getPicOrientation(uri, this@SignUpFragment.context)
-                        if (uri != null && picOrientation != null) {
-                            Util.fetchPhoto(this, PicMetadata(uri.toString(), picOrientation))
+                    data?.data?.let {
+                        uriOfFileToUpload = it
+                        val picOrientation = Util.getPicOrientation(uriOfFileToUpload,
+                                this@SignUpFragment.context)
+                        picOrientation?.let {
+                            Util.fetchPhoto(this,
+                                    PicMetadata(uriOfFileToUpload.path, picOrientation))
                         }
                     }
                 }

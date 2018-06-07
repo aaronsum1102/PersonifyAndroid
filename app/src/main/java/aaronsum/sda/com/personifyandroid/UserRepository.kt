@@ -1,7 +1,6 @@
 package aaronsum.sda.com.personifyandroid
 
 import android.arch.lifecycle.MutableLiveData
-import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
@@ -14,10 +13,6 @@ data class User(val userId: String = "",
                 val email: String = "")
 
 class UserRepository {
-    companion object {
-        private const val TAG = "RepositoryUser"
-    }
-
     private val auth = FirebaseAuth.getInstance()
     val currentUser: MutableLiveData<User?> = MutableLiveData()
     private val db = FirebaseFirestore.getInstance()
@@ -29,8 +24,7 @@ class UserRepository {
     }
 
     private fun addDocumentChangeListener(userId: String) {
-        collection.document(userId).addSnapshotListener { documentSnapshot, exception ->
-            Log.d(TAG, "error adding listener to user metadata doc. ${exception?.localizedMessage}")
+        collection.document(userId).addSnapshotListener { documentSnapshot, _ ->
             documentSnapshot?.let {
                 val user = it.toObject(User::class.java)
                 currentUser.postValue(user)
@@ -66,9 +60,6 @@ class UserRepository {
             val currentUser = it.currentUser
             if (currentUser != null) {
                 currentUser.reload()
-                        .addOnFailureListener {
-                            Log.e(TAG, "account reload failed. ${it.localizedMessage}")
-                        }
                 addDocumentChangeListener(currentUser.uid)
             } else {
                 this.currentUser.postValue(null)
@@ -93,7 +84,6 @@ class UserRepository {
     }
 
     fun deleteProfile(): Task<Void>? {
-        Log.i(TAG, "current user before delete account, ${auth.currentUser}")
         auth.currentUser?.uid?.let {
             collection.document(it).delete()
         }

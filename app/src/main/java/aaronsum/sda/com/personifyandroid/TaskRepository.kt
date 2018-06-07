@@ -1,7 +1,6 @@
 package aaronsum.sda.com.personifyandroid
 
 import android.arch.lifecycle.MutableLiveData
-import android.util.Log
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
@@ -17,7 +16,6 @@ data class Task(var name: String = "",
 
 class TaskRepository {
     companion object {
-        private const val TAG = "RepositoryTask"
         private const val COLLECTION_NAME = "tasks"
         private const val SUB_COLLECTION_NAME = "user tasks"
         private const val TASK_IS_DONE = "Done"
@@ -28,7 +26,7 @@ class TaskRepository {
     private lateinit var taskCollection: CollectionReference
     val tasks: MutableLiveData<List<Pair<String, Task>>> = MutableLiveData()
     val doneTasks: MutableLiveData<List<Pair<String, Task>>> = MutableLiveData()
-    private lateinit var snapshotListener : ListenerRegistration
+    private lateinit var snapshotListener: ListenerRegistration
 
     init {
         db.firestoreSettings = Util.persistenceDBSetting
@@ -37,15 +35,8 @@ class TaskRepository {
     fun initUserTaskDocument(userId: String) {
         initUserTaskCollection(userId)
         if (this::taskCollection.isInitialized) {
-            snapshotListener = taskCollection.addSnapshotListener { documentSnapshot, exception ->
-                if (exception != null) {
-                    Log.w(TAG, "Failed to add event listener to tasks collection. ${exception.message}")
-                    return@addSnapshotListener
-                }
-                val source = if (documentSnapshot != null &&
-                        documentSnapshot.metadata.hasPendingWrites()) "Local" else "Server"
+            snapshotListener = taskCollection.addSnapshotListener { documentSnapshot, _ ->
                 documentSnapshot?.documentChanges?.forEach { change ->
-                    Log.i(TAG, "event source: $source")
                     when (change.type) {
                         DocumentChange.Type.ADDED -> onDocumentAdded(change)
                         DocumentChange.Type.MODIFIED -> onDocumentModified(change)
@@ -94,9 +85,6 @@ class TaskRepository {
             val daysSinceMarkedAsDone = Util.getDaysDifference(task.datesMarkedAsDone)
             if (daysSinceMarkedAsDone <= REMOVE_AFTER_NUMBER_OF_DAYS && this::taskCollection.isInitialized) {
                 taskCollection.document(id).delete()
-                        .addOnFailureListener {
-                            Log.e(TAG, "Failed to remove done task after days limit. ${it.localizedMessage}")
-                        }
             }
         }
     }
@@ -163,7 +151,6 @@ class TaskRepository {
                 .addOnSuccessListener {
                     it.documents.forEach { it.reference.delete() }
                 }
-        Log.i(TAG, "deleted user's tasks data")
     }
 
     fun clearTask() {

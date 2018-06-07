@@ -1,16 +1,21 @@
 package aaronsum.sda.com.personifyandroid
 
+import android.Manifest
+import android.app.Activity
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.MediaStore
 import android.support.media.ExifInterface
+import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
+import android.support.v4.content.ContextCompat
 import android.support.v4.content.FileProvider
-import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import com.google.firebase.firestore.FirebaseFirestoreSettings
@@ -30,24 +35,23 @@ object Util {
     val persistenceDBSetting = FirebaseFirestoreSettings.Builder()
             .setPersistenceEnabled(true)
             .build()
+    const val PERMISSION_REQUEST_CODE = 100
 
     fun hideSoftKeyboard(activity: FragmentActivity?, view: View) {
         val inputMethodManager = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.hideSoftInputFromWindow(view.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
     }
 
-    fun cameraIntent(fragment: Fragment): File? {
+    fun chooseImage(fragment: Fragment) {
         val context = fragment.context
-        val file = createImageFIle(context)
-        file?.let { file ->
-            context?.let { context ->
-                val uriForFile = getUriForFile(file, context)
-                val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, uriForFile)
-                fragment.startActivityForResult(intent, SignUpFragment.CAMERA_REQUEST_CODE)
+        context?.let {
+            val intent = Intent(Intent.ACTION_PICK)
+            intent.type = "image/*"
+            val createChooser = Intent.createChooser(intent, "Choose Image")
+            if (createChooser.resolveActivity(context.packageManager) != null) {
+                fragment.startActivityForResult(createChooser, SignUpFragment.IMAGE_REQUEST_CODE)
             }
         }
-        return file
     }
 
     fun getUriForFile(file: File?, context: Context?): Uri? {
@@ -67,30 +71,44 @@ object Util {
                 }
                 return File.createTempFile("tmp", ".jpg", file)
             } catch (exception: IOException) {
-                Log.e(TAG, "unable to create file. ${exception.message}")
             }
         }
         return null
     }
 
-    fun resizeImage(uri: Uri?, file: File, context: Context?): File {
+    fun resizeImage(uri: Uri?, context: Context?): Uri? {
         uri?.let {
-            val openInputStream = context?.contentResolver?.openInputStream(uri)
-            openInputStream?.let {
-                val bitmap = BitmapFactory.decodeStream(openInputStream)
+            val bitmap = getBitmap(uri, context)
+            bitmap?.let {
                 val ratio = 0.5
                 val newImage = Bitmap.createScaledBitmap(bitmap,
                         (bitmap.width * ratio).toInt(),
                         (bitmap.height * ratio).toInt(), false)
                 val outputStream = ByteArrayOutputStream()
                 newImage.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
-                file.writeBytes(outputStream.toByteArray())
+                val file = createImageFIle(context)
+                file?.writeBytes(outputStream.toByteArray())
                 outputStream.flush()
                 outputStream.close()
+                return getUriForFile(file, context)
             }
         }
-        return file
+        return null
     }
+
+    private fun getBitmap(uri: Uri, context: Context?): Bitmap? {
+        context?.let {
+            val cursor = context.contentResolver.query(uri,
+                    arrayOf(MediaStore.Images.Media.DATA),
+                    null, null, null)
+            cursor.moveToFirst()
+            val path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA))
+            cursor.close()
+            return BitmapFactory.decodeFile(path)
+        }
+        return null
+    }
+
 
     fun getPicOrientation(uri: Uri?, context: Context?): String? {
         var rotation: String? = null
@@ -112,9 +130,9 @@ object Util {
     }
 
     fun getDaysDifference(date: String): Int {
-        val date = dateFormat.parse(date)
+        val dateInFormat = dateFormat.parse(date)
         val currentDate = dateFormat.parse(getCurrentDate())
-        return ((date.time - currentDate.time) / (1000 * 60 * 60 * 24)).toInt()
+        return ((dateInFormat.time - currentDate.time) / (1000 * 60 * 60 * 24)).toInt()
     }
 
     fun fetchPhoto(target: Target, picMetadataMetaData: PicMetadata) {
@@ -138,13 +156,39 @@ object Util {
                         }
                     }
                 } catch (exception: NumberFormatException) {
-                    Log.e(TAG, "something wrong with pic orientation. ${picMetadataMetaData.orientation}")
                 }
             }
 
-            override fun onError(e: Exception?) {
-                Log.e(TAG, "something went wrong when fetching photo. ${e?.message}.")
-            }
+            override fun onError(e: Exception?) {}
         })
+    }
+
+    fun checkForPermission(fragment: Fragment) {
+        val context = fragment.context
+        val permissionRequired = Manifest.permission.READ_EXTERNAL_STORAGE
+        context?.let {
+            if (ContextCompat.checkSelfPermission(context, permissionRequired)
+                    != PackageManager.PERMISSION_GRANTED) {
+                if (ActivityCompat.shouldShowRequestPermissionRationale(context as Activity,
+                                permissionRequired)) {
+                    AlertDialog.Builder(context)
+                            .setTitle(context.getString(R.string.alert_title_request_for_permission))
+                            .setMessage(context.getString(R.string.permission_dialog_content))
+                            .setPositiveButton(context.getString(R.string.acknowledge)) { dialog, _ ->
+                                dialog.dismiss()
+                                fragment.requestPermissions(arrayOf(permissionRequired),
+                                        PERMISSION_REQUEST_CODE)
+                            }
+                            .create()
+                            .show()
+                }
+                else {
+                    fragment.requestPermissions(arrayOf(permissionRequired),
+                            PERMISSION_REQUEST_CODE)
+                }
+            } else {
+                chooseImage(fragment)
+            }
+        }
     }
 }

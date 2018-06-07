@@ -1,7 +1,6 @@
 package aaronsum.sda.com.personifyandroid
 
 import android.arch.lifecycle.MutableLiveData
-import android.util.Log
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -21,7 +20,6 @@ data class UserCompletionStatistic(var earliestCompletion: Int,
 
 class UserStatisticRepository {
     companion object {
-        const val TAG = "RepositoryUserStatistic"
         const val COMPLETION_ON_TIME = "completionOnTime"
         const val OVERDUE = "overdue"
         const val NEW_TASK = "newTask"
@@ -39,11 +37,7 @@ class UserStatisticRepository {
 
     fun initialiseCollection(userId: String) {
         document = db.collection(collectionName).document(userId)
-        document.addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
-            firebaseFirestoreException?.let {
-                Log.e(TAG, "Unable to add listener for task stat. ${it.localizedMessage}")
-                return@addSnapshotListener
-            }
+        document.addSnapshotListener { documentSnapshot, _ ->
             documentSnapshot?.let {
                 taskStatistic = documentSnapshot.toObject(TaskStatistic::class.java)
                 taskStatistic?.let {
@@ -109,7 +103,6 @@ class UserStatisticRepository {
     fun deleteStatistic() {
         if (this::document.isInitialized) {
             document.delete()
-            Log.i(TAG, "deleted user's stat.")
         }
     }
 
