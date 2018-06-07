@@ -194,7 +194,7 @@ class ProfileFragment : Fragment(), Target {
                     Util.chooseImage(this@ProfileFragment)
                 } else {
                     Toast.makeText(this@ProfileFragment.context,
-                            "Please enable permission to access you device storage for selection of profile photo.",
+                            context?.getString(R.string.permission_toast),
                             Toast.LENGTH_LONG)
                             .show()
                 }

@@ -3,6 +3,7 @@ package aaronsum.sda.com.personifyandroid
 import android.app.Activity
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
@@ -138,6 +139,21 @@ class SignUpFragment : Fragment(), TextWatcher, Target {
                                     PicMetadata(uriOfFileToUpload.path, picOrientation))
                         }
                     }
+                }
+            }
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        when (requestCode) {
+            Util.PERMISSION_REQUEST_CODE -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Util.chooseImage(this@SignUpFragment)
+                } else {
+                    Toast.makeText(this@SignUpFragment.context,
+                            context?.getString(R.string.permission_toast),
+                            Toast.LENGTH_LONG)
+                            .show()
                 }
             }
         }

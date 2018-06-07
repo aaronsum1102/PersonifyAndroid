@@ -27,6 +27,7 @@
             android:layout_gravity="end"
             android:layout_marginBottom="8dp"
             android:layout_marginEnd="16dp"
+            android:background="@drawable/download"
             android:contentDescription="@string/profile_picture"
             android:scaleType="fitCenter"
             app:layout_constraintBottom_toBottomOf="parent"

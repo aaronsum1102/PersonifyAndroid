@@ -85,7 +85,8 @@
     <string name="view_tasks_that_were_completed">View tasks that were completed.</string>
     <string name="done_tasks">Done Tasks</string>
     <string name="you_have_no_tasks_to_display">You have no tasks to display</string>
-    <string name="alert_title_request_for_permission">Request for permission</string>
+    <string name="alert_title_request_for_permission">Permission Required</string>
     <string name="acknowledge">Acknowledge</string>
-    <string name="permission_dialog_content">Permission to read your phone storage is required for choosing and display your profile picture only.</string>
+    <string name="permission_dialog_content">Permission to read your phone storage is required for choosing and displaying your profile picture.</string>
+    <string name="permission_toast">Please enable permission to access you device storage.</string>
 </resources>
