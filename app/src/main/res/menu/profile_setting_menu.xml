@@ -9,4 +9,8 @@
         android:id="@+id/actionLogOut"
         android:title="@string/log_out"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/actionChangeConsent"
+        android:title="@string/change_consent_for_data_collection"
+        app:showAsAction="never"/>
 </menu>

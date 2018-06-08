@@ -11,17 +11,17 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
-import android.support.constraint.ConstraintSet
+import android.support.constraint.ConstraintLayout
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.view.*
 import android.widget.PopupMenu
 import android.widget.Toast
-import com.google.android.gms.ads.AdListener
-import com.google.android.gms.ads.AdRequest
+import com.google.ads.consent.ConsentInformation
+import com.google.android.gms.ads.AdView
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
-import kotlinx.android.synthetic.main.fragment_profile_with_ad.*
+import kotlinx.android.synthetic.main.fragment_profile.*
 import java.lang.Exception
 import kotlin.math.abs
 
@@ -42,7 +42,7 @@ class ProfileFragment : Fragment(), Target {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initialisedToolbar()
-        loadAd()
+        ConsentUtil.displayAdd(this, R.layout.fragment_profile, R.layout.fragment_profile_with_ad)
 
         userViewModel = ViewModelProviders.of(activity!!)[UserViewModel::class.java]
         photoViewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
@@ -149,6 +149,16 @@ class ProfileFragment : Fragment(), Target {
                     }
                 }
             }
+
+            R.id.actionChangeConsent -> {
+                ConsentInformation.getInstance(context).reset()
+                val adView = view?.findViewById<AdView>(R.id.adView)
+                view?.findViewById<ConstraintLayout>(R.id.root)?.let { layout ->
+                    adView.let {
+                        layout.removeView(adView)
+                    }
+                }
+            }
         }
         return true
     }
@@ -203,26 +213,6 @@ class ProfileFragment : Fragment(), Target {
                             .show()
                 }
             }
-        }
-    }
-
-    private fun loadAd() {
-        adView.loadAd(Util.adRequest())
-        adView.adListener = object : AdListener() {
-            override fun onAdLoaded() {}
-
-            override fun onAdFailedToLoad(errorCode: Int) {
-                ConstraintSet().run {
-                    clone(context, R.layout.fragment_profile)
-                    applyTo(root)
-                }
-            }
-
-            override fun onAdOpened() {}
-
-            override fun onAdLeftApplication() {}
-
-            override fun onAdClosed() {}
         }
     }
 }

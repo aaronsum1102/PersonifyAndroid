@@ -49,6 +49,7 @@ dependencies {
     implementation 'com.android.support:cardview-v7:27.1.1'
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'com.google.android.gms:play-services-ads:15.0.1'
+    implementation 'com.google.android.ads.consent:consent-library:1.0.4'
 }
 
 apply plugin: 'com.google.gms.google-services'
