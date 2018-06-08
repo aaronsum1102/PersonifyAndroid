@@ -7,18 +7,22 @@ import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.support.constraint.ConstraintSet
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdRequest
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
-import kotlinx.android.synthetic.main.fragment_tasks_list.*
+import kotlinx.android.synthetic.main.fragment_tasks_list_with_ad.*
 import java.lang.Exception
 import kotlin.math.abs
 
@@ -33,13 +37,14 @@ class TaskListFragment : Fragment(), OnTaskClickListener, Target {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_tasks_list, container, false)
+        return inflater.inflate(R.layout.fragment_tasks_list_with_ad, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         (activity as AppCompatActivity).setSupportActionBar(toolbar)
         (activity as AppCompatActivity).supportActionBar?.setDisplayShowTitleEnabled(false)
+        loadAd()
 
         val viewModel = ViewModelProviders.of(activity!!)[TaskViewModel::class.java]
         val userStatisticViewModel = ViewModelProviders.of(activity!!)[UserStatisticViewModel::class.java]
@@ -68,7 +73,6 @@ class TaskListFragment : Fragment(), OnTaskClickListener, Target {
                 }
                 adapter.tasks = tasks
                 adapter.notifyDataSetChanged()
-
             }
         })
 
@@ -136,6 +140,26 @@ class TaskListFragment : Fragment(), OnTaskClickListener, Target {
 
     override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
         toProfilePage?.background = BitmapDrawable(resources, bitmap)
+    }
+
+    private fun loadAd() {
+        adView.loadAd(Util.adRequest())
+        adView.adListener = object : AdListener() {
+            override fun onAdLoaded() {}
+
+            override fun onAdFailedToLoad(errorCode: Int) {
+                ConstraintSet().run {
+                    clone(context, R.layout.fragment_tasks_list)
+                    applyTo(root)
+                }
+            }
+
+            override fun onAdOpened() {}
+
+            override fun onAdLeftApplication() {}
+
+            override fun onAdClosed() {}
+        }
     }
 }
 

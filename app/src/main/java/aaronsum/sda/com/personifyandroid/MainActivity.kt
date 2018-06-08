@@ -2,6 +2,7 @@ package aaronsum.sda.com.personifyandroid
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import com.google.android.gms.ads.MobileAds
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -14,5 +15,7 @@ class MainActivity : AppCompatActivity() {
                     .replace(R.id.container, WelcomeScreenFragment())
                     .commit()
         }
+
+        MobileAds.initialize(this, getString(R.string.adMob_app_id))
     }
 }

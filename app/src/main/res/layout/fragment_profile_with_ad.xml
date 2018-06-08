@@ -140,12 +140,11 @@
         android:layout_marginTop="16dp"
         android:text="@string/no_data_yet"
         android:textAppearance="@style/TextAppearance.H6"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/adView"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="@+id/longestOverDueTitle"
         app:layout_constraintTop_toBottomOf="@+id/longestOverDueTitle"
         tools:text="5 days" />
-
 
     <ImageView
         android:id="@+id/profilePhoto"
@@ -174,5 +173,16 @@
         app:layout_constraintEnd_toEndOf="@+id/profilePhoto"
         app:srcCompat="@drawable/ic_add_black_24dp" />
 
+    <com.google.android.gms.ads.AdView
+        xmlns:ads="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/adView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        ads:adSize="BANNER"
+        ads:adUnitId="@string/test_ad_unit_id"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
+    </com.google.android.gms.ads.AdView>
 </android.support.constraint.ConstraintLayout>

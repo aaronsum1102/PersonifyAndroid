@@ -7,6 +7,7 @@ import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.support.constraint.ConstraintSet
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
@@ -16,9 +17,11 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdRequest
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
-import kotlinx.android.synthetic.main.fragment_done_tasks_list.*
+import kotlinx.android.synthetic.main.fragment_done_tasks_list_with_ad.*
 import java.lang.Exception
 import kotlin.math.abs
 
@@ -28,13 +31,13 @@ class DoneTasksFragment : Fragment(), Target {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_done_tasks_list, container, false)
+        return inflater.inflate(R.layout.fragment_done_tasks_list_with_ad, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         initialisedToolbar()
+        loadAd()
 
         toProfilePage.setOnClickListener {
             fragmentManager
@@ -93,6 +96,26 @@ class DoneTasksFragment : Fragment(), Target {
 
     override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
         toProfilePage?.background = BitmapDrawable(resources, bitmap)
+    }
+
+    private fun loadAd() {
+        adView.loadAd(Util.adRequest())
+        adView.adListener = object : AdListener() {
+            override fun onAdLoaded() {}
+
+            override fun onAdFailedToLoad(errorCode: Int) {
+                ConstraintSet().run {
+                    clone(context, R.layout.fragment_done_tasks)
+                    applyTo(root)
+                }
+            }
+
+            override fun onAdOpened() {}
+
+            override fun onAdLeftApplication() {}
+
+            override fun onAdClosed() {}
+        }
     }
 }
 
