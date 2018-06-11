@@ -102,7 +102,7 @@ class SignUpFragment : Fragment(), TextWatcher, Target {
                             it.result.storage.downloadUrl.addOnSuccessListener { url ->
                                 picOrientation?.let {
                                     photoViewModel.writeUserProfilePictureURL(PicMetadata(
-                                            url.path,
+                                            url.toString(),
                                             picOrientation))
                                 }
                             }
@@ -126,18 +126,12 @@ class SignUpFragment : Fragment(), TextWatcher, Target {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
             IMAGE_REQUEST_CODE -> {
                 if (resultCode == Activity.RESULT_OK) {
                     data?.data?.let {
                         uriOfFileToUpload = it
-                        val picOrientation = Util.getPicOrientation(uriOfFileToUpload,
-                                this@SignUpFragment.context)
-                        picOrientation?.let {
-                            Util.fetchPhoto(this,
-                                    PicMetadata(uriOfFileToUpload.path, picOrientation))
-                        }
+                        Picasso.get().load(it).centerCrop().resize(600, 600).into(this)
                     }
                 }
             }
