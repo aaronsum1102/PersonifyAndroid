@@ -75,7 +75,6 @@ object ConsentUtil {
                     })
                     .withPersonalizedAdsOption()
                     .withNonPersonalizedAdsOption()
-                    .withAdFreeOption()
                     .build()
             form?.load()
         }

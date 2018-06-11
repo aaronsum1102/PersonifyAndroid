@@ -89,5 +89,6 @@
     <string name="acknowledge">Acknowledge</string>
     <string name="permission_dialog_content">Permission to read your phone storage is required for choosing and displaying your profile picture.</string>
     <string name="permission_toast">Please enable permission to access you device storage.</string>
-    <string name="change_consent_for_data_collection">Revoke your consent</string>
+    <string name="change_consent_for_data_collection">Revoke consent</string>
+    <string name="flavor_paid">paid</string>
 </resources>

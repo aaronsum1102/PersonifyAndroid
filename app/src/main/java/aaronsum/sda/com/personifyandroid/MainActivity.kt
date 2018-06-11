@@ -16,6 +16,6 @@ class MainActivity : AppCompatActivity() {
                     .commit()
         }
 
-        MobileAds.initialize(this, getString(R.string.ad_unit_id))
+        MobileAds.initialize(this, getString(R.string.adMob_app_id))
     }
 }

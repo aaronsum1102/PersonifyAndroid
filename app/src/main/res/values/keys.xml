@@ -2,7 +2,6 @@
 <resources>
     <string name="adMob_app_id">ca-app-pub-6741297129613151~2830900486</string>
     <string name="ad_unit_id">ca-app-pub-6741297129613151/5440628245</string>
-    <string name="test_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
     <string name="publisher_id">pub-6741297129613151</string>
     <string name="privacy_policy">https://aaronsum1102.github.io/PersonifyAndroid/</string>
 </resources>

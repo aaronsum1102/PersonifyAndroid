@@ -28,13 +28,13 @@ class DoneTasksFragment : Fragment(), Target {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_done_tasks_list_with_ad, container, false)
+        return inflater.inflate(R.layout.fragment_done_tasks_with_ad, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initialisedToolbar()
-        ConsentUtil.displayAdd(this, R.layout.fragment_done_tasks, R.layout.fragment_done_tasks_list_with_ad)
+        ConsentUtil.displayAdd(this, R.layout.fragment_done_tasks, R.layout.fragment_done_tasks_with_ad)
 
         toProfilePage.setOnClickListener {
             fragmentManager
