@@ -118,8 +118,10 @@ object ConsentUtil {
         val root = view?.findViewById<ConstraintLayout>(R.id.root)
         val set = ConstraintSet()
         set.run {
-            clone(context, layoutId)
-            applyTo(root)
+            context?.let {
+                clone(context, layoutId)
+                applyTo(root)
+            }
         }
     }
 }

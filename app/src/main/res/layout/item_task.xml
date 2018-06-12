@@ -4,12 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/itemTask"
     android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:layout_marginEnd="8dp"
     android:layout_marginStart="8dp"
     android:layout_marginTop="8dp"
-    android:layout_height="80dp"
-    app:cardCornerRadius="10dp"
-    android:background="@color/textVsPrimary">
+    android:background="@color/textVsPrimary"
+    app:cardCornerRadius="10dp">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
@@ -17,22 +17,25 @@
 
         <TextView
             android:id="@+id/taskName"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="24dp"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:textAppearance="@style/TextAppearance.H6"
             app:layout_constraintBottom_toTopOf="@+id/dueDate"
+            app:layout_constraintEnd_toStartOf="@+id/daysLeftText"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_chainStyle="spread_inside"
             tools:text="Laundry" />
 
         <TextView
             android:id="@+id/dueDate"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="8dp"
             android:layout_marginTop="8dp"
             android:textAppearance="@style/TextAppearance.subtitle1"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -69,10 +72,11 @@
 
         <TextView
             android:id="@+id/daysLeftText"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
             android:textAppearance="@style/TextAppearance.H6"
-            app:layout_constraintEnd_toEndOf="@+id/priority"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/taskName"
             tools:text="0 days" />
     </android.support.constraint.ConstraintLayout>
