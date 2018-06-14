@@ -17,6 +17,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import kotlinx.android.synthetic.main.fragment_signup.*
@@ -39,6 +40,10 @@ class SignUpFragment : Fragment(), TextWatcher, Target {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        activity?.let {
+            val analytics = FirebaseAnalytics.getInstance(it)
+            analytics.setCurrentScreen(it, "SignUp", null)
+        }
         addTextWatcher()
 
         createAccountButton.setOnClickListener {
@@ -129,9 +134,12 @@ class SignUpFragment : Fragment(), TextWatcher, Target {
         when (requestCode) {
             IMAGE_REQUEST_CODE -> {
                 if (resultCode == Activity.RESULT_OK) {
-                    data?.data?.let {
-                        uriOfFileToUpload = it
-                        Picasso.get().load(it).centerCrop().resize(600, 600).into(this)
+                    data?.data?.let {uri ->
+                        uriOfFileToUpload = uri
+                        val picOrientation = Util.getPicOrientation(uri, context)
+                        picOrientation?.let {
+                            Util.fetchPhoto(this, PicMetadata(uri.toString(), picOrientation))
+                        }
                     }
                 }
             }

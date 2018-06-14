@@ -16,6 +16,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import com.google.android.gms.tasks.Task
+import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.android.synthetic.main.fragment_edit_profile.*
 
 class EditProfileFragment : Fragment(), TextWatcher {
@@ -25,7 +26,10 @@ class EditProfileFragment : Fragment(), TextWatcher {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        activity?.let {
+            val analytics = FirebaseAnalytics.getInstance(it)
+            analytics.setCurrentScreen(it, "EditProfile", null)
+        }
         initialisedToolbar()
         addTextWatcher()
 

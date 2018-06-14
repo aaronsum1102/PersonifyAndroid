@@ -16,9 +16,10 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
-import kotlinx.android.synthetic.main.fragment_done_tasks.*
+import kotlinx.android.synthetic.main.fragment_done_tasks_with_ad.*
 import java.lang.Exception
 import kotlin.math.abs
 
@@ -34,6 +35,10 @@ class DoneTasksFragment : Fragment(), Target {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initialisedToolbar()
+        activity?.let {
+            val analytics = FirebaseAnalytics.getInstance(it)
+            analytics.setCurrentScreen(it, "DoneTasks", null)
+        }
         ConsentUtil.displayAdd(this, R.layout.fragment_done_tasks, R.layout.fragment_done_tasks_with_ad)
 
         toProfilePage.setOnClickListener {
@@ -71,6 +76,21 @@ class DoneTasksFragment : Fragment(), Target {
                 adapter.notifyDataSetChanged()
             }
         })
+    }
+
+    override fun onResume() {
+        adView?.resume()
+        super.onResume()
+    }
+
+    override fun onPause() {
+        adView?.pause()
+        super.onPause()
+    }
+
+    override fun onDestroy() {
+        adView?.destroy()
+        super.onDestroy()
     }
 
     private fun initialisedToolbar() {

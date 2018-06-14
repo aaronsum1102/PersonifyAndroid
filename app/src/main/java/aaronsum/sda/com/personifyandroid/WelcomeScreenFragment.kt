@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import com.google.firebase.analytics.FirebaseAnalytics
 
 class WelcomeScreenFragment : Fragment() {
     companion object {
@@ -16,6 +17,7 @@ class WelcomeScreenFragment : Fragment() {
         const val STACK_NAME = "welcome"
     }
 
+    private lateinit var analytics: FirebaseAnalytics
     private val welcomeScreenTime: Long = 1500
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -24,6 +26,11 @@ class WelcomeScreenFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        activity?.let {
+            analytics = FirebaseAnalytics.getInstance(it)
+            analytics.setCurrentScreen(it, "WelcomeScreen", null)
+        }
+
         signInStateCheckForAction()
     }
 
@@ -88,9 +95,13 @@ class WelcomeScreenFragment : Fragment() {
         val bundle = Bundle()
         bundle.putString(USER_ID, userId)
         taskListFragment.arguments = bundle
+        if (this::analytics.isInitialized) {
+            analytics.logEvent(FirebaseAnalytics.Event.LOGIN, bundle)
+        }
         fragmentManager
                 ?.beginTransaction()
                 ?.replace(R.id.container, taskListFragment)
                 ?.commit()
+
     }
 }

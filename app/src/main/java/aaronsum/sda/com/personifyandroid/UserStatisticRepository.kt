@@ -1,6 +1,7 @@
 package aaronsum.sda.com.personifyandroid
 
 import android.arch.lifecycle.MutableLiveData
+import com.crashlytics.android.Crashlytics
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -37,7 +38,10 @@ class UserStatisticRepository {
 
     fun initialiseCollection(userId: String) {
         document = db.collection(collectionName).document(userId)
-        document.addSnapshotListener { documentSnapshot, _ ->
+        document.addSnapshotListener { documentSnapshot, exception ->
+            exception?.let {
+                Crashlytics.logException(exception)
+            }
             documentSnapshot?.let {
                 taskStatistic = documentSnapshot.toObject(TaskStatistic::class.java)
                 taskStatistic?.let {

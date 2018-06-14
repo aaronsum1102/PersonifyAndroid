@@ -1,6 +1,7 @@
 package aaronsum.sda.com.personifyandroid
 
 import android.arch.lifecycle.MutableLiveData
+import com.crashlytics.android.Crashlytics
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
@@ -35,7 +36,10 @@ class TaskRepository {
     fun initUserTaskDocument(userId: String) {
         initUserTaskCollection(userId)
         if (this::taskCollection.isInitialized) {
-            snapshotListener = taskCollection.addSnapshotListener { documentSnapshot, _ ->
+            snapshotListener = taskCollection.addSnapshotListener { documentSnapshot, exception ->
+                exception?.let {
+                    Crashlytics.logException(exception)
+                }
                 documentSnapshot?.documentChanges?.forEach { change ->
                     when (change.type) {
                         DocumentChange.Type.ADDED -> onDocumentAdded(change)
@@ -64,9 +68,8 @@ class TaskRepository {
 
         removedTaskAfterMarkedAsDone(taskFromDB, document.id)
 
-        taskFromDB.daysLeft = Util.getDaysDifference(taskFromDB.dueDate)
-
         if (taskFromDB.status != TASK_IS_DONE) {
+            taskFromDB.daysLeft = Util.getDaysDifference(taskFromDB.dueDate)
             temporaryTasks.add(document.id to taskFromDB)
         } else {
             temporaryDoneTasks.add(document.id to taskFromDB)

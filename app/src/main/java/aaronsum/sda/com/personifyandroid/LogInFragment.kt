@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.android.synthetic.main.fragment_user_login.*
 
 class LogInFragment : Fragment(), TextWatcher {
@@ -23,7 +24,10 @@ class LogInFragment : Fragment(), TextWatcher {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        activity?.let {
+            val analytics = FirebaseAnalytics.getInstance(it)
+            analytics.setCurrentScreen(it, "LogIn", null)
+        }
         emailText.addTextChangedListener(this)
         passwordText.addTextChangedListener(this)
 

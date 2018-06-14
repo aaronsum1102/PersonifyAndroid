@@ -20,10 +20,6 @@
         <item name="android:fontFamily">@font/pacifico</item>
     </style>
 
-    <style name="AppTheme.TextColor" parent="TextAppearance.AppCompat">
-        <item name="android:textColor">@color/primaryTextColor</item>
-    </style>
-
     <style name="TextAppearance.H5" parent="TextAppearance.AppCompat.Caption">
         <item name="android:textSize">24sp</item>
         <item name="android:textColor">@color/primaryTextColor</item>

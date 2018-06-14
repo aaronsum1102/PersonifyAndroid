@@ -2,6 +2,7 @@ package aaronsum.sda.com.personifyandroid
 
 import android.arch.lifecycle.MutableLiveData
 import android.net.Uri
+import com.crashlytics.android.Crashlytics
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
@@ -28,7 +29,10 @@ class PhotoRepository {
 
     fun initDocument(userId: String) {
         document = collection.document(userId)
-        document.addSnapshotListener { documentSnapshot, _ ->
+        document.addSnapshotListener { documentSnapshot, exception ->
+            exception?.let {
+                Crashlytics.logException(exception)
+            }
             val profilePic = documentSnapshot?.toObject(PicMetadata::class.java)
             profilePic?.let {
                 profilePhotoMetadata.postValue(profilePic)

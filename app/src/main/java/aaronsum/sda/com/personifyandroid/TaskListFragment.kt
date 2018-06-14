@@ -16,9 +16,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
-import kotlinx.android.synthetic.main.fragment_tasks_list.*
+import kotlinx.android.synthetic.main.fragment_tasks_list_with_ad.*
 import java.lang.Exception
 import kotlin.math.abs
 
@@ -40,6 +41,10 @@ class TaskListFragment : Fragment(), OnTaskClickListener, Target {
         super.onViewCreated(view, savedInstanceState)
         (activity as AppCompatActivity).setSupportActionBar(toolbar)
         (activity as AppCompatActivity).supportActionBar?.setDisplayShowTitleEnabled(false)
+        activity?.let {
+            val analytics = FirebaseAnalytics.getInstance(it)
+            analytics.setCurrentScreen(it, "TaskList", null)
+        }
         ConsentUtil.displayAdd(this, R.layout.fragment_tasks_list, R.layout.fragment_tasks_list_with_ad)
 
         val viewModel = ViewModelProviders.of(activity!!)[TaskViewModel::class.java]
@@ -48,7 +53,9 @@ class TaskListFragment : Fragment(), OnTaskClickListener, Target {
 
         photoViewModel.profilePhotoMetadata.observe(this, Observer { picMetadata ->
             picMetadata?.let {
-                Util.fetchPhoto(this, it)
+                if (it.url.isNotEmpty()) {
+                    Util.fetchPhoto(this, it)
+                }
             }
         })
 
@@ -116,6 +123,21 @@ class TaskListFragment : Fragment(), OnTaskClickListener, Target {
                     ?.addToBackStack(TASK_LIST_BACK_STACK)
                     ?.commit()
         }
+    }
+
+    override fun onResume() {
+        adView?.resume()
+        super.onResume()
+    }
+
+    override fun onPause() {
+        adView?.pause()
+        super.onPause()
+    }
+
+    override fun onDestroy() {
+        adView?.destroy()
+        super.onDestroy()
     }
 
     override fun onTaskClick(task: Task, taskId: String) {

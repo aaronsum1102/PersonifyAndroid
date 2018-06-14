@@ -19,9 +19,10 @@ import android.widget.PopupMenu
 import android.widget.Toast
 import com.google.ads.consent.ConsentInformation
 import com.google.android.gms.ads.AdView
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
-import kotlinx.android.synthetic.main.fragment_profile.*
+import kotlinx.android.synthetic.main.fragment_profile_with_ad.*
 import java.lang.Exception
 import kotlin.math.abs
 
@@ -42,6 +43,10 @@ class ProfileFragment : Fragment(), Target {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initialisedToolbar()
+        activity?.let {
+            val analytics = FirebaseAnalytics.getInstance(it)
+            analytics.setCurrentScreen(it, "Profile", null)
+        }
         ConsentUtil.displayAdd(this, R.layout.fragment_profile, R.layout.fragment_profile_with_ad)
 
         userViewModel = ViewModelProviders.of(activity!!)[UserViewModel::class.java]
@@ -55,7 +60,11 @@ class ProfileFragment : Fragment(), Target {
         })
 
         photoViewModel.profilePhotoMetadata.observe(this, Observer { picMetadata ->
-            picMetadata?.let { Util.fetchPhoto(this, it) }
+            picMetadata?.let {
+                if (it.url.isNotEmpty()) {
+                    Util.fetchPhoto(this, it)
+                }
+            }
         })
 
         changeProfilePicButton.setOnClickListener {
@@ -83,6 +92,21 @@ class ProfileFragment : Fragment(), Target {
                 }
             }
         })
+    }
+
+    override fun onResume() {
+        adView?.resume()
+        super.onResume()
+    }
+
+    override fun onPause() {
+        adView?.pause()
+        super.onPause()
+    }
+
+    override fun onDestroy() {
+        adView?.destroy()
+        super.onDestroy()
     }
 
     private fun initialisedToolbar() {

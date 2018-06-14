@@ -18,6 +18,7 @@ import android.support.v4.content.ContextCompat
 import android.support.v4.content.FileProvider
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import com.crashlytics.android.Crashlytics
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
@@ -30,7 +31,6 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 object Util {
-    private const val TAG = "util"
     val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
     val persistenceDBSetting = FirebaseFirestoreSettings.Builder()
             .setPersistenceEnabled(true)
@@ -54,7 +54,7 @@ object Util {
         }
     }
 
-    fun getUriForFile(file: File?, context: Context?): Uri? {
+    private fun getUriForFile(file: File?, context: Context?): Uri? {
         val authority = "${context?.packageName}.fileprovider"
         if (file != null && context != null) {
             return FileProvider.getUriForFile(context, authority, file)
@@ -71,6 +71,7 @@ object Util {
                 }
                 return File.createTempFile("tmp", ".jpg", file)
             } catch (exception: IOException) {
+                Crashlytics.logException(exception)
             }
         }
         return null
@@ -156,6 +157,7 @@ object Util {
                         }
                     }
                 } catch (exception: NumberFormatException) {
+                    Crashlytics.logException(exception)
                 }
             }
 

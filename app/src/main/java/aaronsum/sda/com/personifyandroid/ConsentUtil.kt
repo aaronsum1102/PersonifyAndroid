@@ -26,7 +26,7 @@ object ConsentUtil {
                 consentInformation.requestConsentInfoUpdate(arrayOf(context.getString(R.string.publisher_id)),
                         object : ConsentInfoUpdateListener {
                             override fun onFailedToUpdateConsentInfo(reason: String?) {
-                                setLayout(fragment, layoutWithoutAd)
+                                setLayout(fragment, layoutWithAd)
                             }
 
                             override fun onConsentInfoUpdated(consentStatus: ConsentStatus?) {
@@ -37,12 +37,12 @@ object ConsentUtil {
                                     else -> {
                                         if (consentInformation.isRequestLocationInEeaOrUnknown) {
                                             if (consentStatus == ConsentStatus.PERSONALIZED) {
-                                                loadAd(fragment, layoutWithoutAd, adRequest(null, null))
+                                                loadAd(fragment, layoutWithAd, adRequest(null, null))
                                             } else {
-                                                loadAd(fragment, layoutWithoutAd, adRequest("npa", "1"))
+                                                loadAd(fragment, layoutWithAd, adRequest("npa", "1"))
                                             }
                                         } else {
-                                            loadAd(fragment, layoutWithoutAd, adRequest(null, null))
+                                            loadAd(fragment, layoutWithAd, adRequest(null, null))
                                         }
                                     }
                                 }
@@ -80,7 +80,7 @@ object ConsentUtil {
         }
     }
 
-    private fun loadAd(fragment: Fragment, @LayoutRes layoutIdWithoutAd: Int, adRequest: AdRequest) {
+    private fun loadAd(fragment: Fragment, @LayoutRes layoutId: Int, adRequest: AdRequest) {
         val view = fragment.view
         view?.let {
             val adView = view.findViewById<AdView>(R.id.adView)
@@ -89,7 +89,7 @@ object ConsentUtil {
                 override fun onAdLoaded() {}
 
                 override fun onAdFailedToLoad(errorCode: Int) {
-                    setLayout(fragment, layoutIdWithoutAd)
+                    setLayout(fragment, layoutId)
                 }
 
                 override fun onAdOpened() {}
@@ -114,13 +114,15 @@ object ConsentUtil {
 
     private fun setLayout(fragment: Fragment, @LayoutRes layoutId: Int) {
         val context = fragment.context
-        val view = fragment.view
+        val view = fragment.activity
         val root = view?.findViewById<ConstraintLayout>(R.id.root)
         val set = ConstraintSet()
-        set.run {
-            context?.let {
-                clone(context, layoutId)
-                applyTo(root)
+        context?.let {
+            root?.let {
+                set.run {
+                    clone(context, layoutId)
+                    applyTo(root)
+                }
             }
         }
     }

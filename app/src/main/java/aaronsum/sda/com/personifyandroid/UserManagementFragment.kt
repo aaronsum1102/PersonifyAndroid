@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.android.synthetic.main.fragment_user_management.*
 
 class UserManagementFragment : Fragment() {
@@ -14,6 +15,11 @@ class UserManagementFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         if (savedInstanceState == null) {
+            activity?.let {
+                val analytics = FirebaseAnalytics.getInstance(it)
+                analytics.setCurrentScreen(it, "UserManagement", null)
+            }
+
             signUpButton.setOnClickListener {
                 fragmentManager
                         ?.beginTransaction()

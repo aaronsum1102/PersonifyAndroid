@@ -8,14 +8,12 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
+        MobileAds.initialize(this, getString(R.string.adMob_app_id))
         if (savedInstanceState == null) {
             supportFragmentManager
                     .beginTransaction()
                     .replace(R.id.container, WelcomeScreenFragment())
                     .commit()
         }
-
-        MobileAds.initialize(this, getString(R.string.adMob_app_id))
     }
 }

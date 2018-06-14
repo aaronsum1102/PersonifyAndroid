@@ -1,6 +1,7 @@
 package aaronsum.sda.com.personifyandroid
 
 import android.arch.lifecycle.MutableLiveData
+import com.crashlytics.android.Crashlytics
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
@@ -24,7 +25,10 @@ class UserRepository {
     }
 
     private fun addDocumentChangeListener(userId: String) {
-        collection.document(userId).addSnapshotListener { documentSnapshot, _ ->
+        collection.document(userId).addSnapshotListener { documentSnapshot, exception ->
+            exception?.let {
+                Crashlytics.logException(exception)
+            }
             documentSnapshot?.let {
                 val user = it.toObject(User::class.java)
                 currentUser.postValue(user)
