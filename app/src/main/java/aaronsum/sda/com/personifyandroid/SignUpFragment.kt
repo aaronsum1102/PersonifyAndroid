@@ -1,7 +1,7 @@
 package aaronsum.sda.com.personifyandroid
 
 import android.app.Activity
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -9,8 +9,8 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -27,12 +27,13 @@ data class UserInfo(val name: String,
                     val email: String,
                     val password: String)
 
-class SignUpFragment : Fragment(), TextWatcher, Target {
+class SignUpFragment : androidx.fragment.app.Fragment(), TextWatcher, Target {
     companion object {
         const val IMAGE_REQUEST_CODE = 100
     }
 
     private lateinit var uriOfFileToUpload: Uri
+    private lateinit var analytics: FirebaseAnalytics
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_signup, container, false)
@@ -41,7 +42,7 @@ class SignUpFragment : Fragment(), TextWatcher, Target {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         activity?.let {
-            val analytics = FirebaseAnalytics.getInstance(it)
+            analytics = FirebaseAnalytics.getInstance(it)
             analytics.setCurrentScreen(it, "SignUp", null)
         }
         addTextWatcher()
@@ -52,6 +53,10 @@ class SignUpFragment : Fragment(), TextWatcher, Target {
                     nameText.text.toString(),
                     emailText.text.toString(),
                     passwordText.text.toString()))
+            if(this::analytics.isInitialized) {
+                analytics.logEvent(FirebaseAnalytics.Event.SIGN_UP, null)
+            }
+
         }
 
         addPhoto.setOnClickListener {
@@ -123,7 +128,7 @@ class SignUpFragment : Fragment(), TextWatcher, Target {
                     .show()
         }
         fragmentManager?.popBackStack(WelcomeScreenFragment.STACK_NAME,
-                FragmentManager.POP_BACK_STACK_INCLUSIVE)
+                androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE)
         fragmentManager
                 ?.beginTransaction()
                 ?.replace(R.id.container, TaskListFragment())

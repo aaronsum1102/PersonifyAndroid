@@ -1,13 +1,13 @@
 package aaronsum.sda.com.personifyandroid
 
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
-import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -19,7 +19,7 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.android.synthetic.main.fragment_edit_profile.*
 
-class EditProfileFragment : Fragment(), TextWatcher {
+class EditProfileFragment : androidx.fragment.app.Fragment(), TextWatcher {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_edit_profile, container, false)
     }
@@ -52,7 +52,7 @@ class EditProfileFragment : Fragment(), TextWatcher {
                         registerNewProfileInfo(userViewModel)
                         Util.hideSoftKeyboard(activity, view)
                         fragmentManager?.popBackStack(TaskListFragment.TASK_LIST_BACK_STACK,
-                                FragmentManager.POP_BACK_STACK_INCLUSIVE)
+                                androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE)
                     }
                     ?.addOnFailureListener { exception ->
                         context?.let {
@@ -70,7 +70,7 @@ class EditProfileFragment : Fragment(), TextWatcher {
         AlertDialog.Builder(context)
                 .setTitle(getString(R.string.alert_title_delete_profile))
                 .setMessage(getString(R.string.alert_content_delete_profile))
-                .setPositiveButton(getString(R.string.confirm), { dialog, _ ->
+                .setPositiveButton(getString(R.string.confirm)) { dialog, _ ->
                     if (password.isEmpty()) {
                         Toast.makeText(context,
                                 "Please enter your current password in the form for confirmation.",
@@ -93,8 +93,8 @@ class EditProfileFragment : Fragment(), TextWatcher {
                                     Toast.makeText(context, it.localizedMessage, Toast.LENGTH_LONG).show()
                                 }
                     }
-                })
-                .setNegativeButton(R.string.cancel, { dialog, _ -> dialog.dismiss() })
+                }
+                .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }
                 .create()
                 .show()
     }
@@ -114,7 +114,7 @@ class EditProfileFragment : Fragment(), TextWatcher {
         view?.let { Util.hideSoftKeyboard(activity, it) }
         fragmentManager?.apply {
             popBackStack(TaskListFragment.TASK_LIST_BACK_STACK,
-                    FragmentManager.POP_BACK_STACK_INCLUSIVE)
+                    androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE)
             beginTransaction()
                     .replace(R.id.container, UserManagementFragment())
                     .commit()

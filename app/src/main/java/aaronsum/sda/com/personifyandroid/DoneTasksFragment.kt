@@ -1,16 +1,16 @@
 package aaronsum.sda.com.personifyandroid
 
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.RecyclerView
+import androidx.fragment.app.Fragment
+import androidx.core.content.ContextCompat
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -23,7 +23,7 @@ import kotlinx.android.synthetic.main.fragment_done_tasks_with_ad.*
 import java.lang.Exception
 import kotlin.math.abs
 
-class DoneTasksFragment : Fragment(), Target {
+class DoneTasksFragment : androidx.fragment.app.Fragment(), Target {
     companion object {
         const val BACK_STACK = "done task"
     }
@@ -116,7 +116,7 @@ class DoneTasksFragment : Fragment(), Target {
     }
 }
 
-class DoneTasksViewAdapter : RecyclerView.Adapter<DoneTasksViewHolder>() {
+class DoneTasksViewAdapter : androidx.recyclerview.widget.RecyclerView.Adapter<DoneTasksViewHolder>() {
     var doneTasks: List<Pair<String, Task>> = listOf()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DoneTasksViewHolder {
@@ -133,7 +133,7 @@ class DoneTasksViewAdapter : RecyclerView.Adapter<DoneTasksViewHolder>() {
     }
 }
 
-class DoneTasksViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+class DoneTasksViewHolder(itemView: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
     fun bind(doneTask: Pair<String, Task>) {
         val task = doneTask.second
         itemView.findViewById<TextView>(R.id.taskName).text = task.name

@@ -1,10 +1,10 @@
 package aaronsum.sda.com.personifyandroid
 
 import android.os.Bundle
-import android.support.annotation.LayoutRes
-import android.support.constraint.ConstraintLayout
-import android.support.constraint.ConstraintSet
-import android.support.v4.app.Fragment
+import androidx.annotation.LayoutRes
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
+import androidx.fragment.app.Fragment
 import com.google.ads.consent.*
 import com.google.ads.mediation.admob.AdMobAdapter
 import com.google.android.gms.ads.AdListener
@@ -14,7 +14,9 @@ import java.net.URL
 
 object ConsentUtil {
     fun displayAdd(fragment: Fragment, @LayoutRes layoutWithAd: Int, @LayoutRes layoutWithoutAd: Int) {
-        verifyConsentStatusBeforeAction(fragment, layoutWithAd, layoutWithoutAd)
+        if (!(BuildConfig.DEBUG)) {
+            verifyConsentStatusBeforeAction(fragment, layoutWithAd, layoutWithoutAd)
+        }
     }
 
     private fun verifyConsentStatusBeforeAction(fragment: Fragment, @LayoutRes layoutWithAd: Int, @LayoutRes layoutWithoutAd: Int) {

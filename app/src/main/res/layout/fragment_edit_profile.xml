@@ -6,11 +6,11 @@
     android:layout_height="match_parent"
     android:background="@color/textVsPrimary">
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <android.support.v7.widget.Toolbar
+        <androidx.appcompat.widget.Toolbar
             android:id="@+id/editProfileToolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -33,7 +33,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/editProfileToolbar"
             app:layout_constraintWidth_percent="0.7"
-            tools:text="aaron" />
+            tools:text="aaron"/>
 
         <TextView
             android:id="@+id/newNameTitle"
@@ -132,5 +132,5 @@
             app:layout_constraintTop_toBottomOf="@+id/saveButton"
             app:layout_constraintWidth_percent="0.6" />
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

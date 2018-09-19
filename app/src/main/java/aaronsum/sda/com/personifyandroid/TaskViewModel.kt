@@ -1,8 +1,8 @@
 package aaronsum.sda.com.personifyandroid
 
 import android.app.Application
-import android.arch.lifecycle.AndroidViewModel
-import android.arch.lifecycle.LiveData
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
 
 class TaskViewModel(application: Application) : AndroidViewModel(application) {
     private val repository = TaskRepository()

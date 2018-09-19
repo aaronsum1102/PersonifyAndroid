@@ -1,21 +1,19 @@
 package aaronsum.sda.com.personifyandroid
 
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
@@ -27,7 +25,7 @@ interface OnTaskClickListener {
     fun onTaskClick(task: Task, taskId: String)
 }
 
-class TaskListFragment : Fragment(), OnTaskClickListener, Target {
+class TaskListFragment : androidx.fragment.app.Fragment(), OnTaskClickListener, Target {
     companion object {
         const val KEY_TASK_ID = "task id"
         const val TASK_LIST_BACK_STACK = "taskList"
@@ -50,6 +48,9 @@ class TaskListFragment : Fragment(), OnTaskClickListener, Target {
         val viewModel = ViewModelProviders.of(activity!!)[TaskViewModel::class.java]
         val userStatisticViewModel = ViewModelProviders.of(activity!!)[UserStatisticViewModel::class.java]
         val photoViewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
+
+        val notificationViewModel = ViewModelProviders.of(activity!!)[NotificationViewModel::class.java]
+        notificationViewModel.applyNotification()
 
         photoViewModel.profilePhotoMetadata.observe(this, Observer { picMetadata ->
             picMetadata?.let {
@@ -161,7 +162,7 @@ class TaskListFragment : Fragment(), OnTaskClickListener, Target {
     }
 }
 
-class TaskViewAdaptor(private val taskClickListener: OnTaskClickListener) : RecyclerView.Adapter<TaskViewHolder>() {
+class TaskViewAdaptor(private val taskClickListener: OnTaskClickListener) : androidx.recyclerview.widget.RecyclerView.Adapter<TaskViewHolder>() {
     var tasks: List<Pair<String, Task>> = listOf()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
@@ -176,7 +177,7 @@ class TaskViewAdaptor(private val taskClickListener: OnTaskClickListener) : Recy
     }
 }
 
-class TaskViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+class TaskViewHolder(itemView: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
     fun bind(pair: Pair<String, Task>, taskClickListener: OnTaskClickListener) {
         val task = pair.second
         itemView.findViewById<TextView>(R.id.taskName).text = task.name

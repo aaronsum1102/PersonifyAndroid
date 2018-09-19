@@ -1,9 +1,9 @@
 package aaronsum.sda.com.personifyandroid
 
 import android.app.DatePickerDialog
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -15,7 +15,7 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.android.synthetic.main.fragment_task_form.*
 import java.util.*
 
-class TaskFormFragment : Fragment() {
+class TaskFormFragment : androidx.fragment.app.Fragment() {
     private var existingTask: Task? = null
     private lateinit var status: String
     private lateinit var priority: String
@@ -130,7 +130,7 @@ class TaskFormFragment : Fragment() {
                     existingTask = it
                     taskNameText.setText(it.name)
                     dueDate.text = it.dueDate
-                    val statusArrayAdapter: ArrayAdapter<String> = statusSpinner.adapter as ArrayAdapter<String>
+                    val statusArrayAdapter = statusSpinner.adapter as ArrayAdapter<String>
                     statusSpinner.setSelection(statusArrayAdapter.getPosition(it.status))
                     val priorityArrayAdapter = prioritySpinner.adapter as ArrayAdapter<String>
                     prioritySpinner.setSelection(priorityArrayAdapter.getPosition(it.priority))

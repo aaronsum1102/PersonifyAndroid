@@ -1,6 +1,6 @@
 package aaronsum.sda.com.personifyandroid
 
-import android.arch.lifecycle.MutableLiveData
+import androidx.lifecycle.MutableLiveData
 import android.net.Uri
 import com.crashlytics.android.Crashlytics
 import com.google.firebase.firestore.DocumentReference

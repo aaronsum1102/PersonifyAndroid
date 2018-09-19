@@ -90,4 +90,11 @@
     <string name="permission_dialog_content">Permission to read your phone storage is required for choosing and displaying your profile picture.</string>
     <string name="permission_toast">Please enable permission to access you device storage.</string>
     <string name="change_consent_for_data_collection">Revoke consent</string>
+    <string name="reminder">Reminder</string>
+    <string name="channelDescription">Notify user the number of tasks due soon.</string>
+    <string name="tasksDueSoon">Tasks due soon</string>
+    <plurals name="numberOfTasksDueSoon">
+        <item quantity="one">You have %d task due in % days. Hurry up and finish it.</item>
+        <item quantity="other">You have %d tasks due in % days. Hurry up and finish it.</item>
+    </plurals>
 </resources>

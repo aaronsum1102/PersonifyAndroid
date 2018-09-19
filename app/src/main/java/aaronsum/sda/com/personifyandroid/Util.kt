@@ -10,14 +10,12 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.MediaStore
-import android.support.media.ExifInterface
-import android.support.v4.app.ActivityCompat
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentActivity
-import android.support.v4.content.ContextCompat
-import android.support.v4.content.FileProvider
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
+import androidx.exifinterface.media.ExifInterface
 import com.crashlytics.android.Crashlytics
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.squareup.picasso.Callback
@@ -37,12 +35,12 @@ object Util {
             .build()
     const val PERMISSION_REQUEST_CODE = 100
 
-    fun hideSoftKeyboard(activity: FragmentActivity?, view: View) {
+    fun hideSoftKeyboard(activity: androidx.fragment.app.FragmentActivity?, view: View) {
         val inputMethodManager = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.hideSoftInputFromWindow(view.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
     }
 
-    fun chooseImage(fragment: Fragment) {
+    fun chooseImage(fragment: androidx.fragment.app.Fragment) {
         val context = fragment.context
         context?.let {
             val intent = Intent(Intent.ACTION_PICK)
@@ -115,8 +113,8 @@ object Util {
         var rotation: String? = null
         if (uri != null && context != null) {
             val inputStream = context.contentResolver.openInputStream(uri)
-            val exifInterface = ExifInterface(inputStream)
-            rotation = exifInterface.getAttribute(ExifInterface.TAG_ORIENTATION)
+            val exifInterface = androidx.exifinterface.media.ExifInterface(inputStream)
+            rotation = exifInterface.getAttribute(androidx.exifinterface.media.ExifInterface.TAG_ORIENTATION)
         }
         return rotation
     }
@@ -143,21 +141,34 @@ object Util {
                 try {
                     val orientation = picMetadataMetaData.orientation.toInt()
                     when (orientation) {
-                        ExifInterface.ORIENTATION_ROTATE_90 -> {
-                            requestCreator.rotate(90f).centerCrop().resize(600, 600).into(target)
+                        androidx.exifinterface.media.ExifInterface.ORIENTATION_ROTATE_90 -> {
+                            requestCreator.rotate(90f)
+                                    .centerCrop()
+                                    .resize(600, 600)
+                                    .into(target)
                         }
-                        ExifInterface.ORIENTATION_ROTATE_180 -> {
-                            requestCreator.rotate(180f).centerCrop().resize(600, 600).into(target)
+                        androidx.exifinterface.media.ExifInterface.ORIENTATION_ROTATE_180 -> {
+                            requestCreator.rotate(180f)
+                                    .centerCrop()
+                                    .resize(600, 600)
+                                    .into(target)
                         }
-                        ExifInterface.ORIENTATION_ROTATE_270 -> {
-                            requestCreator.rotate(270f).centerCrop().resize(600, 600).into(target)
+                        androidx.exifinterface.media.ExifInterface.ORIENTATION_ROTATE_270 -> {
+                            requestCreator.rotate(270f)
+                                    .centerCrop()
+                                    .resize(600, 600)
+                                    .into(target)
                         }
                         else -> {
-                            requestCreator.centerCrop().resize(600, 600).into(target)
+                            requestCreator.centerCrop()
+                                    .resize(600, 600)
+                                    .into(target)
                         }
                     }
                 } catch (exception: NumberFormatException) {
                     Crashlytics.logException(exception)
+                    Crashlytics.log("something wrong with orientation of the photo. \nOrientation: " +
+                            "${picMetadataMetaData.orientation} \nUrl: ${picMetadataMetaData.url} ")
                 }
             }
 
@@ -165,7 +176,7 @@ object Util {
         })
     }
 
-    fun checkForPermission(fragment: Fragment) {
+    fun checkForPermission(fragment: androidx.fragment.app.Fragment) {
         val context = fragment.context
         val permissionRequired = Manifest.permission.READ_EXTERNAL_STORAGE
         context?.let {

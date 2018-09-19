@@ -1,6 +1,6 @@
 package aaronsum.sda.com.personifyandroid
 
-import android.arch.lifecycle.MutableLiveData
+import androidx.lifecycle.MutableLiveData
 import com.crashlytics.android.Crashlytics
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
