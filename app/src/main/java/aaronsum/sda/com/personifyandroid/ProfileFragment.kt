@@ -208,7 +208,7 @@ class ProfileFragment : Fragment(), Target {
         if (this::user.isInitialized) {
             photoViewModel.uploadPhoto(internalUri)
                     ?.continueWith {
-                        it.result.storage.downloadUrl.addOnSuccessListener { url ->
+                        it.result?.storage?.downloadUrl?.addOnSuccessListener { url ->
                             photoViewModel.writeUserProfilePictureURL(PicMetadata(url.toString(), orientation))
                         }
                     }

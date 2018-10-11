@@ -41,7 +41,7 @@
             android:resource="@array/preloaded_fonts" />
         <meta-data
             android:name="io.fabric.ApiKey"
-            android:value="14a7e3b71a3e6ba3e582dba5dc79ee08fb542750" />
+            android:value="@string/fabric_key" />
         <!--Set developer defined notification channel-->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
@@ -50,11 +50,14 @@
         <!--Set default notification icon-->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="@mipmap/ic_stat_p" />
+            android:resource="@mipmap/ic_launcher" />
         <!--Set default color-->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/primaryColor" />
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="@string/adMob_app_id"/>
     </application>
 
 </manifest>

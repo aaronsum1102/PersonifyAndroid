@@ -49,8 +49,9 @@ class TaskListFragment : androidx.fragment.app.Fragment(), OnTaskClickListener, 
         val userStatisticViewModel = ViewModelProviders.of(activity!!)[UserStatisticViewModel::class.java]
         val photoViewModel = ViewModelProviders.of(activity!!)[PhotoViewModel::class.java]
 
-        val notificationViewModel = ViewModelProviders.of(activity!!)[NotificationViewModel::class.java]
-        notificationViewModel.applyNotification()
+        // TODO
+        //val notificationViewModel = ViewModelProviders.of(activity!!)[NotificationViewModel::class.java]
+        //notificationViewModel.applyNotification()
 
         photoViewModel.profilePhotoMetadata.observe(this, Observer { picMetadata ->
             picMetadata?.let {

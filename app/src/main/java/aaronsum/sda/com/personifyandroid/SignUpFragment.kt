@@ -109,7 +109,7 @@ class SignUpFragment : androidx.fragment.app.Fragment(), TextWatcher, Target {
             internalUri?.let {
                 photoViewModel.uploadPhoto(internalUri)
                         ?.continueWith {
-                            it.result.storage.downloadUrl.addOnSuccessListener { url ->
+                            it.result?.storage?.downloadUrl?.addOnSuccessListener { url ->
                                 picOrientation?.let {
                                     photoViewModel.writeUserProfilePictureURL(PicMetadata(
                                             url.toString(),

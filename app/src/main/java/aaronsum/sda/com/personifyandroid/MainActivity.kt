@@ -10,7 +10,8 @@ import io.fabric.sdk.android.Fabric
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        NotificationHelper.createNotificationChannel(this, applicationContext.packageName)
+        //TODO
+        //NotificationHelper.createNotificationChannel(this, applicationContext.packageName)
         val crashlytics = Crashlytics.Builder()
                 .core(CrashlyticsCore.Builder()
                         .disabled(BuildConfig.DEBUG)
